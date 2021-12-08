@@ -8,6 +8,7 @@ use \mywishlist\exceptions\{ExceptionHandler, ForbiddenException};
 use Slim\{App, Container};
 
 #Container
+//TODO REMOVE DISPLAY_ERROR_DETAILS
 $container = new Container(['settings' => ['displayErrorDetails' => true]]);
 $container['notFoundHandler'] = function () {
     return function ($request, $response) {
@@ -64,7 +65,6 @@ $app->get('/', function ($request, $response, $args) {
 });
 
 $app->run();
-
 
 function genererHeader($title, $styles){
     $html = <<<EOD
