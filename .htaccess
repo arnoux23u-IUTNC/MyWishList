@@ -1,0 +1,25 @@
+ErrorDocument 500 /errors/500.html
+ErrorDocument 404 /errors/404.html
+
+Options -Indexes
+DirectoryIndex public/index.php
+
+RewriteEngine On
+#
+# RewriteBase indispensable sur webetu :
+
+#RewriteBase /www/username0/mywishlist
+
+
+#
+# Pour interdire l'accès aux répertoires contenant du code
+RewriteRule ^sql(/.*|)$ - [NC,F]
+RewriteRule ^src(/.*|)$ - [NC,F]
+RewriteRule ^vendor(/.*|)$ - [NC,F]
+
+#
+# réécriture pour slim
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ public/index.php [QSA,L]
