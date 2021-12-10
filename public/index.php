@@ -4,7 +4,7 @@ require_once __DIR__.'\..\src\vendor\autoload.php';
 
 use \mywishlist\bd\Eloquent as Eloquent;
 use \mywishlist\mvc\controllers\{ControllerList, ControllerItem};
-use \mywishlist\exceptions\{ExceptionHandler, ForbiddenException};
+use \mywishlist\exceptions\{ExceptionHandler, ForbiddenException, CookieNotSetException};
 use Slim\{App, Container};
 
 #Container
@@ -30,11 +30,11 @@ $app = new App($container);
 #Modifications temporaires de variables
 $app->get('/participant', function ($request, $response, $args) {
     setcookie("typeUser", 'participant', time()+3600);  /* expire dans 1 heure */
-    return $response->write("<h1>Participant</h1>");
+    return $response->write("<h1>Participant</h1><a href='/'>Retour</a>");
 });
 $app->get('/createur', function ($request, $response, $args) {
     setcookie("typeUser", 'createur', time()+3600);  /* expire dans 1 heure */
-    return $response->write("<h1>Createur</h1>");
+    return $response->write("<h1>Createur</h1> <a href='/'>Retour</a>");
 });
 
 #On redirige tout le traffic de /lists vers le ControllerList
@@ -51,8 +51,8 @@ $app->post("/items[/{path:.*}]", function ($request, $response, $args) use ($con
 
 $app->get('/', function ($request, $response, $args) {
     //TODO REMOVE
-    if(!isset($_COOKIE["typeUser"]) || empty($_COOKIE["typeUser"])){
-        return $response->write("<h1>Veuillez choisir votre type d'utilisateur</h1>");
+    if(empty($request->getCookieParam('typeUser'))){
+        throw new CookieNotSetException();
     }
     $html = genererHeader("MyWishList",["style.css"]) . <<<EOD
     <body>
