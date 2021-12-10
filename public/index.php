@@ -15,6 +15,11 @@ $container['notFoundHandler'] = function () {
         return $response->withStatus(404)->write(file_get_contents('..\errors\404.html'));
     };
 };
+$container['notAllowedHandler'] = function () {
+    return function ($request, $response) {
+        return $response->withStatus(405)->write(file_get_contents('..\errors\405.html'));
+    };
+};
 $container['errorHandler'] = function ($c) {
     return new ExceptionHandler();
 };
@@ -38,17 +43,11 @@ $app->get('/createur', function ($request, $response, $args) {
 });
 
 #On redirige tout le traffic de /lists vers le ControllerList
-$app->get("/lists[/{path:.*}]", function ($request, $response, $args) use ($controllerList) {
+$app->any("/lists[/{path:.*}]", function ($request, $response, $args) use ($controllerList) {
     return $controllerList->process($request, $response, $args);
 });
-$app->post("/lists[/{path:.*}]", function ($request, $response, $args) {
-    throw new ForbiddenException("Accès Interdit","Vous n'avez pas l'autorisation d'accéder à cette page");
-});
 #On redirige tout le traffic de /items vers le ControllerItem
-$app->get("/items[/{path:.*}]", function ($request, $response, $args) {
-    throw new ForbiddenException("Accès Interdit","Vous n'avez pas l'autorisation d'accéder à cette page");
-});
-$app->post("/items[/{path:.*}]", function ($request, $response, $args) use ($controllerItem) {
+$app->any("/items[/{path:.*}]", function ($request, $response, $args) use ($controllerItem) {
     return $controllerItem->process($request, $response, $args);
 });
 

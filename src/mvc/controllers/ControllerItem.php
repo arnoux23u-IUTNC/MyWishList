@@ -2,19 +2,35 @@
 
 namespace mywishlist\mvc\controllers;
 
-use Slim\Exception\NotFoundException;
+use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use \mywishlist\mvc\Renderer;
 use \mywishlist\mvc\views\ItemView;
 use \mywishlist\mvc\models\{Item, Liste};
 use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
 
+use function Symfony\Component\Translation\t;
+
 class ControllerItem{
 
-    function process($rq, $rs, $args){
+    function process($request, $response, $args){
+        switch($request->getMethod()){
+            case 'POST':
+                $this->post($request, $response, $args);
+                break;
+            default:
+                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
+        }
+    }
+
+    private function get($rq, $rs, $args){
+        throw new NotFoundException($rq, $rs);
+    }
+
+    private function post($rq, $rs, $args){
         #Récuperation des parametres
         //$token = $rq->getQueryParam('token');
         $body = filter_var($rq->getParsedBody(), FILTER_SANITIZE_STRING);
-        $item_id = filter_var($args["path"], FILTER_SANITIZE_STRING) ?? "/";
+        $item_id = filter_var($args["path"] ?? "/", FILTER_SANITIZE_STRING);
 
         #Si on a un entier derrière le /item/
         if(preg_match("/^\d+(\/?)$/", $item_id)){

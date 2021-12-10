@@ -2,7 +2,7 @@
 
 namespace mywishlist\mvc\controllers;
 
-use Slim\Exception\NotFoundException;
+use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use \mywishlist\mvc\Renderer;
 use \mywishlist\mvc\views\ListView;
 use \mywishlist\mvc\models\Liste;
@@ -10,10 +10,20 @@ use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
 
 class ControllerList{
 
-    function process($rq, $rs, $args){
+    function process($request, $response, $args){
+        switch($request->getMethod()){
+            case 'GET':
+                $this->get($request, $response, $args);
+                break;
+            default:
+                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
+        }
+    }
+
+    private function get($rq, $rs, $args){
         #Récuperation des parametres
         $token = filter_var($rq->getQueryParam('token'), FILTER_SANITIZE_STRING);
-        $list_id = filter_var($args["path"], FILTER_SANITIZE_STRING) ?? "/";
+        $list_id = filter_var($args["path"] ?? "/", FILTER_SANITIZE_STRING);
         #Si on a un entier derrière le /list/
         if(preg_match("/^\d+(\/?)$/", $list_id)){
             #On récupère la liste | utilisation de where plutot que find pour que 01 ne soit pas transformé en 1
@@ -43,4 +53,7 @@ class ControllerList{
         }
     }
 
+    private function post($rq, $rs, $args){
+        throw new NotFoundException($rq, $rs);
+    }
 }
