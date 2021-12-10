@@ -24,7 +24,7 @@ class ItemView
         $reserved = Reserved::find($i->id);
         $l = $i->liste ?? null;
         if(!empty($reserved))
-            if($l->isExpired() || $this->userMode == "participant")
+            if(($l->isExpired() || $this->userMode == "participant") && !empty($reserved->user_id))
                 $reservation_state = "Réservé par $reserved->user_id";
             else
                 $reservation_state = "Item reservé";

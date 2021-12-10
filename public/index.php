@@ -41,8 +41,11 @@ $app->get('/createur', function ($request, $response, $args) {
 $app->get("/lists[/{path:.*}]", function ($request, $response, $args) use ($controllerList) {
     return $controllerList->process($request, $response, $args);
 });
+$app->post("/lists[/{path:.*}]", function ($request, $response, $args) {
+    throw new ForbiddenException("Accès Interdit","Vous n'avez pas l'autorisation d'accéder à cette page");
+});
 #On redirige tout le traffic de /items vers le ControllerItem
-$app->get("/items[/{path:.*}]", function ($request, $response, $args) use ($controllerItem) {
+$app->get("/items[/{path:.*}]", function ($request, $response, $args) {
     throw new ForbiddenException("Accès Interdit","Vous n'avez pas l'autorisation d'accéder à cette page");
 });
 $app->post("/items[/{path:.*}]", function ($request, $response, $args) use ($controllerItem) {
