@@ -126,7 +126,7 @@ h4 {
 }
 
 .box {
-    width: 300px;
+    width: 600px;
     border-bottom: 20px solid #03a9f4;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -210,4 +210,14 @@ h4 {
     font: inherit;
     cursor: pointer;
     outline: inherit;
+}
+
+.reservation_state {
+    display: flex;
+    margin: auto;
+    align-items: center;
+}
+
+.reservation_state p {
+    color: black;
 }
