@@ -17,4 +17,9 @@ class Item extends Model
         return $this->belongsTo('\mywishlist\mvc\models\List', 'liste_id');
     }
 
+    public function getReservedState()
+    {
+        return $this->belongsTo('\mywishlist\mvc\models\Reserved', 'item_id');
+    }
+
 }
