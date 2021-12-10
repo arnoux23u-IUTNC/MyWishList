@@ -4,7 +4,7 @@ namespace mywishlist\mvc\models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class List extends Model
+class Liste extends Model
 {
     protected $table = 'liste';
     protected $primaryKey = 'no';
@@ -19,10 +19,9 @@ class List extends Model
         return $this->hasMany('\mywishlist\mvc\models\Item', 'liste_id');
     }
 
-    public function isProtected()
+    public function isExpired()
     {
-        return !empty($this->token);
+        return $this->expiration <= date('Y-m-d');
     }
-
 
 }
