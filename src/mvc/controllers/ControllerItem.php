@@ -13,9 +13,8 @@ class ControllerItem{
     function process($rq, $rs, $args){
         #Récuperation des parametres
         //$token = $rq->getQueryParam('token');
-        $body = $rq->getParsedBody();
-
-        $item_id = $args["path"] ?? "/";
+        $body = filter_var($rq->getParsedBody(), FILTER_SANITIZE_STRING);
+        $item_id = filter_var($args["path"], FILTER_SANITIZE_STRING) ?? "/";
 
         #Si on a un entier derrière le /item/
         if(preg_match("/^\d+(\/?)$/", $item_id)){
@@ -23,7 +22,7 @@ class ControllerItem{
             On récupère l'item | utilisation de where plutot que find pour que 01 ne soit pas transformé en 1
             Récupération de la liste associée
             */
-            $item = Item::where("id","LIKE",str_replace("/","",$item_id))->first();
+            $item = Item::where("id","LIKE",filter_var($item_id, FILTER_SANITIZE_NUMBER_INT))->first();
             $liste = $item->liste->whereNo($body['liste_id'] ?? "")->first() ?? null;
             /*
             Si la liste a un token, on verifie celui saisi par l'utilisateur

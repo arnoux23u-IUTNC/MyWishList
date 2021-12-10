@@ -12,12 +12,12 @@ class ControllerList{
 
     function process($rq, $rs, $args){
         #Récuperation des parametres
-        $token = $rq->getQueryParam('token');
-        $list_id = $args["path"] ?? "/";
+        $token = filter_var($rq->getQueryParam('token'), FILTER_SANITIZE_STRING);
+        $list_id = filter_var($args["path"], FILTER_SANITIZE_STRING) ?? "/";
         #Si on a un entier derrière le /list/
         if(preg_match("/^\d+(\/?)$/", $list_id)){
             #On récupère la liste | utilisation de where plutot que find pour que 01 ne soit pas transformé en 1
-            $liste = Liste::where("no","LIKE",str_replace("/","",$list_id))->first();
+            $liste = Liste::where("no","LIKE",filter_var($list_id, FILTER_SANITIZE_NUMBER_INT))->first();
             /*
             Si la liste a un token, on verifie celui saisi par l'utilisateur
             Si il n'en saisi pas ou que le token est incorrect alors on renvoie une erreur 403
@@ -29,7 +29,7 @@ class ControllerList{
             }
             if(!in_array($rq->getCookieParam('typeUser'), ['createur', 'participant']))
                 throw new CookieNotSetException();
-            $renderer = new ListView($liste, $rq->getCookieParam('typeUser'), $token);
+            $renderer = new ListView($liste, $rq->getCookieParam('typeUser'), $token ?? "");
             return $rs->write($renderer->render(Renderer::SHOW));
         }
             //return $rs->write(ListView::afficherListe($list_id, $token));
