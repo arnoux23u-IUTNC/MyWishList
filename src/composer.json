@@ -4,7 +4,8 @@
     "require": {
         "illuminate/database": "^8.74.0",
         "slim/slim": "3.*",
-        "php": "^8.0.0"
+        "php": "^8.0.0",
+        "tokenly/token-generator": "^1.0"
     },
     "autoload": {
         "psr-4": {

@@ -19,10 +19,6 @@ $container['errorHandler'] = function ($c) {
     return new ExceptionHandler();
 };
 
-#Controllers
-$controllerList = new ControllerList();
-$controllerItem = new ControllerItem();
-
 #Launch
 Eloquent::start('..\src\conf\conf.ini');
 $app = new App($container);
@@ -38,19 +34,19 @@ $app->get('/createur', function ($request, $response, $args) {
 });
 
 #On redirige tout le traffic de /lists vers le ControllerList
-$app->get("/lists[/{path:.*}]", function ($request, $response, $args) use ($controllerList) {
-    return $controllerList->process($request, $response, $args);
-});
-$app->post("/lists[/{path:.*}]", function ($request, $response, $args) {
-    throw new ForbiddenException("Accès Interdit","Vous n'avez pas l'autorisation d'accéder à cette page");
-});
+$app->any("/lists[/{path:.*}]", function ($request, $response, $args) {
+    return (new ControllerList($this))->process($request, $response, $args);
+})->setName('lists');
 #On redirige tout le traffic de /items vers le ControllerItem
-$app->get("/items[/{path:.*}]", function ($request, $response, $args) {
-    throw new ForbiddenException("Accès Interdit","Vous n'avez pas l'autorisation d'accéder à cette page");
-});
-$app->post("/items[/{path:.*}]", function ($request, $response, $args) use ($controllerItem) {
-    return $controllerItem->process($request, $response, $args);
-});
+$app->any("/items[/{path:.*}]", function ($request, $response, $args) {
+    return (new ControllerItem($this))->process($request, $response, $args);
+})->setName('items');
+
+
+$app->post("/coucou", function ($request, $response, $args) {
+    return $response->write("<h1>Coucou</h1>");
+})->setName('routecoucou');
+
 
 $app->get('/', function ($request, $response, $args) {
     //TODO REMOVE
