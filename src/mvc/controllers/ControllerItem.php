@@ -5,12 +5,16 @@ namespace mywishlist\mvc\controllers;
 use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use \mywishlist\mvc\Renderer;
 use \mywishlist\mvc\views\ItemView;
-use \mywishlist\mvc\models\{Item, Liste};
+use \mywishlist\mvc\models\Item;
 use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
 
-use function Symfony\Component\Translation\t;
-
 class ControllerItem{
+
+    private $app;
+
+    public function __construct($app){
+        $this->app = $app;
+    }
 
     function process($request, $response, $args){
         switch($request->getMethod()){
@@ -28,7 +32,6 @@ class ControllerItem{
 
     private function post($rq, $rs, $args){
         #Récuperation des parametres
-        //$token = $rq->getQueryParam('token');
         $body = filter_var($rq->getParsedBody(), FILTER_SANITIZE_STRING);
         $item_id = filter_var($args["path"] ?? "/", FILTER_SANITIZE_STRING);
 
@@ -41,11 +44,11 @@ class ControllerItem{
             $item = Item::where("id","LIKE",filter_var($item_id, FILTER_SANITIZE_NUMBER_INT))->first();
             $liste = $item->liste->whereNo($body['liste_id'] ?? "")->first() ?? null;
             /*
-            Si la liste a un token, on verifie celui saisi par l'utilisateur
+            Si la liste a un token de visibilite, on verifie celui saisi par l'utilisateur
             Si il n'en saisi pas ou que le token est incorrect alors on renvoie une erreur 403
             */ 
-            if(!empty($liste->token))
-                $liste = $liste->whereToken($body['token'] ?? "")->first();
+            if(!empty($liste->public_key))
+                $liste = $liste->where("public_key", $body['public_key'] ?? "")->first();
             if (empty($liste))
                 throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
             if(!in_array($rq->getCookieParam('typeUser'), ['createur', 'participant']))

@@ -24,10 +24,6 @@ $container['errorHandler'] = function ($c) {
     return new ExceptionHandler();
 };
 
-#Controllers
-$controllerList = new ControllerList();
-$controllerItem = new ControllerItem();
-
 #Launch
 Eloquent::start('..\src\conf\conf.ini');
 $app = new App($container);
@@ -43,13 +39,13 @@ $app->get('/createur', function ($request, $response, $args) {
 });
 
 #On redirige tout le traffic de /lists vers le ControllerList
-$app->any("/lists[/{path:.*}]", function ($request, $response, $args) use ($controllerList) {
-    return $controllerList->process($request, $response, $args);
-});
+$app->any("/lists[/{path:.*}]", function ($request, $response, $args) {
+    return (new ControllerList($this))->process($request, $response, $args);
+})->setName('lists');
 #On redirige tout le traffic de /items vers le ControllerItem
-$app->any("/items[/{path:.*}]", function ($request, $response, $args) use ($controllerItem) {
-    return $controllerItem->process($request, $response, $args);
-});
+$app->any("/items[/{path:.*}]", function ($request, $response, $args) {
+    return (new ControllerItem($this))->process($request, $response, $args);
+})->setName('items');
 
 $app->get('/', function ($request, $response, $args) {
     //TODO REMOVE
