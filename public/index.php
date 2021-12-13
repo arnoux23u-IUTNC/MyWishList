@@ -15,6 +15,11 @@ $container['notFoundHandler'] = function () {
         return $response->withStatus(404)->write(file_get_contents('..\errors\404.html'));
     };
 };
+$container['notAllowedHandler'] = function () {
+    return function ($request, $response) {
+        return $response->withStatus(405)->write(file_get_contents('..\errors\405.html'));
+    };
+};
 $container['errorHandler'] = function ($c) {
     return new ExceptionHandler();
 };
@@ -41,12 +46,6 @@ $app->any("/lists[/{path:.*}]", function ($request, $response, $args) {
 $app->any("/items[/{path:.*}]", function ($request, $response, $args) {
     return (new ControllerItem($this))->process($request, $response, $args);
 })->setName('items');
-
-
-$app->post("/coucou", function ($request, $response, $args) {
-    return $response->write("<h1>Coucou</h1>");
-})->setName('routecoucou');
-
 
 $app->get('/', function ($request, $response, $args) {
     //TODO REMOVE

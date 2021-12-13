@@ -33,7 +33,7 @@ class ControllerItem{
     private function post($rq, $rs, $args){
         #Récuperation des parametres
         $body = filter_var($rq->getParsedBody(), FILTER_SANITIZE_STRING);
-        $item_id = filter_var($args["path"], FILTER_SANITIZE_STRING) ?? "/";
+        $item_id = filter_var($args["path"] ?? "/", FILTER_SANITIZE_STRING);
 
         #Si on a un entier derrière le /item/
         if(preg_match("/^\d+(\/?)$/", $item_id)){
