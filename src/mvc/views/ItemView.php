@@ -2,18 +2,21 @@
 
 namespace mywishlist\mvc\views;
 
+use Slim\Container;
 use \mywishlist\mvc\models\{Item, Reserved};
 use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
-use mywishlist\mvc\Renderer;
+use \mywishlist\mvc\Renderer;
 
 class ItemView
 {
 
     private Item $item;
     private string $userMode;
+    private Container $container;	
 
-    public function __construct(Item $item, string $mode)
+    public function __construct(Container $c, Item $item, string $mode)
     {
+        $this->container = $c;
         $this->item = $item;
         $this->userMode = $mode;
     }
