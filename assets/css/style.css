@@ -81,6 +81,11 @@ span a:after {
     content: "Créer une liste";
 }
 
+#backBtn::before,
+#backBtn::after {
+    content: "Retour";
+}
+
 #lookBtn::before,
 #lookBtn::after {
     content: "Afficher les listes";
@@ -107,14 +112,21 @@ span a:hover {
     transform: translateZ(-25px) rotateX(-90deg);
 }
 
-.container_list {
+.container_error {
     display: flex;
     margin: auto;
     align-items: center;
+    flex-direction: column;
 }
 
 .forbidden {
     width: auto;
     height: 15vh;
     padding-right: 2vw;
+}
+
+.disabled {
+    pointer-events: none !important;
+    transition: 100s;
+    opacity: .5 !important;
 }
