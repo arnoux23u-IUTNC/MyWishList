@@ -3,6 +3,7 @@
 namespace mywishlist\mvc\controllers;
 
 use Slim\Exception\{NotFoundException, MethodNotAllowedException};
+use Slim\Container;
 use \Tokenly\TokenGenerator\TokenGenerator;
 use \mywishlist\mvc\Renderer;
 use \mywishlist\mvc\views\ListView;
@@ -11,73 +12,84 @@ use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
 
 class ControllerList{
 
-    private $container;
+    private Container $container;
 
-    public function __construct($c){
+    public function __construct(Container $c){
         $this->container = $c;
     }
 
-    function process($request, $response, $args){
-        $pathArgs = filter_var($args["path"] ?? "/", FILTER_SANITIZE_STRING);
+    public function edit($request, $response, $args){
         switch($request->getMethod()){
             case 'GET':
-                return $this->get($request, $response, $pathArgs);
-                break;
+                $liste = Liste::where("no","LIKE",filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+                if(empty($liste))
+                    throw new NotFoundException($request, $response);
+                $renderer = new ListView($this->container, $liste, $request);
+                return $response->write($renderer->render(Renderer::REQUEST_AUTH));
             case 'POST':
-                return $this->post($request, $response, $pathArgs);
-                break;
+                $liste = Liste::where("no", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+                $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
+                if(empty($liste) || !password_verify($private_key, $liste->private_key))
+                    throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
+                if(!empty($request->getParsedBodyParam('auth'))){
+                    $liste->update([
+                        'titre' => filter_var($request->getParsedBodyParam('titre'), FILTER_SANITIZE_STRING),
+                        'user_id' => filter_var($request->getParsedBodyParam('user'), FILTER_SANITIZE_STRING),
+                        'description' => filter_var($request->getParsedBodyParam('descr'), FILTER_SANITIZE_STRING),
+                        'expiration' => filter_var($request->getParsedBodyParam('exp'), FILTER_SANITIZE_STRING),
+                        'public_key' => filter_var($request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING)
+                    ]);
+                    return $response->withRedirect($this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key,"updated"=>"true"]));
+                }else{
+                    $renderer = new ListView($this->container, $liste, $request);	
+                    return $response->write($renderer->render(Renderer::EDIT));
+                }
             default:
                 throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
         }
     }
 
-    private function get($rq, $rs, $pathArgs){
-        #Récuperation des parametres
-        $public_key = filter_var($rq->getQueryParam('public_key'), FILTER_SANITIZE_STRING);
-        #Si on a un entier derrière le /list/
-        if(preg_match("/^\d+(\/?)$/", $pathArgs)){
-            #On récupère la liste | utilisation de where plutot que find pour que 01 ne soit pas transformé en 1
-            $liste = Liste::where("no","LIKE",filter_var($pathArgs, FILTER_SANITIZE_NUMBER_INT))->first();
-            /*
-            Si la liste a un token, on verifie celui saisi par l'utilisateur
-            Si il n'en saisi pas ou que le token est incorrect alors on renvoie une erreur 403
-            */ 
-            if(!empty($liste->public_key)){
-                $liste = Liste::whereNoAndPublicKey($liste->no,$public_key)->first();
-                if (is_null($liste) || empty($public_key))
-                    throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
-            }
-            if(!in_array($rq->getCookieParam('typeUser'), ['createur', 'participant']))
-                throw new CookieNotSetException();
-            $renderer = new ListView($liste, $rq, $public_key ?? "");
-            return $rs->write($renderer->render(Renderer::SHOW));
-        }
-        else
-            switch(str_replace([" ", "/"], "", $pathArgs)){
-                case "create":
-                    $renderer = new ListView();
-                    return $rs->write($renderer->render(Renderer::CREATE));
-                    break;
-                default:
-                    throw new NotFoundException($rq, $rs);
-        }
-    }
-
-    private function post($rq, $rs, $pathArgs){
-        switch(str_replace([" ", "/"], "", $pathArgs)){
-            case "create":
+    public function create($request, $response, $args){
+        switch($request->getMethod()){
+            case 'GET':
+                $renderer = new ListView($this->container);
+                return $response->write($renderer->render(Renderer::CREATE));
+            case 'POST':
                 $liste = new Liste();
-                $liste->titre = filter_var($rq->getParsedBodyParam('titre'), FILTER_SANITIZE_STRING);
-                $liste->description = filter_var($rq->getParsedBodyParam('description'), FILTER_SANITIZE_STRING) ?? NULL;
-                $liste->expiration = $rq->getParsedBodyParam('exp') !== "" ? filter_var($rq->getParsedBodyParam('exp'), FILTER_SANITIZE_STRING) : NULL;
-                $liste->public_key = (!empty($rq->getParsedBodyParam('public_key')) && trim($rq->getParsedBodyParam('public_key')) !== "") ? filter_var($rq->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) : NULL;
+                $liste->titre = filter_var($request->getParsedBodyParam('titre'), FILTER_SANITIZE_STRING);
+                $liste->description = filter_var($request->getParsedBodyParam('description'), FILTER_SANITIZE_STRING) ?? NULL;
+                $liste->expiration = $request->getParsedBodyParam('exp') !== "" ? filter_var($request->getParsedBodyParam('exp'), FILTER_SANITIZE_STRING) : NULL;
+                $liste->public_key = (!empty($request->getParsedBodyParam('public_key')) && trim($request->getParsedBodyParam('public_key')) !== "") ? filter_var($request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) : NULL;
                 $token = (new TokenGenerator())->generateToken(16);
                 $liste->private_key = password_hash($token, PASSWORD_DEFAULT);
                 $liste->save();
-                $path = $this->container->router->pathFor('lists',["path" => $liste->no."?public_key=$liste->public_key"]);
-                return $rs->write("<script type='text/javascript'>alert('Votre token de modification est $token');window.location.href='$path';</script>");
+                $path = $this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key]);
+                return $response->write("<script type='text/javascript'>alert('Votre token de modification est $token');window.location.href='$path';</script>");
             default:
-                throw new NotFoundException($rq, $rs);
+                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
         }
     }
+
+    public function show($request, $response, $args){
+        switch($request->getMethod()){
+            case 'GET':
+                $public_key = filter_var($request->getQueryParam('public_key'), FILTER_SANITIZE_STRING);
+                $liste = Liste::where("no","LIKE",filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+                /*
+                Si la liste a un token, on verifie celui saisi par l'utilisateur
+                Si il n'en saisi pas ou que le token est incorrect alors on renvoie une erreur 403
+                */ 
+                if(!empty($liste->public_key))
+                    $liste = Liste::whereNoAndPublicKey($liste->no,$public_key)->first();
+                if (empty($liste))
+                    throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
+                if(!in_array($request->getCookieParam('typeUser'), ['createur', 'participant']))
+                    throw new CookieNotSetException();
+                $renderer = new ListView($this->container, $liste, $request, $public_key ?? "");
+                return $response->write($renderer->render(Renderer::SHOW));
+            default:
+                throw new MethodNotAllowedException($request, $response, ['GET']);
+        }
+    }
+
 }
