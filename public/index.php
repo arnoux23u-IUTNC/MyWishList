@@ -20,7 +20,7 @@ $container['notAllowedHandler'] = function () {
         return $response->withStatus(405)->write(file_get_contents('..\errors\405.html'));
     };
 };
-$container['errorHandler'] = function ($c) {
+$container['errorHandler'] = function () {
     return new ExceptionHandler();
 };
 
@@ -30,37 +30,46 @@ $app = new App($container);
 
 #Modifications temporaires de variables
 $app->get('/participant', function ($request, $response, $args) {
-    setcookie("typeUser", 'participant', time()+3600);  /* expire dans 1 heure */
+    setcookie("typeUser", 'participant', time()+3600*24);  /* expire dans 1 heure */
     return $response->write("<h1>Participant</h1><a href='/'>Retour</a>");
 });
 $app->get('/createur', function ($request, $response, $args) {
-    setcookie("typeUser", 'createur', time()+3600);  /* expire dans 1 heure */
+    setcookie("typeUser", 'createur', time()+3600*24);  /* expire dans 1 heure */
     return $response->write("<h1>Createur</h1> <a href='/'>Retour</a>");
 });
 
-#On redirige tout le traffic de /lists vers le ControllerList
-$app->any("/lists[/{path:.*}]", function ($request, $response, $args) {
-    return (new ControllerList($this))->process($request, $response, $args);
-})->setName('lists');
-#On redirige tout le traffic de /items vers le ControllerItem
-$app->any("/items[/{path:.*}]", function ($request, $response, $args) {
-    return (new ControllerItem($this))->process($request, $response, $args);
-})->setName('items');
+
+
+#Redirection du traffic dans l'application
+$app->any("/lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
+    return (new ControllerList($this))->edit($request, $response, $args);
+})->setName('lists_edit_id');
+$app->any("/lists/new[/]", function ($request, $response, $args) {
+    return (new ControllerList($this))->create($request, $response, $args);
+})->setName('lists_create');
+$app->get("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
+    return (new ControllerList($this))->show($request, $response, $args);
+})->setName('lists_show_id');
+
+$app->post("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
+    return (new ControllerItem($this))->show($request, $response, $args);
+})->setName('items_show_id');
 
 $app->get('/', function ($request, $response, $args) {
     //TODO REMOVE
     if(empty($request->getCookieParam('typeUser'))){
         throw new CookieNotSetException();
     }
+    $routeCreate = $this->router->pathFor('lists_create');
     $html = genererHeader("MyWishList",["style.css"]) . <<<EOD
     <body>
         <h3>Bienvenue sur MyWishList</h3>
-        <span><a id="createBtn" href="/lists/create"></a></span>
-        <span><a id="lookBtn" href="/lists"></a></span>
+        <span><a id="createBtn" href="$routeCreate"></a></span>
+        <span><a class="disabled" id="lookBtn" href="#"></a></span>
     </body>
     EOD; 
     return $response->write($html);
-});
+})->setName('main');
 
 $app->run();
 
