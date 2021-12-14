@@ -9,6 +9,7 @@ class Liste extends Model
     protected $table = 'liste';
     protected $primaryKey = 'no';
     public $timestamps = false;
+    protected $fillable = ['titre', 'user_id', 'description', 'expiration', 'public_key'];
 
 
     public function items()
