@@ -22,7 +22,7 @@ class Liste extends Model
 
     public function isExpired()
     {
-        return $this->expiration <= date('Y-m-d');
+        return !empty($this->expiration) && $this->expiration <= date('Y-m-d');
     }
 
 }

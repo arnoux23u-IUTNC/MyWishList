@@ -17,6 +17,64 @@ class ControllerItem{
         $this->container = $c;
     }
 
+    public function edit($request, $response, $args){
+        switch($request->getMethod()){
+            case 'GET':
+                $item = Item::where("id","LIKE",filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+                if(empty($item))
+                    throw new NotFoundException($request, $response);
+                $renderer = new ItemView($this->container, $item, $request);
+                return $response->write($renderer->render(Renderer::REQUEST_AUTH));
+            case 'POST':
+                $item = Item::where("id","LIKE",filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+                $liste = $item->liste()->first();
+                $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
+                if(empty($item) || !password_verify($private_key, $liste->private_key))
+                    throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
+                if(!empty($request->getParsedBodyParam('auth'))){
+                    $item->update([
+                        'nom' => filter_var($request->getParsedBodyParam('item_name'), FILTER_SANITIZE_STRING),
+                        'descr' => filter_var($request->getParsedBodyParam('description'), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
+                        'tarif' => filter_var($request->getParsedBodyParam('price'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+                        'url' => filter_var($request->getParsedBodyParam('url'), FILTER_SANITIZE_URL),
+                    ]);
+                    return $response->withRedirect($this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key,"state"=>"modItem"]));
+                }else{
+                    $renderer = new ItemView($this->container, $item, $request);	
+                    return $response->write($renderer->render(Renderer::EDIT));
+                }
+            default:
+                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
+        }
+    }
+
+    public function delete($request, $response, $args){
+        $public_key = filter_var($request->getQueryParam('public_key'), FILTER_SANITIZE_STRING);
+        switch($request->getMethod()){
+            case 'GET':
+                $item = Item::where("id","LIKE",filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+                if(empty($item))
+                    throw new NotFoundException($request, $response);
+                $renderer = new ItemView($this->container, $item, $request, $public_key);
+                return $response->write($renderer->render(Renderer::PREVENT_DELETE));
+            case 'POST':
+                $item = Item::where("id","LIKE",filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+                $liste = $item->liste()->first();
+                $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
+                if(empty($item) || !password_verify($private_key, $liste->private_key))
+                    throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
+                if(!empty($request->getParsedBodyParam('auth'))){
+                    $item->delete();
+                    return $response->withRedirect($this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key,"state"=>"delItem"]));
+                }else{
+                    $renderer = new ItemView($this->container, $item, $request, $public_key);	
+                    return $response->write($renderer->render(Renderer::DELETE));
+                }
+            default:
+                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
+        }
+    }
+
     public function show($request, $response, $args){
         #Récuperation des parametres
         
