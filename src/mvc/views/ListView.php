@@ -29,9 +29,11 @@ class ListView
     {
         $l = $this->list;
         $routeAddItem = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
-        $dataHeader = match(filter_var($this->request->getQueryParam('updated'), FILTER_SANITIZE_STRING) ?? ""){
+        $dataHeader = match(filter_var($this->request->getQueryParam('state'), FILTER_SANITIZE_STRING) ?? ""){
             "update" => "<div class='popup'>La liste a été mise à jour.</div>",
-            "newItem" => "<div class='popup'>Nouvel item ajouté.</div>",
+            "newItem"  => "<div class='popup'>Nouvel item ajouté.</div>",
+            "modItem"  => "<div class='popup'>Item modifié.</div>",
+            "delItem"  => "<div class='popup warning'>Item supprimé.</div>",
             default => ""
         };        
         $html = genererHeader("Liste $l->no - MyWishList", ["list.css"]) . <<<EOD
@@ -49,23 +51,12 @@ class ListView
         foreach ($l->items as $pos => $item) {
             $pos++;
             $reserved = Reserved::find($item->id);
+            $routeModItem = $this->container->router->pathFor('items_edit_id',['id' => $item->id]);
+            $routeDelItem = $this->container->router->pathFor('items_delete_id',['id' => $item->id],["public_key" => $this->public_key]);
             $item_desc = "<span>$pos</span>$item->nom".(!empty($item->img) && file_exists(__DIR__."\..\..\..\assets\img\items\\$item->img") ? "<img class='list_item_img' alt='$item->nom' src='/assets/img/items/$item->img'>":'');
-            if($this->request->getCookieParam("typeUser") === 'participant')
-                if(!empty($reserved))
-                    $item_res = "<p>Réservé par $reserved->user_id -> $reserved->message</p>";
-                else
-                    if($l->isExpired())
-                        $item_res = "<p><i>Vous ne pouvez pas reserver cet item</i></p>";
-                    else
-                        $item_res = "<form method='post' action='#'>\n\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='Envoyer'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t</form>";
-            else
-                if(!empty($reserved))
-                    if($l->isExpired())
-                        $item_res = "<p>Réservé par $reserved->user_id -> $reserved->message</p>";
-                    else
-                        $item_res = "<p>Item reservé</p>";
-                else
-                    $item_res = "<p>Item non réservé</p>";
+            $item_res = ($this->request->getCookieParam("typeUser") === 'participant') ? (!empty($reserved) ? "<p>Réservé par $reserved->user_id -> $reserved->message</p>" : ($l->isExpired() ? "<p><i>Vous ne pouvez pas reserver cet item</i></p>" : "\n\t\t\t\t\t\t<form method='post' action='#'>\n\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='Réserver'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t</form>\n\t\t\t\t\t")) : (!empty($reserved) ? ($l->isExpired() ? "<p>Réservé par $reserved->user_id -> $reserved->message</p>" : "<p>Item reservé</p>") : "<p>Item non réservé</p>");
+            $item_mod = $this->request->getCookieParam("typeUser") === 'createur' && empty($reserved) ? "\n\t\t\t\t\t<div class='reservation_state'>\n\t\t\t\t\t\t<a href='$routeModItem'><img src='/assets/img/edit.png'/>\n\t\t\t\t\t</div>" : "";
+            $item_del = $this->request->getCookieParam("typeUser") === 'createur' && empty($reserved) ? "\n\t\t\t\t\t<div class='reservation_state'>\n\t\t\t\t\t\t<a href='$routeDelItem'><img src='/assets/img/del.png'/>\n\t\t\t\t\t</div>" : "";
             $routeItemShow = $this->container->router->pathFor("items_show_id", ["id" => $item->id]);
             $html .= <<<EOD
                     
@@ -74,8 +65,8 @@ class ListView
                                     <input type="hidden" name="public_key" value="$this->public_key" /> 
                                     <input type="hidden" name="liste_id" value="$l->no" /> 
                                     <a onclick="this.parentNode.submit();">$item_desc</a>
-                                </form>
-                                <div class="reservation_state">$item_res</div>
+                                </form>$item_mod
+                                <div class="reservation_state">$item_res</div>$item_del
                             </li>
             EOD;
         }
@@ -124,7 +115,7 @@ class ListView
                     <label for="url">URL</label>
                     <input type="url" name="url" id="url" />
                     <input type="hidden" name="auth" id="auth" value="$private_key"/>
-                    <button type="submit" name="sendBtn">Créer</button>            
+                    <button type="submit" name="sendBtn">Créer</button>
                 </form>
             <div>
         </body>
@@ -202,6 +193,8 @@ class ListView
                 return $this->edit();
             case Renderer::EDIT_ADD_ITEM:
                 return $this->addItem();
+            default:
+                throw new ForbiddenException("Vous n'avez pas accès à cette page");
         }
     }
 

@@ -57,6 +57,12 @@ $app->get("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
 /*$app->any("/items/new[/]", function ($request, $response, $args) {
     return (new ControllerItem($this))->create($request, $response, $args);
 })->setName('items_list_add');*/
+$app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
+    return (new ControllerItem($this))->delete($request, $response, $args);
+})->setName('items_delete_id');
+$app->any("/items/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
+    return (new ControllerItem($this))->edit($request, $response, $args);
+})->setName('items_edit_id');
 $app->post("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerItem($this))->show($request, $response, $args);
 })->setName('items_show_id');

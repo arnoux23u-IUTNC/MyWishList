@@ -9,5 +9,7 @@ abstract class Renderer{
     const EDIT = 2;
     const EDIT_ADD_ITEM = 22;
     const REQUEST_AUTH = 3;
+    const PREVENT_DELETE = 41;
+    const DELETE = 42;
 
 }
