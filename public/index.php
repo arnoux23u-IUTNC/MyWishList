@@ -41,6 +41,9 @@ $app->get('/createur', function ($request, $response, $args) {
 
 
 #Redirection du traffic dans l'application
+$app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
+    return (new ControllerList($this))->addItem($request, $response, $args);
+})->setName('lists_edit_items_id');
 $app->any("/lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
     return (new ControllerList($this))->edit($request, $response, $args);
 })->setName('lists_edit_id');
@@ -51,6 +54,9 @@ $app->get("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerList($this))->show($request, $response, $args);
 })->setName('lists_show_id');
 
+/*$app->any("/items/new[/]", function ($request, $response, $args) {
+    return (new ControllerItem($this))->create($request, $response, $args);
+})->setName('items_list_add');*/
 $app->post("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerItem($this))->show($request, $response, $args);
 })->setName('items_show_id');
