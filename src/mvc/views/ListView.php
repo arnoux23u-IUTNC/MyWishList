@@ -28,13 +28,19 @@ class ListView
     private function showList()
     {
         $l = $this->list;
-        $dataHeader = $this->request->getQueryParam('updated') === "true" ? "<div class='popup'>La liste a été mise à jour.</div>" : "";
+        $routeAddItem = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
+        $dataHeader = match(filter_var($this->request->getQueryParam('updated'), FILTER_SANITIZE_STRING) ?? ""){
+            "update" => "<div class='popup'>La liste a été mise à jour.</div>",
+            "newItem" => "<div class='popup'>Nouvel item ajouté.</div>",
+            default => ""
+        };        
         $html = genererHeader("Liste $l->no - MyWishList", ["list.css"]) . <<<EOD
         <body>
             <h2>$l->titre</h2>$dataHeader
             <p>Utilisateur associé : $l->user_id</p>
             <p>Description : $l->description</p>
             <p>Date d'expiration : $l->expiration</p>
+            <a href="$routeAddItem">Ajouter un item</a>
             <div class='items_list'>
                 <div class='box'>
                     <h2>Items de la liste $l->no</h2>
@@ -100,14 +106,51 @@ class ListView
         EOD;
     }
 
+    private function addItem(){
+        $l = $this->list;
+        $routeAddItem = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
+        $private_key = $this->request->getParsedBodyParam("private_key");
+        return genererHeader("Items | Liste $l->no", ["list.css"]). <<<EOD
+        <body>
+            <h2>Ajouter un item à la liste $l->no</h2>
+            <div>
+                <form class='form_container' method="post" action="$routeAddItem">
+                    <label for="item_name">Nom</label>
+                    <input type="text" name="item_name" id="titre" required autofocus />
+                    <label for="description">Description</label>
+                    <textarea name="description" id="description"/></textarea>
+                    <label for="price">Prix</label>
+                    <input type="number" min="0" step="0.01" name="price" id="price" />
+                    <label for="url">URL</label>
+                    <input type="url" name="url" id="url" />
+                    <input type="hidden" name="auth" id="auth" value="$private_key"/>
+                    <button type="submit" name="sendBtn">Créer</button>            
+                </form>
+            <div>
+        </body>
+        </html>
+        EOD;
+    }
+
     private function requestAuth(){
         $l = $this->list;
-        $routeListEdit = $this->container->router->pathFor('lists_edit_id',["id" => $l->no]);
+        $from = $this->request->getRequestTarget();
+        switch ($from) {
+            case (preg_match('/^\/lists\/[0-9]+\/edit\/items(\/?)/', $from) ? true : false) :
+                $from = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
+                break;
+            case (preg_match('/^\/lists\/[0-9]+\/edit(\/?)/', $from) ? true : false) :
+            $from = $this->container->router->pathFor('lists_edit_id',['id' => $l->no]);
+                break;
+            default: 
+                throw new ForbiddenException("Vous n'avez pas accès à cette page");
+                break;
+        }
         return genererHeader("Edition de liste - Authentification", ["list.css"]). <<<EOD
         <body>
             <h2>Edition de liste</h2>
             <div>
-                <form class='form_container' method="post" action="$routeListEdit">
+                <form class='form_container' method="post" action="$from">
                     <label for="private_key">Token de modification de la liste $l->no</label>
                     <input type="password" name="private_key" id="private_key" required />
                     <button type="submit" name="sendBtn">Créer</button>
@@ -133,7 +176,7 @@ class ListView
                     <label for="descr">Description</label>
                     <input type="text" name="descr" id="description" value="$l->description"/>
                     <label for="user">Utilisateur associé</label>
-                    <input type="text" name="user" id="user" value="$l->user_id"/>
+                    <input type="number" name="user" id="user" value="$l->user_id"/>
                     <label for="exp">Date d'expiration </label>
                     <input type="date" name="exp" id="expiration" value="$l->expiration"/>
                     <label for="public_key">Token d'accès public </label>
@@ -157,6 +200,8 @@ class ListView
                 return $this->requestAuth();
             case Renderer::EDIT:
                 return $this->edit();
+            case Renderer::EDIT_ADD_ITEM:
+                return $this->addItem();
         }
     }
 

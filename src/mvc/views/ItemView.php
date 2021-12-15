@@ -11,14 +11,14 @@ class ItemView
 {
 
     private Item $item;
-    private string $userMode;
+    private $request;
     private Container $container;	
 
-    public function __construct(Container $c, Item $item, string $mode)
+    public function __construct(Container $c, Item $item = NULL, $request = null)
     {
         $this->container = $c;
         $this->item = $item;
-        $this->userMode = $mode;
+        $this->request = $request;
     }
 
     private function showItem()
@@ -27,7 +27,7 @@ class ItemView
         $reserved = Reserved::find($i->id);
         $l = $i->liste ?? null;
         if(!empty($reserved))
-            if(($l->isExpired() || $this->userMode == "participant") && !empty($reserved->user_id))
+            if(($l->isExpired() || $this->request->getCookieParam('typeUser') == "participant") && !empty($reserved->user_id))
                 $reservation_state = "Réservé par $reserved->user_id";
             else
                 $reservation_state = "Item reservé";
