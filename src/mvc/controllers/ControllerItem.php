@@ -42,11 +42,22 @@ class ControllerItem{
                     throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
                 if(!in_array($request->getCookieParam('typeUser'), ['createur', 'participant']))
                     throw new CookieNotSetException();
-                $renderer = new ItemView($this->container, $item, $request->getCookieParam('typeUser'));
+                $renderer = new ItemView($this->container, $item, $request);
                 return $response->write($renderer->render(Renderer::SHOW));
             default:
                 throw new MethodNotAllowedException($request, $response, ['GET']);
         }
     }
+
+
+    /*public function create($request, $response, $args){
+        switch($request->getMethod()){
+            case 'GET':
+                $renderer = new ItemView($this->container);
+                return $response->write($renderer->render(Renderer::CREATE));
+            default:
+                throw new MethodNotAllowedException($request, $response, ['GET']);
+        }
+    }*/
 
 }

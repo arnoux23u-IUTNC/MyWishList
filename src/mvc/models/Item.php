@@ -9,6 +9,7 @@ class Item extends Model
     protected $table = 'item';
     protected $primaryKey = 'id';
     public $timestamps = false;
+    protected $fillable = ['liste_id', 'nom', 'descr', 'img', 'url', 'tarif'];
 
     public function liste()
     {
