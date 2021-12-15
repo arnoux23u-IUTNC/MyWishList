@@ -2,6 +2,7 @@
 
 namespace mywishlist\mvc\controllers;
 
+use Directory;
 use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use Slim\Container;
 use \mywishlist\mvc\Renderer;
@@ -16,8 +17,10 @@ class ControllerItem{
     public function __construct(Container $c){
         $this->container = $c;
     }
-
+    
     public function edit($request, $response, $args){
+        if($request->getCookieParam('typeUser') !== "createur")
+            throw new CookieNotSetException("Vous n'êtes pas connecté", "Vous devez être connecté pour accéder à cette ressource");
         switch($request->getMethod()){
             case 'GET':
                 $item = Item::where("id","LIKE",filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
@@ -31,14 +34,35 @@ class ControllerItem{
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
                 if(empty($item) || !password_verify($private_key, $liste->private_key))
                     throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
-                if(!empty($request->getParsedBodyParam('auth'))){
+                if(!empty($request->getParsedBodyParam('auth'))&& password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)){
+                    $file = $request->getUploadedFiles()['file_img'];
+                    print_r($file);
+                    if($request->getParsedBodyParam('type') === "upload" && !empty($file))
+                        if($file->getError() === UPLOAD_ERR_OK){
+                            $file_name = $file->getClientFilename();
+                            if( !in_array($file->getClientMediaType(), ['image/png', 'image/jpeg', 'image/jpg']))
+                                $info = "typeerr";
+                            if($file->getSize() > 10000000 || $file->getSize() < 2000)
+                                $info = "sizeerr";
+                            $tmp = $this->container['items_upload_dir'].DIRECTORY_SEPARATOR;
+                            if(!file_exists($tmp.$file_name)){
+                                if(is_writable($tmp)){
+                                    $file->moveTo($tmp.$file_name);
+                                    $info = "ok";
+                                }else
+                                    $info = "writeerr";
+                            }else
+                                $info = "fileexist";
+                        }else
+                            $info = "error";                    
                     $item->update([
                         'nom' => filter_var($request->getParsedBodyParam('item_name'), FILTER_SANITIZE_STRING),
                         'descr' => filter_var($request->getParsedBodyParam('description'), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
                         'tarif' => filter_var($request->getParsedBodyParam('price'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
                         'url' => filter_var($request->getParsedBodyParam('url'), FILTER_SANITIZE_URL),
+                        'img'=> $request->getParsedBodyParam('type') === "link" ? filter_var($request->getParsedBodyParam('url_img'), FILTER_SANITIZE_URL) : ($request->getParsedBodyParam('type') === "upload" ? ($info === "ok" ? $file_name : $item->img ): NULL)
                     ]);
-                    return $response->withRedirect($this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key,"state"=>"modItem"]));
+                    return $response->withRedirect($this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key,"state"=>"modItem","info"=>$info]));
                 }else{
                     $renderer = new ItemView($this->container, $item, $request);	
                     return $response->write($renderer->render(Renderer::EDIT));
@@ -49,6 +73,8 @@ class ControllerItem{
     }
 
     public function delete($request, $response, $args){
+        if($request->getCookieParam('typeUser') !== "createur")
+            throw new CookieNotSetException("Vous n'êtes pas connecté", "Vous devez être connecté pour accéder à cette ressource");
         $public_key = filter_var($request->getQueryParam('public_key'), FILTER_SANITIZE_STRING);
         switch($request->getMethod()){
             case 'GET':
@@ -63,7 +89,7 @@ class ControllerItem{
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
                 if(empty($item) || !password_verify($private_key, $liste->private_key))
                     throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
-                if(!empty($request->getParsedBodyParam('auth'))){
+                if(!empty($request->getParsedBodyParam('auth'))&& password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)){
                     $item->delete();
                     return $response->withRedirect($this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key,"state"=>"delItem"]));
                 }else{
