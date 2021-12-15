@@ -23,6 +23,7 @@ $container['notAllowedHandler'] = function () {
 $container['errorHandler'] = function () {
     return new ExceptionHandler();
 };
+$container['items_upload_dir'] = __DIR__.'\..\assets\img\items';
 
 #Launch
 Eloquent::start('..\src\conf\conf.ini');
@@ -93,6 +94,7 @@ function genererHeader($title, $styles){
         <meta charset='UTF-8'>
         <link rel="icon" href="/assets/img/icons/favicon.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
     EOD;
     $html .= "\n\t<title>$title</title>\n";

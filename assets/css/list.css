@@ -255,3 +255,7 @@ textarea {
 .popup.warning {
     background: #ec7063;
 }
+
+.invisible {
+    visibility: hidden;
+}
