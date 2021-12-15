@@ -29,16 +29,25 @@ class ListView
     {
         $l = $this->list;
         $routeAddItem = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
-        $dataHeader = match(filter_var($this->request->getQueryParam('state'), FILTER_SANITIZE_STRING) ?? ""){
+        $dataHeader = "\n\t".match(filter_var($this->request->getQueryParam('state'), FILTER_SANITIZE_STRING) ?? ""){
             "update" => "<div class='popup'>La liste a été mise à jour.</div>",
             "newItem"  => "<div class='popup'>Nouvel item ajouté.</div>",
             "modItem"  => "<div class='popup'>Item modifié.</div>",
             "delItem"  => "<div class='popup warning'>Item supprimé.</div>",
             default => ""
+        };    
+        $warnEdit = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
+            "ok" => "<div class='popup'>Image sauvegardée</div>",
+            "typeerr"  => "<div class='popup warning'>Type non supporté [png,jpg,jpeg]</div>",
+            "sizeerr"  => "<div class='popup warning'>Taille maximale : 10Mo</div>",
+            "writeerr"  => "<div class='popup warning'>Permission en écriture refusée</div>",
+            "fileexist"  => "<div class='popup warning'>Une image porte dejà ce nom</div>",
+            "error"  => "<div class='popup warning'>Une erreur est survenue pendant l'envoi de l'image</div>",
+            default => ""
         };        
         $html = genererHeader("Liste $l->no - MyWishList", ["list.css"]) . <<<EOD
         <body>
-            <h2>$l->titre</h2>$dataHeader
+            <h2>$l->titre</h2>$dataHeader$warnEdit
             <p>Utilisateur associé : $l->user_id</p>
             <p>Description : $l->description</p>
             <p>Date d'expiration : $l->expiration</p>
@@ -53,7 +62,7 @@ class ListView
             $reserved = Reserved::find($item->id);
             $routeModItem = $this->container->router->pathFor('items_edit_id',['id' => $item->id]);
             $routeDelItem = $this->container->router->pathFor('items_delete_id',['id' => $item->id],["public_key" => $this->public_key]);
-            $item_desc = "<span>$pos</span>$item->nom".(!empty($item->img) && file_exists(__DIR__."\..\..\..\assets\img\items\\$item->img") ? "<img class='list_item_img' alt='$item->nom' src='/assets/img/items/$item->img'>":'');
+            $item_desc = "<span>$pos</span>$item->nom".(!empty($item->img) ? (file_exists(__DIR__."\..\..\..\assets\img\items\\$item->img") ? "<img class='list_item_img' alt='$item->nom' src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/\.]+).(jpe?g|png))?$/",$item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")):"");
             $item_res = ($this->request->getCookieParam("typeUser") === 'participant') ? (!empty($reserved) ? "<p>Réservé par $reserved->user_id -> $reserved->message</p>" : ($l->isExpired() ? "<p><i>Vous ne pouvez pas reserver cet item</i></p>" : "\n\t\t\t\t\t\t<form method='post' action='#'>\n\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='Réserver'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t</form>\n\t\t\t\t\t")) : (!empty($reserved) ? ($l->isExpired() ? "<p>Réservé par $reserved->user_id -> $reserved->message</p>" : "<p>Item reservé</p>") : "<p>Item non réservé</p>");
             $item_mod = $this->request->getCookieParam("typeUser") === 'createur' && empty($reserved) ? "\n\t\t\t\t\t<div class='reservation_state'>\n\t\t\t\t\t\t<a href='$routeModItem'><img src='/assets/img/edit.png'/>\n\t\t\t\t\t</div>" : "";
             $item_del = $this->request->getCookieParam("typeUser") === 'createur' && empty($reserved) ? "\n\t\t\t\t\t<div class='reservation_state'>\n\t\t\t\t\t\t<a href='$routeDelItem'><img src='/assets/img/del.png'/>\n\t\t\t\t\t</div>" : "";

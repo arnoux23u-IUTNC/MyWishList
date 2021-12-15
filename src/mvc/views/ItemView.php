@@ -116,7 +116,7 @@ class ItemView
         <body>
             <h2>Edition de l'item $i->id</h2>
             <div>
-                <form class='form_container' method="post" action="$routeItemEdit">
+                <form onsubmit="return checkForm()" class='form_container' enctype="multipart/form-data" method="post" action="$routeItemEdit">
                     <label for="item_name">Nom</label>
                     <input type="text" name="item_name" id="titre" required autofocus value="$i->nom" />
                     <label for="description">Description</label>
@@ -125,10 +125,19 @@ class ItemView
                     <input type="number" min="0" step="0.01" value="$i->tarif" name="price" id="price" />
                     <label for="url">URL</label>
                     <input type="url" name="url" id="url" value="$i->url" />
+                    <div>
+                        <label for="link">URL</label>
+                        <input type="radio" checked id="link" name="type" value="link">
+                        <label for="upload">Upload</label>
+                        <input type="radio" id="upload" name="type" value="upload">
+                        <input type="file" name="file_img" id="file_img"/>
+                        <input class="invisible" type="text" name="url_img" id="url_img" value="$i->img"/>
+                    </div>                   
                     <input type="hidden" name="auth" id="auth" value="$private_key"/>
-                    <button type="submit" name="sendBtn">Créer</button>            
+                    <button type="submit" name="sendBtn">Sauvegarder</button>            
                 </form>
             <div>
+            <script src="/assets/js/form-validate-img.js"></script>
         </body>
         </html>
         EOD;
