@@ -130,14 +130,15 @@ class ItemView
                         <input type="radio" checked id="link" name="type" value="link">
                         <label for="upload">Upload</label>
                         <input type="radio" id="upload" name="type" value="upload">
-                        <input type="file" name="file_img" id="file_img"/>
-                        <input class="invisible" type="text" name="url_img" id="url_img" value="$i->img"/>
+                        <input class="invisible" type="file" name="file_img" id="file_img"/>
+                        <input type="text" name="url_img" id="url_img" value="$i->img"/>
+                        <button type="button" class="sendBtn" id="delete"><img alt="delete" id="delete_img" src="/assets/img/del.png" /></button>
                     </div>                   
                     <input type="hidden" name="auth" id="auth" value="$private_key"/>
                     <button type="submit" name="sendBtn">Sauvegarder</button>            
                 </form>
             <div>
-            <script src="/assets/js/form-validate-img.js"></script>
+            <script src="/assets/js/form-delete.js"></script>
         </body>
         </html>
         EOD;

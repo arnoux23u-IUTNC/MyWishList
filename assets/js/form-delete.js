@@ -29,10 +29,14 @@ $('input[type=radio][name=type]').on('change', function() {
     switch ($(this).val()) {
         case 'link':
             $('#url_img').removeClass('invisible');
+            $('#delete').removeClass('invisible');
+            $('#delete_img').removeClass('invisible');
             $('#file_img').addClass('invisible');
             break;
         case 'upload':
             $('#url_img').addClass('invisible');
+            $('#delete').addClass('invisible');
+            $('#delete_img').addClass('invisible');
             $('#file_img').removeClass('invisible');
             break;
     }
@@ -42,11 +46,19 @@ $(document).ready(function() {
     switch ($('input[type=radio][name=type]').val()) {
         case 'link':
             $('#url_img').removeClass('invisible');
+            $('#delete').removeClass('invisible');
+            $('#delete_img').removeClass('invisible');
             $('#file_img').addClass('invisible');
             break;
         case 'upload':
             $('#url_img').addClass('invisible');
+            $('#delete').addClass('invisible');
+            $('#delete_img').addClass('invisible');
             $('#file_img').removeClass('invisible');
             break;
     }
+});
+
+$('#delete').click(function() {
+    $('#url_img').val('');
 });
