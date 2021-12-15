@@ -15,9 +15,9 @@ class Eloquent
         $capsule->bootEloquent();
         try {
             $capsule->getConnection()->getPdo();
-        } catch (Exception $e) {
+        } catch (Exception) {
             header('HTTP/1.1 500 Internal Server Error');
-            require_once 'errors/500.html';
+            require_once __DIR__.'\..\..\errors\500.html';
             exit();
         }
     }
