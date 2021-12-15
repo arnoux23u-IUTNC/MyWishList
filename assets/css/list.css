@@ -251,3 +251,7 @@ textarea {
     font-weight: bold;
     margin-left: .5vw;
 }
+
+.popup.warning {
+    background: #ec7063;
+}
