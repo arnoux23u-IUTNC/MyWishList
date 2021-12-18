@@ -2,7 +2,7 @@
 
 namespace mywishlist\mvc\controllers;
 
-use Directory;
+use \mywishlist\Validator;
 use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use Slim\Container;
 use \mywishlist\mvc\Renderer;
@@ -36,31 +36,15 @@ class ControllerItem{
                     throw new ForbiddenException("Token Incorrect", "Vous n'avez pas l'autorisation d'accéder à cette ressource");
                 if(!empty($request->getParsedBodyParam('auth'))&& password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)){
                     $file = $request->getUploadedFiles()['file_img'];
-                    print_r($file);
+                    $filename = $file->getClientFilename();
                     if($request->getParsedBodyParam('type') === "upload" && !empty($file))
-                        if($file->getError() === UPLOAD_ERR_OK){
-                            $file_name = $file->getClientFilename();
-                            if( !in_array($file->getClientMediaType(), ['image/png', 'image/jpeg', 'image/jpg']))
-                                $info = "typeerr";
-                            if($file->getSize() > 10000000 || $file->getSize() < 2000)
-                                $info = "sizeerr";
-                            $tmp = $this->container['items_upload_dir'].DIRECTORY_SEPARATOR;
-                            if(!file_exists($tmp.$file_name)){
-                                if(is_writable($tmp)){
-                                    $file->moveTo($tmp.$file_name);
-                                    $info = "ok";
-                                }else
-                                    $info = "writeerr";
-                            }else
-                                $info = "fileexist";
-                        }else
-                            $info = "error";                    
+                        $info = Validator::validateFile($this->container, $file, $filename, "item");                
                     $item->update([
                         'nom' => filter_var($request->getParsedBodyParam('item_name'), FILTER_SANITIZE_STRING),
                         'descr' => filter_var($request->getParsedBodyParam('description'), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
                         'tarif' => filter_var($request->getParsedBodyParam('price'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-                        'url' => filter_var($request->getParsedBodyParam('url'), FILTER_SANITIZE_URL),
-                        'img'=> $request->getParsedBodyParam('type') === "link" ? filter_var($request->getParsedBodyParam('url_img'), FILTER_SANITIZE_URL) : ($request->getParsedBodyParam('type') === "upload" ? ($info === "ok" ? $file_name : $item->img ): NULL)
+                        'url' => filter_var($request->getParsedBodyParam('url') ?? "", FILTER_VALIDATE_URL) ? filter_var($request->getParsedBodyParam('url'), FILTER_SANITIZE_URL) : NULL,
+                        'img'=> $request->getParsedBodyParam('type') === "link" ? filter_var($request->getParsedBodyParam('url_img'), FILTER_SANITIZE_URL) : ($request->getParsedBodyParam('type') === "upload" ? ($info === "ok" ? $filename : $item->img ): NULL)
                     ]);
                     return $response->withRedirect($this->container->router->pathFor('lists_show_id',["id" => $liste->no], ["public_key"=>$liste->public_key,"state"=>"modItem","info"=>$info]));
                 }else{
