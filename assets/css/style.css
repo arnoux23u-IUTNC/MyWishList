@@ -4,7 +4,7 @@
     --btn-height: 60px;
 }
 
-html {
+body {
     background: #4b6cb7;
     background: -webkit-linear-gradient(to right, #182848, #4b6cb7);
     background: linear-gradient(to right, #182848, #4b6cb7);
@@ -35,6 +35,12 @@ h5 {
     font-size: 0.4em;
 }
 
+h3 {
+    width: 100% - var(--sidebar-width);
+    text-align: center;
+    font-size: .8em;
+}
+
 p {
     font-size: 0.3em;
     bottom: 10%;
@@ -48,12 +54,12 @@ p a {
 
 span {
     position: relative;
+    align-items: center;
     display: inline-flex;
     height: var(--btn-height);
     width: var(--btn-width);
-    margin: 0 15px;
+    margin: auto 15px;
     perspective: 1000px;
-    padding-top: 4vh;
 }
 
 span a {
@@ -89,6 +95,7 @@ span a:after {
 #lookBtn::before,
 #lookBtn::after {
     content: "Afficher les listes";
+    margin-top: 2vh;
 }
 
 span a:before {
@@ -109,24 +116,12 @@ span a:after {
 span a:hover {
     height: var(--btn-height);
     width: var(--btn-width);
-    transform: translateZ(-25px) rotateX(-90deg);
+    transform: translateZ(20px) rotateX(-90deg);
 }
 
-.container_error {
-    display: flex;
-    margin: auto;
-    align-items: center;
-    flex-direction: column;
-}
-
-.forbidden {
-    width: auto;
-    height: 15vh;
-    padding-right: 2vw;
-}
-
-.disabled {
-    pointer-events: none !important;
-    transition: 100s;
-    opacity: .5 !important;
+@media (max-width: 800px) {
+    h3 {
+        font-size: 7vw;
+        width: 60%;
+    }
 }

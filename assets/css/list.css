@@ -237,25 +237,3 @@ textarea {
     height: 20vh;
     width: 30vw;
 }
-
-.popup {
-    display: flex;
-    margin: 2vh auto;
-    padding: 2vh 2vw;
-    background: lightgreen;
-    border-radius: 20px;
-    align-items: center;
-}
-
-.popup>span {
-    font-weight: bold;
-    margin-left: .5vw;
-}
-
-.popup.warning {
-    background: #ec7063;
-}
-
-.invisible {
-    visibility: hidden;
-}

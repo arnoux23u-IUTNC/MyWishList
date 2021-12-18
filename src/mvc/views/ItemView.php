@@ -36,7 +36,7 @@ class ItemView
                 $reservation_state = "Item reservé";
         else
             $reservation_state = "Item non réservé";
-        $item_desc = "<body>\n\t<div>\n\t\t<h2>$i->nom</h2>\n\t\t".(!empty($i->descr) ? "<p>Description : $i->descr</p>\n\t\t" : "").(!empty($i->url) ? "<p>URL : $i->url</p>\n\t\t" : "").(!empty($i->tarif) ? "<p>Prix : $i->tarif</p>\n\t\t" : "").(!empty($i->img) && file_exists(__DIR__."\..\..\..\assets\img\items\\$i->img") ? "<img alt='$i->nom' src='/assets/img/items/$i->img'>\n\t\t" : "")."<p>Liste associée : $l->titre | $l->description ($l->expiration)</p>\n\t\t"."<p>Etat reservation : $reservation_state</p>\n\t</div>\n</body>";
+        $item_desc = "\t<div>\n\t\t<h2>$i->nom</h2>\n\t\t".(!empty($i->descr) ? "<p>Description : $i->descr</p>\n\t\t" : "").(!empty($i->url) ? "<p>URL : $i->url</p>\n\t\t" : "").(!empty($i->tarif) ? "<p>Prix : $i->tarif</p>\n\t\t" : "").(!empty($i->img) && file_exists(__DIR__."\..\..\..\assets\img\items\\$i->img") ? "<img alt='$i->nom' src='/assets/img/items/$i->img'>\n\t\t" : "")."<p>Liste associée : $l->titre | $l->description ($l->expiration)</p>\n\t\t"."<p>Etat reservation : $reservation_state</p>\n\t</div>\n</body>";
         return genererHeader("Item $i->id - MyWishList", ["item.css"]).$item_desc;
     }
 
@@ -53,7 +53,6 @@ class ItemView
                 break;
         }
         return genererHeader("Edition d'Item - Authentification", ["list.css"]). <<<EOD
-        <body>
             <h2>Edition d'un Item</h2>
             <div>
                 <form class='form_container' method="post" action="$from">
@@ -72,7 +71,6 @@ class ItemView
         $l = $i->liste()->first();
         $from = $this->container->router->pathFor('items_delete_id',['id' => $i->id],["public_key" => $this->public_key]);
         return genererHeader("Suppression Item - Authentification", ["list.css"]). <<<EOD
-        <body>
             <h2>Supression d'un Item</h2>
             <div>
                 <form class='form_container' method="post" action="$from">
@@ -88,11 +86,10 @@ class ItemView
 
     private function confirmDelete(){
         $i = $this->item;
-        $private_key = $this->request->getParsedBodyParam("private_key");
+        $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $delete = $this->container->router->pathFor('items_delete_id',['id' => $i->id]);
         $back = $this->container->router->pathFor('lists_show_id',['id' => $i->liste()->first()->no],["public_key" => $this->public_key]);
         return genererHeader("Suppression Item $i->id", ["list.css"]). <<<EOD
-        <body>
             <h2>Supression de l'item $i->id</h2>
             <div>
                 <p class="warning">Êtes vous sur de vouloir supprimer l'item $i->id ?</p>
@@ -110,10 +107,9 @@ class ItemView
     private function edit(){
         $i = $this->item;
         //Utilisation de POST plutot que de la requête slim pour éviter de passer des arguments inutiles à la méthode
-        $private_key = $this->request->getParsedBodyParam("private_key");
+        $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $routeItemEdit = $this->container->router->pathFor('items_edit_id',["id" => $i->id]);
         return genererHeader("Item $i->id | Edition", ["list.css"]). <<<EOD
-        <body>
             <h2>Edition de l'item $i->id</h2>
             <div>
                 <form onsubmit="return checkForm()" class='form_container' enctype="multipart/form-data" method="post" action="$routeItemEdit">

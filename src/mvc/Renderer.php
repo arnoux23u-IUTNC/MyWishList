@@ -11,5 +11,7 @@ abstract class Renderer{
     const REQUEST_AUTH = 3;
     const PREVENT_DELETE = 41;
     const DELETE = 42;
-
+    const LOGIN = 71;
+    const REGISTER = 72;
+    const PROFILE = 73;
 }

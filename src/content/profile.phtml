@@ -1,0 +1,170 @@
+  <div class="main-content">
+    <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+      <div class="container-fluid">
+        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="%main_route%"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
+          <ul class="navbar-nav align-items-center d-none d-md-flex">
+            <li class="nav-item dropdown">
+              <a class="nav-link pr-0" href="%main_route%" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div class="media align-items-center">
+                  <span class="avatar avatar-sm rounded-circle"><img alt="Image placeholder" src="%avatar_src%"></span>
+                  <div class="media-body ml-2 d-none d-lg-block">
+                    <span class="mb-0 text-sm  font-weight-bold">%user_lastname% %user_firstname%</span>
+                  </div>
+                </div>
+              </a>
+              <!--<div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
+                  <div class=" dropdown-header noti-title">
+                      <h6 class="text-overflow m-0">Welcome!</h6>
+                  </div>
+                  <a href="../examples/profile.html" class="dropdown-item">
+                      <i class="ni ni-single-02"></i>
+                      <span>My profile</span>
+                  </a>
+                  <a href="../examples/profile.html" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>Settings</span>
+                  </a>
+                  <a href="../examples/profile.html" class="dropdown-item">
+                      <i class="ni ni-calendar-grid-58"></i>
+                      <span>Activity</span>
+                  </a>
+                  <a href="../examples/profile.html" class="dropdown-item">
+                      <i class="ni ni-support-16"></i>
+                      <span>Support</span>
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a href="#!" class="dropdown-item">
+                      <i class="ni ni-user-run"></i>
+                      <span>Logout</span>
+                  </a>
+              </div>-->
+            </li>
+          </ul>
+      </div>
+    </nav>
+    <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+      <span class="mask bg-gradient-default opacity-8"></span>
+      <div class="container-fluid align-items-center">
+        <div class="row">
+          <div class="col-lg-7 col-md-10">
+            <h1 class="display-2 text-white">Hello %user_firstname%</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid mt--7">
+      <div class="row">
+        <div class="col-xl-4 order-xl-2 mb-5 mb-xl-0">
+          <form method="post" action="%profile_route%">
+            <div class="card card-profile shadow">
+              <div class="row justify-content-center">
+                <div class="col-lg-3 order-lg-2">
+                  <div class="card-profile-image">
+                    <img src="%avatar_src%" alt="avatar" class="rounded-circle">
+                  </div>
+                </div>
+              </div>
+              <div class="card-header text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                <div class="d-flex justify-content-between">
+                  <button type="button" id="upload_btn" class="btn btn-sm btn-info mr-4">Uploader</button>
+                  <button type="submit" id="delete_btn" name="delete_btn" value="delete" class="btn btn-sm btn-danger float-right">Supprimer</button>
+                </div>
+              </div>
+              <div class="card-body pt-0 pt-md-4">%info_msg%
+                <div class="text-center">
+                  <h3>%user_lastname% %user_firstname%</h3>
+                  <p class="userinfo">Date de création : %user_created_at%</p>
+                  <p class="userinfo">Date de dernière modification : %user_updated_at%</p>
+                  <p class="userinfo">Dernière connexion : %user_lastlogged_at% [%user_lastlogged_ip%]</p>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <!--VueListe ici -->
+        <div class="col-xl-8 order-xl-1">
+          <form onsubmit="return matchPwd()"method="post" action="%profile_route%">
+            <div class="card bg-secondary shadow">
+              <div class="card-header bg-white border-0">
+                <div class="row align-items-center">
+                  <div class="col-8">
+                    <h3 class="mb-0">Mes informations personnelles</h3>
+                  </div>
+                  <div class="col-4 text-right">
+                    <a href="%logout_route%" class="btn btn-sm btn-danger btn-danger-fr">Déconnexion</a>
+                    <button type="submit" class="btn btn-sm btn-primary">Sauvegarder</button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <h6 class="heading-small text-muted mb-4">Utilisateur</h6>
+                <div class="pl-lg-4">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-username">Nom d'utilisateur</label>
+                        <input type="text" id="input-username" name="input-username" disabled class="form-control form-control-alternative" placeholder="Username" value="%user_username%">
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-email">Adresse Email</label>
+                        <input type="email" id="input-email" name="input-email" class="form-control form-control-alternative" value="%user_email%">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-last-name">Nom</label>
+                        <input type="text" id="input-last-name" name="input-last-name" class="form-control form-control-alternative" placeholder="Last name" value="%user_lastname%">
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-first-name">Prénom</label>
+                        <input type="text" id="input-first-name" name="input-first-name" class="form-control form-control-alternative" placeholder="First name" value="%user_firstname%">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <hr class="my-4">
+                <h6 class="heading-small text-muted mb-4">Mot de Passe</h6>
+                <div class="pl-lg-4">
+                  <div class="row">
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-old-password">Ancien Mot de Passe</label>
+                        <input type="password" id="input-old-password" name="input-old-password" class="form-control form-control-alternative" required placeholder="Requis">
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                        <label class="form-control-label" for="input-new-password">Nouveau Mot de Passe</label>
+                        <input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative">
+                      </div>
+                      <div id="message">
+                        <h6 class="heading-small text-muted mb-4">Mot de passe valide</h6>
+                        <p id="small" class="invalid">Une lettre <b>minuscule</b></p>
+                        <p id="capital" class="invalid">Une lettre <b>majuscule</b></p>
+                        <p id="number" class="invalid">Une <b>chiffre</b></p>
+                        <p id="special" class="invalid">Un <b>caractère spécial</b></p>
+                        <p id="length" class="invalid">14 <b>caractères minimum</b></p>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group focused">
+                          <label class="form-control-label" for="input-new-password-c">Confirmation</label>
+                          <input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/assets/js/password-validator.js"></script>
