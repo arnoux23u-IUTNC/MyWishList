@@ -46,7 +46,6 @@ class ListView
             default => ""
         };        
         $html = genererHeader("Liste $l->no - MyWishList", ["list.css"]) . <<<EOD
-        <body>
             <h2>$l->titre</h2>$dataHeader$warnEdit
             <p>Utilisateur associé : $l->user_id</p>
             <p>Description : $l->description</p>
@@ -86,7 +85,6 @@ class ListView
     private function createList(){
         $routeCreate = $this->container->router->pathFor('lists_create');
         return genererHeader("Créer une liste", ["list.css"]). <<<EOD
-        <body>
             <h2>Créer une liste</h2>
             <div>
                 <form class='form_container' method="post" action="$routeCreate">
@@ -109,9 +107,8 @@ class ListView
     private function addItem(){
         $l = $this->list;
         $routeAddItem = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
-        $private_key = $this->request->getParsedBodyParam("private_key");
+        $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         return genererHeader("Items | Liste $l->no", ["list.css"]). <<<EOD
-        <body>
             <h2>Ajouter un item à la liste $l->no</h2>
             <div>
                 <form class='form_container' method="post" action="$routeAddItem">
@@ -147,7 +144,6 @@ class ListView
                 break;
         }
         return genererHeader("Edition de liste - Authentification", ["list.css"]). <<<EOD
-        <body>
             <h2>Edition de liste</h2>
             <div>
                 <form class='form_container' method="post" action="$from">
@@ -164,10 +160,9 @@ class ListView
     private function edit(){
         $l = $this->list;
         //Utilisation de POST plutot que de la requête slim pour éviter de passer des arguments inutiles à la méthode
-        $private_key = $this->request->getParsedBodyParam("private_key");
+        $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $routeListEdit = $this->container->router->pathFor('lists_edit_id',["id" => $this->list->no]);
         return genererHeader("Liste $l->no | Edition", ["list.css"]). <<<EOD
-        <body>
             <h2>Edition de la liste $l->no</h2>
             <div>
                 <form class='form_container' method="post" action="$routeListEdit">
