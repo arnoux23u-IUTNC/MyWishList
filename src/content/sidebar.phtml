@@ -1,0 +1,50 @@
+    <div class="sidebar">
+        <div class="logo-details">
+            <i class='bx bx-list-check icon'></i>
+            <div class="logo_name">MyWishList</div>
+            <i class='bx bx-menu' id="btn"></i>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <a href="/">
+                    <i class='bx bx-home-alt' ></i>
+                    <span class="links_name">Accueil</span>
+                </a>
+                <span class="tooltip">Accueil</span>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bx-list-ul' ></i>
+                    <span class="links_name">Mes Listes</span>
+                </a>
+                <span class="tooltip">Mes Listes</span>
+            </li>
+            <li>
+                <a href="/lists/new">
+                    <i class='bx bx-list-plus' ></i>
+                    <span class="links_name">Créer une liste</span>
+                </a>
+                <span class="tooltip">Créer une liste</span>
+            </li>%userprofile%
+            <li class="profile">
+                <div class="profile-details">
+                    <span>%user_name%</span>
+                </div>
+                <a class='tobtn' href="%href%"><i class="%iconclass%" id="logbtn"></i>  </a>
+            </li>
+        </ul>
+    </div>
+    <script>
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        closeBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        });
+        let menuBtnChange = () => {
+            if (sidebar.classList.contains("open"))
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            else
+                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+        }
+    </script>
