@@ -2,7 +2,7 @@
 
 if(empty($_SESSION['lang']))
     $_SESSION['lang'] = "fr";
-else if($_SESSION['lang'] !== $_GET['lang'])
+else if(!empty($_GET['lang']) && $_SESSION['lang'] !== $_GET['lang'])
     try {
         $_SESSION['lang'] = match ($_GET['lang']) {
             'fr' => 'fr',
@@ -11,4 +11,4 @@ else if($_SESSION['lang'] !== $_GET['lang'])
     }catch(UnhandledMatchError){
         $_SESSION['lang'] = "fr";
     }
-require_once("langs/".$_SESSION['lang'].".php");
+require_once(__DIR__.DIRECTORY_SEPARATOR."langs".DIRECTORY_SEPARATOR.$_SESSION['lang'].".php");

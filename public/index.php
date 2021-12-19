@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-$lang = NULL;
 require_once __DIR__ . '\..\src\vendor\autoload.php';
 require_once __DIR__ . '\..\src\i18n\langs.php';
 
@@ -83,7 +82,7 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
     //END TODO
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("$lang[dd] MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
+    $html = genererHeader("{$lang['title_home']} MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
     $phtmlVars = array(
         'user_name' => $_SESSION["USER_NAME"] ?? "Se connecter",
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
