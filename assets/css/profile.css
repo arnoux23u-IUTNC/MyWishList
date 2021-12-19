@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap');
-:root {
+ :root {
     --blue: #5e72e4;
     --indigo: #5603ad;
     --purple: #8965e0;
@@ -1907,6 +1907,19 @@ textarea[resize='horizontal'] {
     }
 }
 
+@media (max-width: 993px) {
+    .display-2 {
+        font-size: 6vw;
+        text-align: center;
+    }
+    .btn {
+        font-size: .875rem
+    }
+    .col-8 {
+        max-width: 50%;
+    }
+}
+
 @keyframes show-navbar-collapse {
     0% {
         transform: scale(.95);
@@ -1986,7 +1999,65 @@ p {
 }
 
 .userinfo {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     text-align: left;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.overlay:target {
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup1 {
+    margin: 70px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    width: 60%;
+    position: relative;
+    transition: all 5s ease-in-out;
+}
+
+.popup1 h2 {
+    margin-top: 0;
+    color: #333;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+.popup1 .close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    transition: all 200ms;
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+}
+
+.popup1 .close:hover {
+    color: #06D85F;
+}
+
+.popup1 .content {
+    max-height: 30%;
+    overflow: auto;
+}
+
+.code>p {
+    font-size: 1.4rem;
+    font-weight: bold;
 }

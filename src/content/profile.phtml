@@ -2,44 +2,14 @@
     <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
       <div class="container-fluid">
         <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="%main_route%"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
-          <ul class="navbar-nav align-items-center d-none d-md-flex">
-            <li class="nav-item dropdown">
-              <a class="nav-link pr-0" href="%main_route%" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <div class="media align-items-center">
-                  <span class="avatar avatar-sm rounded-circle"><img alt="Image placeholder" src="%avatar_src%"></span>
-                  <div class="media-body ml-2 d-none d-lg-block">
-                    <span class="mb-0 text-sm  font-weight-bold">%user_lastname% %user_firstname%</span>
-                  </div>
-                </div>
-              </a>
-              <!--<div class="dropdown-menu dropdown-menu-arrow dropdown-menu-right">
-                  <div class=" dropdown-header noti-title">
-                      <h6 class="text-overflow m-0">Welcome!</h6>
-                  </div>
-                  <a href="../examples/profile.html" class="dropdown-item">
-                      <i class="ni ni-single-02"></i>
-                      <span>My profile</span>
-                  </a>
-                  <a href="../examples/profile.html" class="dropdown-item">
-                      <i class="ni ni-settings-gear-65"></i>
-                      <span>Settings</span>
-                  </a>
-                  <a href="../examples/profile.html" class="dropdown-item">
-                      <i class="ni ni-calendar-grid-58"></i>
-                      <span>Activity</span>
-                  </a>
-                  <a href="../examples/profile.html" class="dropdown-item">
-                      <i class="ni ni-support-16"></i>
-                      <span>Support</span>
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a href="#!" class="dropdown-item">
-                      <i class="ni ni-user-run"></i>
-                      <span>Logout</span>
-                  </a>
-              </div>-->
-            </li>
-          </ul>
+          <a class="nav-link pr-0" href="%main_route%" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="media align-items-center">
+              <span class="avatar avatar-sm rounded-circle"><img alt="Image placeholder" src="%avatar_src%"></span>
+              <div class="media-body ml-2 d-none d-lg-block">
+                <span class="mb-0 text-sm  font-weight-bold">%user_lastname% %user_firstname%</span>
+              </div>
+            </div>
+          </a>
       </div>
     </nav>
     <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -83,7 +53,7 @@
         </div>
         <!--VueListe ici -->
         <div class="col-xl-8 order-xl-1">
-          <form onsubmit="return matchPwd()"method="post" action="%profile_route%">
+          <form onsubmit="return matchPwd()" method="post" action="%profile_route%">
             <div class="card bg-secondary shadow">
               <div class="card-header bg-white border-0">
                 <div class="row align-items-center">
@@ -137,6 +107,9 @@
                         <label class="form-control-label" for="input-old-password">Ancien Mot de Passe</label>
                         <input type="password" id="input-old-password" name="input-old-password" class="form-control form-control-alternative" required placeholder="Requis">
                       </div>
+                      <div>
+                        <a href="%2fa_route%" class="btn btn-sm btn-default">Authentification 2FA</a>
+                      </div>
                     </div>
                     <div class="col-lg-4">
                       <div class="form-group focused">
@@ -154,8 +127,8 @@
                     </div>
                     <div class="col-lg-4">
                       <div class="form-group focused">
-                          <label class="form-control-label" for="input-new-password-c">Confirmation</label>
-                          <input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative">
+                        <label class="form-control-label" for="input-new-password-c">Confirmation</label>
+                        <input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative">
                       </div>
                     </div>
                   </div>
