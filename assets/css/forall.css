@@ -35,6 +35,10 @@
     background: #ec7063;
 }
 
+.popup.info {
+    background: #00fff2;
+}
+
 .invisible {
     visibility: hidden;
 }
@@ -71,4 +75,12 @@ input.invalid {
     margin-right: 5px;
     left: -35px;
     content: "❌";
+}
+
+.text-black {
+    color: black !important;
+}
+
+.text-white {
+    color: white !important;
 }
