@@ -32,7 +32,8 @@ class UserView
             "password"  => "<div class='popup warning'>Mot de passe incorrect</div>",
             "not_logged"  => "<div class='popup warning'>Vous n'êtes pas connecté.</div>",
             "pc"  => "<div class='popup'>Mot de passe changé, veuillez vous reconnecter.</div>",
-            "2fa"  => "<div class='popup'>2FA Activé, veuillez vous reconnecter.</div>",
+            "2fa"  => "<div class='popup'>2FA activé, veuillez vous reconnecter.</div>",
+            "2farec"  => "<div class='popup'>2FA désactivé.</div>",
             default => ""
         }); 
         $username = $authenticator ? filter_var($this->request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
@@ -40,6 +41,7 @@ class UserView
         $auth2FA = $authenticator ? "<label for='2fa'>Code 2FA</label>\n\t\t<input type='text' autofocus name='query-code' required maxlength='6' minlenght='6' pattern='^\d{6}$'>" : "";
         $route = $this->container->router->pathFor('accounts',["action" => 'login']);
         $routeInscription = $this->container->router->pathFor('accounts',["action" => 'register']);
+        $routeRecover = $this->container->router->pathFor('2fa',["action" => 'recover'],["username" => $username]);
         return genererHeader("Login - Authentification", ["list.css"]). <<<EOD
             <h2>Connexion</h2>$popup
             <div>
@@ -50,12 +52,36 @@ class UserView
                     <input type="password" name="password" id="password" value="$password" required />$auth2FA
                     <button type="submit" value="OK" name="sendBtn">Connexion</button>
                     <a href="$routeInscription">Pas de compte ? S'inscrire</a>
+                    <a href="$routeRecover">Code perdu ?</a>
                 </form>
             <div>
         </body>
         </html>
         EOD;
     }
+
+    private function recover2FA(){
+      $username = filter_var($this->request->getQueryParam('username'), FILTER_SANITIZE_STRING) ?? "";
+      $routeRecover = $this->container->router->pathFor('2fa',["action" => 'recover']);
+      $popup = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "" ){
+        "nok" => "<div class='popup warning'>Code 2FA incorrect</div>",
+        default => ""
+      };
+      return genererHeader("Recover - Authentification", ["list.css"]). <<<EOD
+          <h2>Récupération 2FA</h2>
+          <div>
+              <form class='form_container' method="post" action="$routeRecover">$popup
+                  <label for="username">Nom d'utilisateur</label>
+                  <input type="text" autofocus name="username" value="$username" required>
+                  <label for="rescue">Code de secours</label>
+                  <input type="text" name="rescue" required maxlength="8" minlenght="8" pattern="^\d{8}$">
+                  <button type="submit" value="OK" name="sendBtn">Supprimer 2FA</button>
+              </form>
+          <div>
+      </body>
+      </html>
+      EOD;
+  }
 
     private function register(){
         $popup = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
@@ -198,7 +224,7 @@ class UserView
     private function manage2FA(){
       $route_main = $this->container->router->pathFor('home');
       $route_2fa = $this->container->router->pathFor('2fa', ["action" => "disable"]);
-      return genererHeader("Activation de 2FA - MyWishList",["profile.css"]).<<<EOD
+      return genererHeader("Gestion 2FA - MyWishList",["profile.css"]).<<<EOD
       <div class="main-content">
       <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
         <div class="container-fluid">
@@ -242,12 +268,12 @@ class UserView
 
     private function show2FACodes(){
         $route_main = $this->container->router->pathFor('home');
-        $route_logout = $this->container->router->pathFor('accounts', ["action" => 'logout'],["info" => "2fa"]);
+        $route_login = $this->container->router->pathFor('accounts', ["action" => 'login'],["info" => "2fa"]);
         $codes = "";
         foreach (RescueCode::whereUser($this->user->user_id)->get() as $code){
             $codes.="<p>$code->code</p>";
         }
-        return genererHeader("Activation de 2FA - MyWishList",["profile.css"]).<<<EOD
+        return genererHeader("Gestion 2FA - MyWishList",["profile.css"]).<<<EOD
         <div class="main-content">
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
           <div class="container-fluid">
@@ -272,7 +298,7 @@ class UserView
                             $codes
                           </div>
                           <div>
-                            <a href="$route_logout" class="btn btn-sm btn-default">C'est noté !</a>
+                            <a href="$route_login" class="btn btn-sm btn-default">C'est noté !</a>
                           </div>
                         </div>
                       </div>
@@ -303,6 +329,8 @@ class UserView
                 return $this->manage2FA();
             case Renderer::SHOW_2FA_CODES:
                 return $this->show2FACodes();
+            case Renderer::RECOVER_2FA:
+              return $this->recover2FA();
             default:
                 throw new ForbiddenException("Vous n'avez pas accès à cette page");
         }

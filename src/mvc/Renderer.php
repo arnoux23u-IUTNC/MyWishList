@@ -18,4 +18,5 @@ abstract class Renderer{
     const ENABLE_2FA = 81;
     const MANAGE_2FA = 82;
     const SHOW_2FA_CODES = 83;
+    const RECOVER_2FA = 84;
 }

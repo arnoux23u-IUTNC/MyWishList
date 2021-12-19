@@ -163,9 +163,7 @@ class ControllerUser{
     private function logout($request, $response, $args){
         switch ($request->getMethod()) {
             case 'GET':
-                session_destroy();
-                //Double vérification pour éviter les problèmes de session
-                unset($_SESSION);
+                User::logout();
                 switch ($request->getQueryParam('info')){
                     case 'pc':
                         return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'login'], ["info" => "pc"]));
@@ -188,58 +186,73 @@ class ControllerUser{
         return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'profile']));
     }
 
-    public function show2FA($request, $response, $args){
-        if(empty($_SESSION['LOGGED_IN']))
-            return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'login'],["info" => "not_logged"]));    
-        $user = User::find($_SESSION['USER_ID']);
-        $renderer = new UserView($this->container, $user, $request);
-        switch($request->getMethod()){
-            case 'GET':
-                if($args["action"] !== "manage")
-                    throw new NotFoundException($request, $response);
-                if(empty($user->totp_key)){
-                    $secret_2fa = TOTP::create()->getSecret();
-                    return $response->write($renderer->with2FA($secret_2fa)->render(Renderer::ENABLE_2FA));
-                }
-                return $response->write($renderer->render(Renderer::MANAGE_2FA));
-                break;
-            case 'POST':
-                switch($args["action"]){
-                    case "disable":
-                        if($request->getParsedBodyParam('sendBtn') !== "ok")
-                            throw new ForbiddenException("Vous n'avez pas accès à cette page");
-                        if(empty($user->totp_key))
-                            return $response->withRedirect($this->container->router->pathFor('2fa',["action" => 'manage']));
-                        $user->update(["totp_key" => NULL]);
-                        RescueCode::whereUser($user->user_id)->delete();
-                        return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'profile'],["info" => "2fa_disabled"]));
-                        break;
-                    case "enable":
-                        if($request->getParsedBodyParam('sendBtn') !== "ok")
-                            throw new ForbiddenException("Vous n'avez pas accès à cette page");
-                        if(!empty($user->totp_key))
-                            return $response->withRedirect($this->container->router->pathFor('2fa',["action" => 'manage']));
-                        $secret = filter_var($request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
-                        $code = filter_var($request->getParsedBodyParam('query-code'), FILTER_SANITIZE_NUMBER_INT);
-                        if(TOTP::create($secret)->verify($code)){
-                            if(RescueCode::whereUser(1)->get()->isEmpty()){
-                                $user->update(["totp_key" => $secret]);
-                                for ($i = 1; $i <= 6; $i++)
-                                    RescueCode::create(["user" => $user->user_id, "code" => rand(10000000, 99999999)]);
-                            }
-                            return $response->write($renderer->render(Renderer::SHOW_2FA_CODES));
-                        }
-                        return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'profile'],["info" => "2fanok"]));
-                        break;
-                    default:
+    public function auth2FA($request, $response, $args){
+        if($args["action"] == "recover"){
+            switch($request->getMethod()){
+                case 'GET':
+                    return $response->write((new UserView($this->container, request:$request))->render(Renderer::RECOVER_2FA));
+                case 'POST':
+                    if($request->getParsedBodyParam('sendBtn') !== "OK")
+                        throw new ForbiddenException("Vous n'avez pas accès à cette page");
+                    $rescue = filter_var($request->getParsedBodyParam('rescue'), FILTER_SANITIZE_NUMBER_INT);
+                    $user = User::whereUsername(filter_var($request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING))->first();
+                    $rescueObj = RescueCode::whereUserAndCode($user->user_id, $rescue)->first();
+                    if(empty($rescueObj))
+                        return $response->withRedirect($this->container->router->pathFor('2fa',["action" => 'recover'],["info" => "nok","username" => $user->username]));
+                    $rescueObj->delete();
+                    $user->remove2FA();
+                    return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'login'],["info" => "2farec"]));
+                    break;
+                default:
+                    throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
+            }
+        }else{
+            if(empty($_SESSION['LOGGED_IN']))
+                return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'login'],["info" => "not_logged"]));    
+            $user = User::find($_SESSION['USER_ID']);
+            $renderer = new UserView($this->container, $user, $request);
+            switch($request->getMethod()){
+                case 'GET':
+                    if($args["action"] !== "manage")
                         throw new NotFoundException($request, $response);
-                }
-
-
-                
-                break;
-            default:
-                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);        
+                    if(empty($user->totp_key)){
+                        $secret_2fa = TOTP::create()->getSecret();
+                        return $response->write($renderer->with2FA($secret_2fa)->render(Renderer::ENABLE_2FA));
+                    }
+                    return $response->write($renderer->render(Renderer::MANAGE_2FA));
+                    break;
+                case 'POST':
+                    switch($args["action"]){
+                        case "disable":
+                            if($request->getParsedBodyParam('sendBtn') !== "ok")
+                                throw new ForbiddenException("Vous n'avez pas accès à cette page");
+                            if(empty($user->totp_key))
+                                return $response->withRedirect($this->container->router->pathFor('2fa',["action" => 'manage']));
+                            $user->remove2FA();
+                            return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'profile'],["info" => "2fa_disabled"]));
+                            break;
+                        case "enable":
+                            if($request->getParsedBodyParam('sendBtn') !== "ok")
+                                throw new ForbiddenException("Vous n'avez pas accès à cette page");
+                            if(!empty($user->totp_key))
+                                return $response->withRedirect($this->container->router->pathFor('2fa',["action" => 'manage']));
+                            $secret = filter_var($request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
+                            $code = filter_var($request->getParsedBodyParam('query-code'), FILTER_SANITIZE_NUMBER_INT);
+                            if(TOTP::create($secret)->verify($code)){
+                                if(RescueCode::whereUser(1)->get()->isEmpty())
+                                    $user->create2FA($secret);
+                                User::logout();
+                                return $response->write($renderer->render(Renderer::SHOW_2FA_CODES));
+                            }
+                            return $response->withRedirect($this->container->router->pathFor('accounts',["action" => 'profile'],["info" => "2fanok"]));
+                            break;
+                        default:
+                            throw new NotFoundException($request, $response);
+                    }
+                    break;
+                default:
+                    throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);        
+            }
         }
     }
 
