@@ -41,6 +41,9 @@ $app->get('/createur', function ($request, $response, $args) {
 });
 
 #Redirection du traffic dans l'application
+$app->any("/accounts/profile/2fa/{action:enable|disable|manage}[/]", function ($request, $response, $args) {
+    return (new ControllerUser($this))->show2FA($request, $response, $args);
+})->setName('2fa');
 $app->any("/accounts/{action:login|profile|logout|register}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this))->process($request, $response, $args);
 })->setName('accounts');
