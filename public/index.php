@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+$lang = [];
+
 require_once __DIR__ . '\..\src\vendor\autoload.php';
 require_once __DIR__ . '\..\src\i18n\langs.php';
 
@@ -84,23 +86,29 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
     $html = genererHeader("{$lang['title_home']} MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
     $phtmlVars = array(
-        'user_name' => $_SESSION["USER_NAME"] ?? "Se connecter",
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
+        'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['home_login']}",
+        'create_list_route' => $routeCreate,
         'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),
         'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<EOD
 
                     <li>
                         <a href="$routeProfile">
                             <i class='bx bxs-user'></i>
-                            <span class="links_name">Mon Profil</span>
+                            <span class="links_name">{$lang['home_my_profile']}</span>
                         </a>
-                        <span class="tooltip">Mon Profil</span>
+                        <span class="tooltip">{$lang['home_my_profile']}</span>
                     </li>
         EOD
     );
     foreach ($phtmlVars as $key => $value) {
         $html = str_replace("%" . $key . "%", $value, $html);
-    };  
+    };
+    preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+    foreach ($matches[0] as $match) {
+        //$html = str_replace($match, "", $html);
+        print_r($match);
+    }
     $html .= <<<EOD
         <div class="main_container">
             <h3>Bienvenue sur MyWishList</h3>

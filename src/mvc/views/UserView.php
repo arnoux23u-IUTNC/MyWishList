@@ -126,7 +126,7 @@ class UserView
     }
 
     private function showProfile(){
-        $html = genererHeader("Votre Profil - MyWishList",["profile.css"]).file_get_contents(__DIR__.'\..\..\content\profile.phtml');
+        $html = genererHeader("Votre Profil - MyWishList",["profile.css"]).file_get_contents(__DIR__.'\..\..\phtml\profile.phtml');
         $user = $this->user;
         $phtmlVars = array(
             "main_route"=> $this->container->router->pathFor('home'),
