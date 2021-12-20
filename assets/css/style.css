@@ -84,17 +84,17 @@ span a:after {
 
 #createBtn::before,
 #createBtn::after {
-    content: "Créer une liste";
+    content: var(--content);
 }
 
 #backBtn::before,
 #backBtn::after {
-    content: "Retour";
+    content: var(--content);
 }
 
 #lookBtn::before,
 #lookBtn::after {
-    content: "Afficher les listes";
+    content: var(--content);
     margin-top: 2vh;
 }
 

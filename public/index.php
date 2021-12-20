@@ -15,14 +15,22 @@ use Slim\{App, Container};
 //todo remove errors
 $container = new Container(['settings' => ['displayErrorDetails' => true]]);
 //end todo
-$container['notFoundHandler'] = function () {
-    return function ($request, $response) {
-        return $response->withStatus(404)->write(file_get_contents('..\errors\404.html'));
+$container['notFoundHandler'] = function () use ($lang) {
+    return function ($request, $response) use ($lang) {
+        $html = file_get_contents('..\errors\404.html');
+        preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+        foreach ($matches[0] as $match)
+            $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+        return $response->withStatus(404)->write($html);
     };
 };
-$container['notAllowedHandler'] = function () {
-    return function ($request, $response) {
-        return $response->withStatus(405)->write(file_get_contents('..\errors\405.html'));
+$container['notAllowedHandler'] = function () use ($lang) {
+    return function ($request, $response) use ($lang) {
+        $html = file_get_contents('..\errors\405.html');
+        preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+        foreach ($matches[0] as $match)
+            $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+        return $response->withStatus(405)->write($html);
     };
 };
 $container['errorHandler'] = function () {
@@ -65,7 +73,6 @@ $app->any("/lists/new[/]", function ($request, $response, $args) {
 $app->get("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerList($this))->show($request, $response, $args);
 })->setName('lists_show_id');
-
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this))->delete($request, $response, $args);
 })->setName('items_delete_id');
@@ -78,16 +85,15 @@ $app->post("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
 
 $app->get('/', function ($request, $response, $args) use ($lang) {
     //TODO REMOVE
-    if (empty($request->getCookieParam('typeUser'))) {
+    if (empty($request->getCookieParam('typeUser')))
         throw new CookieNotSetException();
-    }
     //END TODO
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("{$lang['title_home']} MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
+    $html = genererHeader("{$lang['home_title']} MyWishList", ["style.css"]) . file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
     $phtmlVars = array(
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
-        'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['home_login']}",
+        'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
         'create_list_route' => $routeCreate,
         'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),
         'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<EOD
@@ -106,14 +112,13 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
     };
     preg_match_all("/{#(\w|_)+#}/", $html, $matches);
     foreach ($matches[0] as $match) {
-        //$html = str_replace($match, "", $html);
-        print_r($match);
+        $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
     }
     $html .= <<<EOD
         <div class="main_container">
-            <h3>Bienvenue sur MyWishList</h3>
-            <span><a id="createBtn" href="$routeCreate"></a></span>
-            <span><a class="disabled" id="lookBtn" href="#"></a></span>
+            <h3>{$lang["home_welcome"]}</h3>
+            <span><a id="createBtn" style="--content:{$lang['phtml_lists_create']};" href="$routeCreate"></a></span>
+            <span><a class="disabled" style="--content:{$lang['html_btn_list']};" id="lookBtn" href="#"></a></span>
         </div>
     </body>
     EOD;

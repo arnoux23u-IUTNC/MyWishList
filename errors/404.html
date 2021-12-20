@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
-    <title>Erreur 404</title>
+    <title>{#phtml_error_error#} 404</title>
     <link rel="icon" href="/assets/img/icons/404.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
@@ -13,7 +12,7 @@
         *::before {
             box-sizing: border-box;
         }
-        
+
         html,
         body {
             align-items: center;
@@ -26,12 +25,12 @@
             margin: 0;
             padding: 0;
         }
-        
+
         h1 {
             text-shadow: 0 0 10px #fff;
             animation: blink 4.8s infinite both;
         }
-        
+
         @keyframes blink {
             0%,
             50%,
@@ -43,38 +42,35 @@
                 opacity: 1;
             }
         }
-        
+
         h5,
         p {
             position: absolute;
             font-family: monospace;
         }
-        
+
         h5 {
             top: 10%;
             font-size: 0.4em;
         }
-        
+
         p {
             font-size: 0.3em;
             bottom: 10%;
             width: 50%;
             text-align: center;
         }
-        
+
         p a {
             color: cyan;
         }
     </style>
-
 </head>
-
 <body>
-    <h5>Page introuvable</h5>
+    <h5>{#phtml_error_notfound#}</h5>
     <h1>4</h1>
     <h1>0</h1>
     <h1>4</h1>
-    <p>Revenir à l'<a href="/">accueil</a></h5>
+    <p>{#phtml_error_backhome#}</p>
 </body>
-
 </html>

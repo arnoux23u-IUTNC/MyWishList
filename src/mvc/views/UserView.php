@@ -15,7 +15,7 @@ class UserView
     private Container $container;
     private $request;
     private $secret;
-    
+
 
     public function __construct(Container $c, User $user = NULL, $request = null)
     {
@@ -24,99 +24,102 @@ class UserView
         $this->request = $request;
     }
 
-    private function login($authenticator = false){
-        
-        $popup = "\n\t".( $authenticator ? "\n\t<div class='popup info'>Entrez votre code 2FA.</div>" : match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
-            "nouser" => "<div class='popup warning'>Aucun utilisateur trouvé</div>",
-            "2fanok" => "<div class='popup warning'>Code 2FA incorrect</div>",
-            "password"  => "<div class='popup warning'>Mot de passe incorrect</div>",
-            "not_logged"  => "<div class='popup warning'>Vous n'êtes pas connecté.</div>",
-            "pc"  => "<div class='popup'>Mot de passe changé, veuillez vous reconnecter.</div>",
-            "2fa"  => "<div class='popup'>2FA activé, veuillez vous reconnecter.</div>",
-            "2farec"  => "<div class='popup'>2FA désactivé.</div>",
-            default => ""
-        }); 
+    private function login($authenticator = false)
+    {
+
+        $popup = "\n\t" . ($authenticator ? "\n\t<div class='popup info'>{$lang['user_2fa_request_code']}</div>" : match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+                "nouser" => "<div class='popup warning'>{$lang['user_user_notfound']}</div>",
+                "2fanok" => "<div class='popup warning'>{$lang['user_2fa_incorrect_code']}</div>",
+                "password" => "<div class='popup warning'>{$lang['user_password_incorrect']}</div>",
+                "not_logged" => "<div class='popup warning'>{$lang['user_not_logged']}</div>",
+                "pc" => "<div class='popup'>{$lang['user_password_changed']}</div>",
+                "2fa" => "<div class='popup'>{$lang['user_2fa_enabled_log']}</div>",
+                "2farec" => "<div class='popup'>{$lang['user_2fa_disabled']}</div>",
+                default => ""
+            });
         $username = $authenticator ? filter_var($this->request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
         $password = $authenticator ? filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
-        $auth2FA = $authenticator ? "<label for='2fa'>Code 2FA</label>\n\t\t<input type='text' autofocus name='query-code' required maxlength='6' minlenght='6' pattern='^\d{6}$'>" : "";
-        $route = $this->container->router->pathFor('accounts',["action" => 'login']);
-        $routeInscription = $this->container->router->pathFor('accounts',["action" => 'register']);
-        $routeRecover = $this->container->router->pathFor('2fa',["action" => 'recover'],["username" => $username]);
-        return genererHeader("Login - Authentification", ["list.css"]). <<<EOD
-            <h2>Connexion</h2>$popup
+        $auth2FA = $authenticator ? "<label for='2fa'>{$lang['user_2fa_code']}</label>\n\t\t<input type='text' autofocus name='query-code' required maxlength='6' minlenght='6' pattern='^\d{6}$'>" : "";
+        $route = $this->container->router->pathFor('accounts', ["action" => 'login']);
+        $routeInscription = $this->container->router->pathFor('accounts', ["action" => 'register']);
+        $routeRecover = $this->container->router->pathFor('2fa', ["action" => 'recover'], ["username" => $username]);
+        return genererHeader("Auth | MyWishList", ["list.css"]) . <<<EOD
+            <h2>{$lang['login_title']}</h2>$popup
             <div>
                 <form class='form_container' method="post" action="$route">
-                    <label for="username">Utilisateur</label>
+                    <label for="username">{$lang['user_username']}</label>
                     <input type="text" name="username" id="username" value="$username" required />
-                    <label for="password">Mot de passe</label>
+                    <label for="password">{$lang['user_password']}</label>
                     <input type="password" name="password" id="password" value="$password" required />$auth2FA
-                    <button type="submit" value="OK" name="sendBtn">Connexion</button>
-                    <a href="$routeInscription">Pas de compte ? S'inscrire</a>
-                    <a href="$routeRecover">Code perdu ?</a>
-                </form>
+                    <button type="submit" value="OK" name="sendBtn">{$lang['login_title']}</button>
+                    <a href="$routeInscription">{$lang['login_to_register']}</a>
+                    <a href="$routeRecover">{$lang['login_lost_2FA']}</a>
+                </form>FA
             <div>
         </body>
         </html>
         EOD;
     }
 
-    private function recover2FA(){
-      $username = filter_var($this->request->getQueryParam('username'), FILTER_SANITIZE_STRING) ?? "";
-      $routeRecover = $this->container->router->pathFor('2fa',["action" => 'recover']);
-      $popup = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "" ){
-        "nok" => "<div class='popup warning'>Code 2FA incorrect</div>",
-        default => ""
-      };
-      return genererHeader("Recover - Authentification", ["list.css"]). <<<EOD
-          <h2>Récupération 2FA</h2>
+    private function recover2FA()
+    {
+        $username = filter_var($this->request->getQueryParam('username'), FILTER_SANITIZE_STRING) ?? "";
+        $routeRecover = $this->container->router->pathFor('2fa', ["action" => 'recover']);
+        $popup = "\n\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+                "nok" => "<div class='popup warning'>{$lang['user_2fa_incorrect_code']}</div>",
+                default => ""
+            };
+        return genererHeader("Auth - MyWishList", ["list.css"]) . <<<EOD
+          <h2>{$lang['user_2fa_recover']}</h2>
           <div>
               <form class='form_container' method="post" action="$routeRecover">$popup
-                  <label for="username">Nom d'utilisateur</label>
+                  <label for="username">{$lang['user_username']}</label>
                   <input type="text" autofocus name="username" value="$username" required>
-                  <label for="rescue">Code de secours</label>
-                  <input type="text" name="rescue" required maxlength="8" minlenght="8" pattern="^\d{8}$">
-                  <button type="submit" value="OK" name="sendBtn">Supprimer 2FA</button>
+                  <label for="rescue">{$lang['user_2fa_rescue_code']}</label>
+                  <input type="text" name="rescue" required maxlength="8" minlength="8" pattern="^\d{8}$">
+                  <button type="submit" value="OK" name="sendBtn">{$lang['user_2fa_delete']}</button>
               </form>
           <div>
       </body>
       </html>
       EOD;
-  }
+    }
 
-    private function register(){
-        $popup = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
-            "invalid" => "<div class='popup warning'>Un ou plusieurs champs sont incorrects</div>",
-            "password" => "<div class='popup warning'>Mot de passe invalide</div>",
-            default => ""
-        };    
-        $route = $this->container->router->pathFor('accounts',["action" => 'register']);
-        $routeConnexion = $this->container->router->pathFor('accounts',["action" => 'login']);
-        return genererHeader("Inscription - Authentification", ["list.css"]). <<<EOD
-            <h2>Inscription</h2>$popup
+    private function register()
+    {
+        $popup = "\n\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+                "invalid" => "<div class='popup warning'>{$lang['phtml_error_fields']}</div>",
+                "password" => "<div class='popup warning'>{$lang['user_password_incorrect']}</div>",
+                default => ""
+            };
+        $route = $this->container->router->pathFor('accounts', ["action" => 'register']);
+        $routeConnexion = $this->container->router->pathFor('accounts', ["action" => 'login']);
+        return genererHeader("{$lang['resiter_title']} - MyWishList", ["list.css"]) . <<<EOD
+            <h2>{$lang['resiter_title']}</h2>$popup
             <div>
                 <form class='form_container' enctype="multipart/form-data" method="post" action="$route">
-                    <label for="username">Utilisateur</label>
+                    <label for="username">{$lang['user_username']}</label>
                     <input type="text" name="username" id="username" required />
-                    <label for="lastname">Nom</label>
+                    <label for="lastname">{$lang['user_lastname']}</label>
                     <input type="text" name="lastname" id="lastname" required />
-                    <label for="firstname">Prénom</label>
+                    <label for="firstname">{$lang['user_firstname']}</label>
                     <input type="text" name="firstname" id="firstname" required />
-                    <label for="email">E-Mail</label>
+                    <label for="email">{$lang['user_email']}</label>
                     <input type="email" name="email" id="email" required />
-                    <label for="file_img">Avatar</label>
+                    <label for="file_img">{$lang['user_avatar']}</label>
                     <input type="file" name="file_img" id="file_img"/>
-                    <label for="password">Mot de passe</label>
+                    <label for="password">{$lang['user_password']}</label>
                     <input required type="password" id="input-new-password" minlength="14" maxlength="40" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" >
                     <div id="message">
-                        <h6 class="heading-small text-muted mb-4">Mot de passe valide</h6>
-                        <p id="small" class="invalid">Une lettre <b>minuscule</b></p>
-                        <p id="capital" class="invalid">Une lettre <b>majuscule</b></p>
-                        <p id="number" class="invalid">Une <b>chiffre</b></p>
-                        <p id="special" class="invalid">Un <b>caractère spécial</b></p>
-                        <p id="length" class="invalid">14 <b>caractères minimum</b></p>
+                        <h6 class="heading-small text-muted mb-4">{$lang['password_form_valid']}</h6>
+                        <p id="small" class="invalid">{$lang['password_form_valid_small']}</b></p>
+                        <p id="capital" class="invalid">{$lang['password_form_valid_capital']}</b></p>
+                        <p id="number" class="invalid">{$lang['password_form_valid_number']}</p>
+                        <p id="special" class="invalid">{$lang['password_form_valid_special']}</p>
+                        <p id="length" class="invalid">{$lang['password_form_valid_length']}</p>
                     </div>
-                    <button type="submit" value="OK" name="sendBtn">S'inscrire</button>
-                    <a href="$routeConnexion">Deja un compte ? Se connecter</a>
+                    <button type="submit" value="OK" name="sendBtn">{$lang['title_register']}</button>
+                    <a href="$routeConnexion">{$lang['register_to_login']}</a>
                 </form>
             <div>
             <script src="/assets/js/password-validator.js"></script>
@@ -125,48 +128,54 @@ class UserView
         EOD;
     }
 
-    private function showProfile(){
-        $html = genererHeader("Votre Profil - MyWishList",["profile.css"]).file_get_contents(__DIR__.'\..\..\phtml\profile.phtml');
+    private function showProfile()
+    {
+        $html = genererHeader("{$lang['profil_title']} - MyWishList", ["profile.css"]) . file_get_contents(__DIR__ . '\..\..\phtml\profile.phtml');
         $user = $this->user;
         $phtmlVars = array(
-            "main_route"=> $this->container->router->pathFor('home'),
-            "profile_route"=> $this->container->router->pathFor('accounts',["action" => 'profile']),
-            "logout_route"=> $this->container->router->pathFor('accounts',["action" => 'logout']),
-            "2fa_route"=> $this->container->router->pathFor('2fa', ["action" => 'manage']),
-            "avatar_src"=> (!empty($user->avatar) && file_exists($this->container['users_upload_dir']."\\$user->avatar")) ? $this->container['users_upload_dir']."\\$user->avatar" : "https://www.gravatar.com/avatar/".md5(strtolower(trim($user->mail))),
-            "user_username"=>$this->user->username,
-            "user_firstname"=>$this->user->firstname,
-            "user_lastname"=>$this->user->lastname,
-            "user_email"=>$this->user->mail,
-            "user_created_at"=>$this->user->created_at,
-            "user_updated_at"=>$this->user->updated ?? "Jamais",
-            "user_lastlogged_at"=>$this->user->last_login,
-            "user_lastlogged_ip"=>long2ip($this->user->last_ip),
-            "info_msg"=> match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
-                "noavatar" => "<div class='popup warning fit'><span style='color:black;'>Vous n'avez pas d'avatar<br>Nous utilisons automatiquement un Gravatar dans ce cas.</span></div>",
-                "password" => "<div class='popup warning fit'><span style='color:black;'>Mot de passe incorrect</span></div>",
-                "no-change" => "<div class='popup warning fit'><span style='color:black;'>Aucun changement apporté</span></div>",
-                "equals" => "<div class='popup warning fit'><span style='color:black;'>Mot de passe identique à l'ancien.</span></div>",
-                "2faok" => "<div class='popup fit'><span style='color:black;'>2FA Activé.</span></div>",
-                "2fanok" => "<div class='popup warning fit'><span style='color:black;'>Erreur pendant l'activation de 2FA.</span></div>",
-                "2fa_disabled" => "<div class='popup fit'><span style='color:black;'>2FA desactivé</span></div>",
-                "success" => "<div class='popup fit'><span style='color:black;'>Profil mis à jour</span></div>",
+            "main_route" => $this->container->router->pathFor('home'),
+            "profile_route" => $this->container->router->pathFor('accounts', ["action" => 'profile']),
+            "logout_route" => $this->container->router->pathFor('accounts', ["action" => 'logout']),
+            "2fa_route" => $this->container->router->pathFor('2fa', ["action" => 'manage']),
+            "avatar_src" => (!empty($user->avatar) && file_exists($this->container['users_upload_dir'] . "\\$user->avatar")) ? $this->container['users_upload_dir'] . "\\$user->avatar" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($user->mail))),
+            "user_username" => $this->user->username,
+            "user_firstname" => $this->user->firstname,
+            "user_lastname" => $this->user->lastname,
+            "user_email" => $this->user->mail,
+            "user_created_at" => $this->user->created_at,
+            "user_updated_at" => $this->user->updated ?? $lang['never'],
+            "user_lastlogged_at" => $this->user->last_login,
+            "user_lastlogged_ip" => long2ip($this->user->last_ip),
+            "info_msg" => match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+                "noavatar" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_noavatar']}</span></div>",
+                "password" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_password_incorrect']}</span></div>",
+                "no-change" => "<div class='popup warning fit'><span style='color:black;'>{$lang['no_changes']}</span></div>",
+                "equals" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_same_password']}</span></div>",
+                "2faok" => "<div class='popup fit'><span style='color:black;'>{$lang['user_2fa_enabled']}</span></div>",
+                "2fanok" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_2fa_error']}</span></div>",
+                "2fa_disabled" => "<div class='popup fit'><span style='color:black;'>{$lang['user_2fa_disabled']}</span></div>",
+                "success" => "<div class='popup fit'><span style='color:black;'>{$lang['profile_updated_title']}</span></div>",
                 default => ""
             },
         );
         foreach ($phtmlVars as $key => $value) {
-            $html = str_replace("%".$key."%", $value, $html);
-        };  
+            $html = str_replace("%" . $key . "%", $value, $html);
+        };
+        preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+        foreach ($matches[0] as $match) {
+            $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+        }
         return $html;
     }
 
-    private function enable2FA(){
+    private function enable2FA()
+    {
         $route_main = $this->container->router->pathFor('home');
         $route_2fa = $this->container->router->pathFor('2fa', ["action" => 'enable']);
         $otp = TOTP::create($this->secret);
         $otp->setLabel('MyWishList');
-        $img_src = $otp->getQrCodeUri('https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M','[DATA]');
-        return genererHeader("Activation de 2FA - MyWishList",["profile.css"]).<<<EOD
+        $img_src = $otp->getQrCodeUri('https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M', '[DATA]');
+        return genererHeader("Activation de 2FA - MyWishList", ["profile.css"]) . <<<EOD
         <div class="main-content">
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
           <div class="container-fluid">
@@ -221,10 +230,11 @@ class UserView
         EOD;
     }
 
-    private function manage2FA(){
-      $route_main = $this->container->router->pathFor('home');
-      $route_2fa = $this->container->router->pathFor('2fa', ["action" => "disable"]);
-      return genererHeader("Gestion 2FA - MyWishList",["profile.css"]).<<<EOD
+    private function manage2FA()
+    {
+        $route_main = $this->container->router->pathFor('home');
+        $route_2fa = $this->container->router->pathFor('2fa', ["action" => "disable"]);
+        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<EOD
       <div class="main-content">
       <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
         <div class="container-fluid">
@@ -264,16 +274,17 @@ class UserView
       </div>
       </div>
       EOD;
-  }
+    }
 
-    private function show2FACodes(){
+    private function show2FACodes()
+    {
         $route_main = $this->container->router->pathFor('home');
-        $route_login = $this->container->router->pathFor('accounts', ["action" => 'login'],["info" => "2fa"]);
+        $route_login = $this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "2fa"]);
         $codes = "";
-        foreach (RescueCode::whereUser($this->user->user_id)->get() as $code){
-            $codes.="<p>$code->code</p>";
+        foreach (RescueCode::whereUser($this->user->user_id)->get() as $code) {
+            $codes .= "<p>$code->code</p>";
         }
-        return genererHeader("Gestion 2FA - MyWishList",["profile.css"]).<<<EOD
+        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<EOD
         <div class="main-content">
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
           <div class="container-fluid">
@@ -313,12 +324,13 @@ class UserView
         EOD;
     }
 
-    public function render($method){
+    public function render($method)
+    {
         switch ($method) {
             case Renderer::LOGIN:
-              return $this->login();
+                return $this->login();
             case Renderer::LOGIN_2FA:
-              return $this->login(true);
+                return $this->login(true);
             case Renderer::REGISTER:
                 return $this->register();
             case Renderer::PROFILE:
@@ -330,13 +342,14 @@ class UserView
             case Renderer::SHOW_2FA_CODES:
                 return $this->show2FACodes();
             case Renderer::RECOVER_2FA:
-              return $this->recover2FA();
+                return $this->recover2FA();
             default:
-                throw new ForbiddenException("Vous n'avez pas accès à cette page");
+                throw new ForbiddenException($lang['exception_page_not_allowed']);
         }
     }
 
-    public function with2FA($secret){
+    public function with2FA($secret)
+    {
         $this->secret = $secret;
         return $this;
     }

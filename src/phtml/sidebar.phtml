@@ -7,30 +7,31 @@
         <ul class="nav-list">
             <li>
                 <a href="/">
-                    <i class='bx bx-home-alt' ></i>
-                    <span class="links_name">{#phtml_home#}</span>
+                    <i class='bx bx-home-alt'></i>
+                    <span class="links_name">{#home_title#}</span>
                 </a>
-                <span class="tooltip">{#phtml_home#}</span>
+                <span class="tooltip">{#home_title#}</span>
             </li>
             <li>
                 <a href="#">
-                    <i class='bx bx-list-ul' ></i>
+                    <i class='bx bx-list-ul'></i>
                     <span class="links_name">{#phtml_lists#}</span>
                 </a>
                 <span class="tooltip">{#phtml_lists#}</span>
             </li>
             <li>
                 <a href="%create_list_route%">
-                    <i class='bx bx-list-plus' ></i>
+                    <i class='bx bx-list-plus'></i>
                     <span class="links_name">{#phtml_lists_create#}</span>
                 </a>
                 <span class="tooltip">{#phtml_lists_create#}</span>
-            </li>%userprofile%
+            </li>
+            %userprofile%
             <li class="profile">
                 <div class="profile-details">
                     <span>%user_name%</span>
                 </div>
-                <a class='tobtn' href="%href%"><i class="%iconclass%" id="logbtn"></i>  </a>
+                <a class='tobtn' href="%href%"><i class="%iconclass%" id="logbtn"></i> </a>
             </li>
         </ul>
     </div>
