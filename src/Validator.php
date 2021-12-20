@@ -36,7 +36,6 @@ class Validator
     {
         foreach ($strings as $key => $string) {
             if (empty(str_replace(" ", "", $string))) {
-                echo $key . " -> " . $string . "is empty<br>";
                 return false;
             }
         }
