@@ -16,7 +16,6 @@ class UserView
     private $request;
     private $secret;
 
-
     public function __construct(Container $c, User $user = NULL, $request = null)
     {
         $this->user = $user;
@@ -27,34 +26,34 @@ class UserView
     private function login($authenticator = false)
     {
 
-        $popup = "\n\t" . ($authenticator ? "\n\t<div class='popup info'>{$lang['user_2fa_request_code']}</div>" : match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-                "nouser" => "<div class='popup warning'>{$lang['user_user_notfound']}</div>",
-                "2fanok" => "<div class='popup warning'>{$lang['user_2fa_incorrect_code']}</div>",
-                "password" => "<div class='popup warning'>{$lang['user_password_incorrect']}</div>",
-                "not_logged" => "<div class='popup warning'>{$lang['user_not_logged']}</div>",
-                "pc" => "<div class='popup'>{$lang['user_password_changed']}</div>",
-                "2fa" => "<div class='popup'>{$lang['user_2fa_enabled_log']}</div>",
-                "2farec" => "<div class='popup'>{$lang['user_2fa_disabled']}</div>",
+        $popup = "\n\t" . ($authenticator ? "\n\t<div class='popup info'>{$this->container->lang['user_2fa_request_code']}</div>" : match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+                "nouser" => "<div class='popup warning'>{$this->container->lang['user_user_notfound']}</div>",
+                "2fanok" => "<div class='popup warning'>{$this->container->lang['user_2fa_incorrect_code']}</div>",
+                "password" => "<div class='popup warning'>{$this->container->lang['user_password_incorrect']}</div>",
+                "not_logged" => "<div class='popup warning'>{$this->container->lang['user_not_logged']}</div>",
+                "pc" => "<div class='popup'>{$this->container->lang['user_password_changed']}</div>",
+                "2fa" => "<div class='popup'>{$this->container->lang['user_2fa_enabled_log']}</div>",
+                "2farec" => "<div class='popup'>{$this->container->lang['user_2fa_disabled']}</div>",
                 default => ""
             });
         $username = $authenticator ? filter_var($this->request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
         $password = $authenticator ? filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
-        $auth2FA = $authenticator ? "<label for='2fa'>{$lang['user_2fa_code']}</label>\n\t\t<input type='text' autofocus name='query-code' required maxlength='6' minlenght='6' pattern='^\d{6}$'>" : "";
+        $auth2FA = $authenticator ? "<label for='2fa'>{$this->container->lang['user_2fa_code']}</label>\n\t\t<input type='text' autofocus name='query-code' required maxlength='6' minlenght='6' pattern='^\d{6}$'>" : "";
         $route = $this->container->router->pathFor('accounts', ["action" => 'login']);
         $routeInscription = $this->container->router->pathFor('accounts', ["action" => 'register']);
         $routeRecover = $this->container->router->pathFor('2fa', ["action" => 'recover'], ["username" => $username]);
         return genererHeader("Auth | MyWishList", ["list.css"]) . <<<EOD
-            <h2>{$lang['login_title']}</h2>$popup
+            <h2>{$this->container->lang['login_title']}</h2>$popup
             <div>
                 <form class='form_container' method="post" action="$route">
-                    <label for="username">{$lang['user_username']}</label>
+                    <label for="username">{$this->container->lang['user_username']}</label>
                     <input type="text" name="username" id="username" value="$username" required />
-                    <label for="password">{$lang['user_password']}</label>
+                    <label for="password">{$this->container->lang['user_password']}</label>
                     <input type="password" name="password" id="password" value="$password" required />$auth2FA
-                    <button type="submit" value="OK" name="sendBtn">{$lang['login_title']}</button>
-                    <a href="$routeInscription">{$lang['login_to_register']}</a>
-                    <a href="$routeRecover">{$lang['login_lost_2FA']}</a>
-                </form>FA
+                    <button type="submit" value="OK" name="sendBtn">{$this->container->lang['login_title']}</button>
+                    <a href="$routeInscription">{$this->container->lang['login_to_register']}</a>
+                    <a href="$routeRecover">{$this->container->lang['login_lost_2FA']}</a>
+                </form>
             <div>
         </body>
         </html>
@@ -66,18 +65,18 @@ class UserView
         $username = filter_var($this->request->getQueryParam('username'), FILTER_SANITIZE_STRING) ?? "";
         $routeRecover = $this->container->router->pathFor('2fa', ["action" => 'recover']);
         $popup = "\n\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-                "nok" => "<div class='popup warning'>{$lang['user_2fa_incorrect_code']}</div>",
+                "nok" => "<div class='popup warning'>{$this->container->lang['user_2fa_incorrect_code']}</div>",
                 default => ""
             };
         return genererHeader("Auth - MyWishList", ["list.css"]) . <<<EOD
-          <h2>{$lang['user_2fa_recover']}</h2>
+          <h2>{$this->container->lang['user_2fa_recover']}</h2>
           <div>
               <form class='form_container' method="post" action="$routeRecover">$popup
-                  <label for="username">{$lang['user_username']}</label>
+                  <label for="username">{$this->container->lang['user_username']}</label>
                   <input type="text" autofocus name="username" value="$username" required>
-                  <label for="rescue">{$lang['user_2fa_rescue_code']}</label>
+                  <label for="rescue">{$this->container->lang['user_2fa_rescue_code']}</label>
                   <input type="text" name="rescue" required maxlength="8" minlength="8" pattern="^\d{8}$">
-                  <button type="submit" value="OK" name="sendBtn">{$lang['user_2fa_delete']}</button>
+                  <button type="submit" value="OK" name="sendBtn">{$this->container->lang['user_2fa_delete']}</button>
               </form>
           <div>
       </body>
@@ -88,38 +87,38 @@ class UserView
     private function register()
     {
         $popup = "\n\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-                "invalid" => "<div class='popup warning'>{$lang['phtml_error_fields']}</div>",
-                "password" => "<div class='popup warning'>{$lang['user_password_incorrect']}</div>",
+                "invalid" => "<div class='popup warning'>{$this->container->lang['phtml_error_fields']}</div>",
+                "password" => "<div class='popup warning'>{$this->container->lang['user_password_incorrect']}</div>",
                 default => ""
             };
         $route = $this->container->router->pathFor('accounts', ["action" => 'register']);
         $routeConnexion = $this->container->router->pathFor('accounts', ["action" => 'login']);
-        return genererHeader("{$lang['resiter_title']} - MyWishList", ["list.css"]) . <<<EOD
-            <h2>{$lang['resiter_title']}</h2>$popup
+        return genererHeader("{$this->container->lang['resiter_title']} - MyWishList", ["list.css"]) . <<<EOD
+            <h2>{$this->container->lang['resiter_title']}</h2>$popup
             <div>
                 <form class='form_container' enctype="multipart/form-data" method="post" action="$route">
-                    <label for="username">{$lang['user_username']}</label>
+                    <label for="username">{$this->container->lang['user_username']}</label>
                     <input type="text" name="username" id="username" required />
-                    <label for="lastname">{$lang['user_lastname']}</label>
+                    <label for="lastname">{$this->container->lang['user_lastname']}</label>
                     <input type="text" name="lastname" id="lastname" required />
-                    <label for="firstname">{$lang['user_firstname']}</label>
+                    <label for="firstname">{$this->container->lang['user_firstname']}</label>
                     <input type="text" name="firstname" id="firstname" required />
-                    <label for="email">{$lang['user_email']}</label>
+                    <label for="email">{$this->container->lang['user_email']}</label>
                     <input type="email" name="email" id="email" required />
-                    <label for="file_img">{$lang['user_avatar']}</label>
+                    <label for="file_img">{$this->container->lang['user_avatar']}</label>
                     <input type="file" name="file_img" id="file_img"/>
-                    <label for="password">{$lang['user_password']}</label>
+                    <label for="password">{$this->container->lang['user_password']}</label>
                     <input required type="password" id="input-new-password" minlength="14" maxlength="40" name="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" >
                     <div id="message">
-                        <h6 class="heading-small text-muted mb-4">{$lang['password_form_valid']}</h6>
-                        <p id="small" class="invalid">{$lang['password_form_valid_small']}</b></p>
-                        <p id="capital" class="invalid">{$lang['password_form_valid_capital']}</b></p>
-                        <p id="number" class="invalid">{$lang['password_form_valid_number']}</p>
-                        <p id="special" class="invalid">{$lang['password_form_valid_special']}</p>
-                        <p id="length" class="invalid">{$lang['password_form_valid_length']}</p>
+                        <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
+                        <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</b></p>
+                        <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</b></p>
+                        <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
+                        <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
+                        <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
                     </div>
-                    <button type="submit" value="OK" name="sendBtn">{$lang['title_register']}</button>
-                    <a href="$routeConnexion">{$lang['register_to_login']}</a>
+                    <button type="submit" value="OK" name="sendBtn">{$this->container->lang['title_register']}</button>
+                    <a href="$routeConnexion">{$this->container->lang['register_to_login']}</a>
                 </form>
             <div>
             <script src="/assets/js/password-validator.js"></script>
@@ -130,7 +129,7 @@ class UserView
 
     private function showProfile()
     {
-        $html = genererHeader("{$lang['profil_title']} - MyWishList", ["profile.css"]) . file_get_contents(__DIR__ . '\..\..\phtml\profile.phtml');
+        $html = genererHeader("{$this->container->lang['profile_title']} - MyWishList", ["profile.css"]) . file_get_contents(__DIR__ . '\..\..\content\profile.phtml');
         $user = $this->user;
         $phtmlVars = array(
             "main_route" => $this->container->router->pathFor('home'),
@@ -143,18 +142,18 @@ class UserView
             "user_lastname" => $this->user->lastname,
             "user_email" => $this->user->mail,
             "user_created_at" => $this->user->created_at,
-            "user_updated_at" => $this->user->updated ?? $lang['never'],
+            "user_updated_at" => $this->user->updated ?? $this->container->lang['never'],
             "user_lastlogged_at" => $this->user->last_login,
             "user_lastlogged_ip" => long2ip($this->user->last_ip),
             "info_msg" => match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-                "noavatar" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_noavatar']}</span></div>",
-                "password" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_password_incorrect']}</span></div>",
-                "no-change" => "<div class='popup warning fit'><span style='color:black;'>{$lang['no_changes']}</span></div>",
-                "equals" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_same_password']}</span></div>",
-                "2faok" => "<div class='popup fit'><span style='color:black;'>{$lang['user_2fa_enabled']}</span></div>",
-                "2fanok" => "<div class='popup warning fit'><span style='color:black;'>{$lang['user_2fa_error']}</span></div>",
-                "2fa_disabled" => "<div class='popup fit'><span style='color:black;'>{$lang['user_2fa_disabled']}</span></div>",
-                "success" => "<div class='popup fit'><span style='color:black;'>{$lang['profile_updated_title']}</span></div>",
+                "noavatar" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_noavatar']}</span></div>",
+                "password" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_password_incorrect']}</span></div>",
+                "no-change" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['no_changes']}</span></div>",
+                "equals" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_same_password']}</span></div>",
+                "2faok" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['user_2fa_enabled']}</span></div>",
+                "2fanok" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_2fa_error']}</span></div>",
+                "2fa_disabled" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['user_2fa_disabled']}</span></div>",
+                "success" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['profile_updated_title']}</span></div>",
                 default => ""
             },
         );
@@ -163,7 +162,7 @@ class UserView
         };
         preg_match_all("/{#(\w|_)+#}/", $html, $matches);
         foreach ($matches[0] as $match) {
-            $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+            $html = str_replace($match, $this->container->lang[str_replace(["{", "#", "}"], "", $match)], $html);
         }
         return $html;
     }
@@ -344,7 +343,7 @@ class UserView
             case Renderer::RECOVER_2FA:
                 return $this->recover2FA();
             default:
-                throw new ForbiddenException($lang['exception_page_not_allowed']);
+                throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
         }
     }
 

@@ -5,8 +5,7 @@ if(empty($_SESSION['lang']))
 else if(!empty($_GET['lang']) && $_SESSION['lang'] !== $_GET['lang'])
     try {
         $_SESSION['lang'] = match ($_GET['lang']) {
-            'fr' => 'fr',
-            'en' => 'en',
+            'fr' => 'fr'
         };
     }catch(UnhandledMatchError){
         $_SESSION['lang'] = "fr";

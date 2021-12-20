@@ -33,11 +33,12 @@ $container['notAllowedHandler'] = function () use ($lang) {
         return $response->withStatus(405)->write($html);
     };
 };
-$container['errorHandler'] = function () {
-    return new ExceptionHandler();
+$container['errorHandler'] = function () use ($lang){
+    return new ExceptionHandler($lang);
 };
 $container['items_upload_dir'] = __DIR__ . '\..\assets\img\items';
 $container['users_upload_dir'] = __DIR__ . '\..\assets\img\avatars';
+$container['lang'] = $lang;
 
 #Launch
 Eloquent::start('..\src\conf\conf.ini');
@@ -90,7 +91,7 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
     //END TODO
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("{$lang['home_title']} MyWishList", ["style.css"]) . file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
+    $html = genererHeader("{$lang['home_title']} MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
     $phtmlVars = array(
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
         'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",

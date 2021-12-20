@@ -37,7 +37,7 @@ class ControllerList
                 $liste = Liste::where("no", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
                 if (empty($liste) || !password_verify($private_key, $liste->private_key))
-                    throw new ForbiddenException($lang['exception_incorrect_token'], $lang['exception_ressource_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
                     $liste->update([
                         'titre' => filter_var($request->getParsedBodyParam('titre'), FILTER_SANITIZE_STRING),
@@ -74,7 +74,7 @@ class ControllerList
                 $liste = Liste::where("no", "LIKE", $list_id)->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
                 if (empty($liste) || !password_verify($private_key, $liste->private_key))
-                    throw new ForbiddenException($lang['exception_incorrect_token'], $lang['exception_ressource_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
                     $liste->items()->create([
                         'liste_id' => $list_id,
@@ -113,7 +113,7 @@ class ControllerList
                 $liste->private_key = password_hash($token, PASSWORD_DEFAULT);
                 $liste->save();
                 $path = $this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key]);
-                return $response->write("<script type='text/javascript'>alert('{$lang['alert_modify_token']} $token');window.location.href='$path';</script>");
+                return $response->write("<script type='text/javascript'>alert('{$this->container->lang['alert_modify_token']} $token');window.location.href='$path';</script>");
             default:
                 throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
         }
@@ -132,7 +132,7 @@ class ControllerList
                 if (!empty($liste->public_key))
                     $liste = Liste::whereNoAndPublicKey($liste->no, $public_key)->first();
                 if (empty($liste))
-                    throw new ForbiddenException($lang['exception_incorrect_token'], $lang['exception_ressource_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 //TODO REMOVE
                 if (!in_array($request->getCookieParam('typeUser'), ['createur', 'participant']))
                     throw new CookieNotSetException();

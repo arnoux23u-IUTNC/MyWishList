@@ -30,7 +30,7 @@ class ControllerUser
                 else {
                     $user = User::find($_SESSION['USER_ID']);
                     if (empty($user))
-                        throw new ForbiddenException($lang['exception_page_not_allowed']);
+                        throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
                     $renderer = new UserView($this->container, $user, $request);
                     return $response->write($renderer->render(Renderer::PROFILE));
                 }
@@ -42,7 +42,7 @@ class ControllerUser
                     return $this->deleteAvatar($request, $response, $args);
                 $user = User::find($_SESSION['USER_ID']);
                 if (empty($user))
-                    throw new ForbiddenException($lang['exception_page_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
                 if (!password_verify(filter_var($request->getParsedBodyParam("input-old-password"), FILTER_SANITIZE_STRING), $user->password))
                     return $response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "password"]));
                 $toUpdate = array();
@@ -91,7 +91,7 @@ class ControllerUser
                 break;
             case 'POST':
                 if ($request->getParsedBodyParam('sendBtn') !== "OK")
-                    throw new ForbiddenException($lang['exception_page_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
                 $username = filter_var($request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING);
                 $password = filter_var($request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING);
                 $auth_2FA = filter_var($request->getParsedBodyParam('query-code'), FILTER_SANITIZE_NUMBER_INT) ?? null;
@@ -130,7 +130,7 @@ class ControllerUser
                 break;
             case 'POST':
                 if ($request->getParsedBodyParam('sendBtn') !== "OK")
-                    throw new ForbiddenException($lang['exception_page_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
                 $username = filter_var($request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL;
                 $lastname = filter_var($request->getParsedBodyParam('lastname'), FILTER_SANITIZE_STRING) ?? NULL;
                 $firstname = filter_var($request->getParsedBodyParam('firstname'), FILTER_SANITIZE_STRING) ?? NULL;
@@ -201,7 +201,7 @@ class ControllerUser
                     return $response->write((new UserView($this->container, request: $request))->render(Renderer::RECOVER_2FA));
                 case 'POST':
                     if ($request->getParsedBodyParam('sendBtn') !== "OK")
-                        throw new ForbiddenException($lang['exception_page_not_allowed']);
+                        throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
                     $rescue = filter_var($request->getParsedBodyParam('rescue'), FILTER_SANITIZE_NUMBER_INT);
                     $user = User::whereUsername(filter_var($request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING))->first();
                     $rescueObj = RescueCode::whereUserAndCode($user->user_id, $rescue)->first();
@@ -233,7 +233,7 @@ class ControllerUser
                     switch ($args["action"]) {
                         case "disable":
                             if ($request->getParsedBodyParam('sendBtn') !== "ok")
-                                throw new ForbiddenException($lang['exception_page_not_allowed']);
+                                throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
                             if (empty($user->totp_key))
                                 return $response->withRedirect($this->container->router->pathFor('2fa', ["action" => 'manage']));
                             $user->remove2FA();
@@ -241,7 +241,7 @@ class ControllerUser
                             break;
                         case "enable":
                             if ($request->getParsedBodyParam('sendBtn') !== "ok")
-                                throw new ForbiddenException($lang['exception_page_not_allowed']);
+                                throw new ForbiddenException($this->container->lang['exception_page_not_allowed']);
                             if (!empty($user->totp_key))
                                 return $response->withRedirect($this->container->router->pathFor('2fa', ["action" => 'manage']));
                             $secret = filter_var($request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);

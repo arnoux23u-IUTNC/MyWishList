@@ -4,7 +4,16 @@ namespace mywishlist\exceptions;
 
 class ExceptionHandler
 {
+
+    private static array $lang;
+
+    public function __construct(array $lang)
+    {
+        self::$lang = $lang;
+    }
+
     public function __invoke($request, $response, $exception) {
+        $lang = self::$lang;
         if ($exception instanceof ForbiddenException) {
             $title = $exception->getTitle();
             $msg = $exception->getMessage();

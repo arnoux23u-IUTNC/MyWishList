@@ -38,7 +38,7 @@ class ControllerItem
                 $liste = $item->liste()->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
                 if (empty($item) || !password_verify($private_key, $liste->private_key))
-                    throw new ForbiddenException($lang['exception_incorrect_token'], $lang['exception_ressource_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
                     $file = $request->getUploadedFiles()['file_img'];
                     $filename = $file->getClientFilename();
@@ -80,7 +80,7 @@ class ControllerItem
                 $liste = $item->liste()->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
                 if (empty($item) || !password_verify($private_key, $liste->private_key))
-                    throw new ForbiddenException($lang['exception_incorrect_token'], $lang['exception_ressource_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
                     $item->delete();
                     return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "delItem"]));
@@ -104,7 +104,7 @@ class ControllerItem
                 */
                 $item = Item::where("id", "LIKE", filter_var(filter_var($args["id"], FILTER_SANITIZE_STRING), FILTER_SANITIZE_NUMBER_INT))->first();
                 if (empty($item->liste))
-                    throw new ForbiddenException($lang['exception_forbidden'], $lang['exception_ressource_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
                 $liste = $item->liste->whereNo(filter_var($request->getParsedBodyParam('liste_id'), FILTER_SANITIZE_STRING) ?? "")->first() ?? null;
                 /*
                 Si la liste a un token de visibilite, on verifie celui saisi par l'utilisateur
@@ -113,7 +113,7 @@ class ControllerItem
                 if (!empty($liste->public_key))
                     $liste = $liste->where("public_key", filter_var($request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) ?? "")->first();
                 if (empty($liste))
-                    throw new ForbiddenException($lang['exception_incorrect_token'], $lang['exception_ressource_not_allowed']);
+                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 //TODO REMOVE
                 if (!in_array($request->getCookieParam('typeUser'), ['createur', 'participant']))
                     throw new CookieNotSetException();
