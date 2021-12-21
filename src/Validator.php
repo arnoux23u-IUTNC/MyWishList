@@ -18,17 +18,23 @@ class Validator
         if($type === "user"){
             if (!is_writable($container['users_upload_dir'].DIRECTORY_SEPARATOR))
                 return "writeerr";
-            if(!$file->moveTo($container['users_upload_dir'].DIRECTORY_SEPARATOR . $file_name))
+            try{
+                $file->moveTo($container['users_upload_dir'].DIRECTORY_SEPARATOR  .$file_name);
+                return "ok";
+            }catch(\Exception){
                 return "error";
-            return "ok";
+            }
         }else{
             if (file_exists($container['items_upload_dir'].DIRECTORY_SEPARATOR . $file_name))
                 return "fileexist";
             if (!is_writable($container['items_upload_dir'].DIRECTORY_SEPARATOR)) 
                 return "writeerr";
-            if(!$file->moveTo($container['items_upload_dir'].DIRECTORY_SEPARATOR . $file_name))
+            try{
+                $file->moveTo($container['items_upload_dir'].DIRECTORY_SEPARATOR . $file_name);
+                return "ok";
+            }catch(\Exception){
                 return "error";
-            return "ok";
+            }
         }
     }
 
