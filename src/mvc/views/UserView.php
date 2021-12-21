@@ -151,6 +151,12 @@ class UserView
                 "2fanok" => "<div class='popup warning fit'><span style='color:black;'>Erreur pendant l'activation de 2FA.</span></div>",
                 "2fa_disabled" => "<div class='popup fit'><span style='color:black;'>2FA desactivé</span></div>",
                 "success" => "<div class='popup fit'><span style='color:black;'>Profil mis à jour</span></div>",
+                "ok" => "<div class='popup fit'><span style='color:black;'>//</span></div>",
+                "typeerr"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
+                "sizeerr"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
+                "writeerr"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
+                "fileexist"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
+                "error"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
                 default => ""
             },
         );

@@ -37,7 +37,13 @@ class ControllerUser{
                     return $this->login($request, $response, $args);
                 if(!empty($request->getParsedBodyParam("delete_btn")) && $request->getParsedBodyParam("delete_btn") === "delete")
                     return $this->deleteAvatar($request, $response, $args);
+                $file = $request->getUploadedFiles()['avatarinput'];
                 $user = User::find($_SESSION['USER_ID']);
+                if(!empty($file)){
+                    $filename = $user->user_id.".".pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
+                    $info = Validator::validateFile($this->container, $file, $filename, "user");
+                    return $response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ['info' => $info]));
+                }
                 if(empty($user))
                     throw new ForbiddenException("Vous n'êtes pas autorisé à accéder à cette page");
                 if(!password_verify(filter_var($request->getParsedBodyParam("input-old-password"), FILTER_SANITIZE_STRING), $user->password))
