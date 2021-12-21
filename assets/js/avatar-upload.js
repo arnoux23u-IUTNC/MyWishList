@@ -23,4 +23,5 @@ let assertFile = () => {
         }
         form.submit();
     }
+    return false;
 }

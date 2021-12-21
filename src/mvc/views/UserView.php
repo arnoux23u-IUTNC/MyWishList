@@ -96,7 +96,7 @@ class UserView
         return genererHeader("{$this->container->lang['title_register']} - MyWishList", ["list.css"]) . <<<EOD
             <h2>{$this->container->lang['title_register']}</h2>$popup
             <div>
-                <form class='form_container' onsubmit='return assertFile()' enctype="multipart/form-data" method="post" action="$route">
+                <form class='form_container' onsubmit='return assertFile()' enctype="multipart/form-data" id="form" method="post" action="$route">
                     <label for="username">{$this->container->lang['user_username']}</label>
                     <input type="text" name="username" id="username" required />
                     <label for="lastname">{$this->container->lang['user_lastname']}</label>
@@ -117,7 +117,7 @@ class UserView
                         <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
                         <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
                     </div>
-                    <button type="submit" value="OK" name="sendBtn">{$this->container->lang['title_register']}</button>
+                    <button type="submit" value="OK" id="sendbtn" name="sendBtn">{$this->container->lang['title_register']}</button>
                     <a href="$routeConnexion">{$this->container->lang['register_to_login']}</a>
                 </form>
             <div>
