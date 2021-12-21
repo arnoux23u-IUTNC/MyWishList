@@ -40,11 +40,21 @@ class ControllerUser
                     return $this->login($request, $response, $args);
                 if (!empty($request->getParsedBodyParam("delete_btn")) && $request->getParsedBodyParam("delete_btn") === "delete")
                     return $this->deleteAvatar($request, $response, $args);
-                $file = $request->getUploadedFiles()['avatarinput'];
                 $user = User::find($_SESSION['USER_ID']);
+                $file = $request->getUploadedFiles()['avatarinput'];
                 if(!empty($file)){
-                    $filename = $user->user_id.".".pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
-                    $info = Validator::validateFile($this->container, $file, $filename, "user");
+                    $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
+                    $finfo = [$user->user_id,strtolower($extension)];
+                    $oldfile = $this->container['users_upload_dir'].DIRECTORY_SEPARATOR.$user->avatar;
+                    $info = Validator::validateFile($this->container, $file, $finfo, "user");
+                    if($info === "ok"){
+                        if($user->avatar !== $finfo[0].".".$finfo[1]){
+                            unlink($oldfile);
+                        }
+                        $user->update(['avatar' => $finfo[0].".".$finfo[1]]);
+                    }
+                    unset($_FILES);
+                    //return $response->write("old : ".$user->avatar." new : ".$filename);
                     return $response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ['info' => $info]));
                 }
                 if(empty($user))
@@ -156,10 +166,13 @@ class ControllerUser
                 $user->created_at = date("Y-m-d H:i:s");
                 $user->save();
                 if (!empty($file)) {
-                    $info = Validator::validateFile($this->container, $file, $user->user_id, "user");
+                    $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
+                    $finfo = [$user->user_id,strtolower($extension)];
+                    $info = Validator::validateFile($this->container, $file, $finfo, "user");
                     if ($info === "ok")
-                        $user->update(["avatar" => $user->user_id]);
+                        $user->update(["avatar" => $finfo[0].".".$finfo[1]]);
                 }
+                unset($_FILES);
                 session_regenerate_id();
                 $user->update(['last_ip' => ip2long($_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']), "last_login" => date("Y-m-d H:i:s")]);
                 $_SESSION['LOGGED_IN'] = true;
@@ -195,6 +208,7 @@ class ControllerUser
         $user = User::find($_SESSION['USER_ID']);
         if (empty($user->avatar))
             return $response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "noavatar"]));
+        unlink($this->container['users_upload_dir'].DIRECTORY_SEPARATOR  .$user->avatar);
         $user->update(["avatar" => NULL]);
         return $response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile']));
     }
