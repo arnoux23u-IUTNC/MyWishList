@@ -93,10 +93,10 @@ class UserView
             };
         $route = $this->container->router->pathFor('accounts', ["action" => 'register']);
         $routeConnexion = $this->container->router->pathFor('accounts', ["action" => 'login']);
-        return genererHeader("{$this->container->lang['resiter_title']} - MyWishList", ["list.css"]) . <<<EOD
-            <h2>{$this->container->lang['resiter_title']}</h2>$popup
+        return genererHeader("{$this->container->lang['title_register']} - MyWishList", ["list.css"]) . <<<EOD
+            <h2>{$this->container->lang['title_register']}</h2>$popup
             <div>
-                <form class='form_container' enctype="multipart/form-data" method="post" action="$route">
+                <form class='form_container' onsubmit='return assertFile()' enctype="multipart/form-data" method="post" action="$route">
                     <label for="username">{$this->container->lang['user_username']}</label>
                     <input type="text" name="username" id="username" required />
                     <label for="lastname">{$this->container->lang['user_lastname']}</label>
@@ -122,6 +122,7 @@ class UserView
                 </form>
             <div>
             <script src="/assets/js/password-validator.js"></script>
+            <script src="/assets/js/avatar-register.js"></script>
         </body>
         </html>
         EOD;
@@ -136,7 +137,7 @@ class UserView
             "profile_route"=> $this->container->router->pathFor('accounts',["action" => 'profile']),
             "logout_route"=> $this->container->router->pathFor('accounts',["action" => 'logout']),
             "2fa_route"=> $this->container->router->pathFor('2fa', ["action" => 'manage']),
-            "avatar_src"=> (!empty($user->avatar) && file_exists($this->container['users_upload_dir']."\\$user->avatar")) ? $this->container['users_upload_dir']."\\$user->avatar" : "https://www.gravatar.com/avatar/".md5(strtolower(trim($user->mail))),
+            "avatar_src"=> (!empty($user->avatar) && file_exists($this->container['users_upload_dir'].DIRECTORY_SEPARATOR."$user->avatar")) ? "/assets/img/avatars/$user->avatar" : "https://www.gravatar.com/avatar/".md5(strtolower(trim($user->mail)))."?size=120",
             "user_username"=>$this->user->username,
             "user_firstname"=>$this->user->firstname,
             "user_lastname"=>$this->user->lastname,
@@ -154,12 +155,12 @@ class UserView
                 "2fanok" => "<div class='popup warning fit'><span style='color:black;'>Erreur pendant l'activation de 2FA.</span></div>",
                 "2fa_disabled" => "<div class='popup fit'><span style='color:black;'>2FA desactivé</span></div>",
                 "success" => "<div class='popup fit'><span style='color:black;'>Profil mis à jour</span></div>",
-                "ok" => "<div class='popup fit'><span style='color:black;'>//</span></div>",
-                "typeerr"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
-                "sizeerr"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
-                "writeerr"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
-                "fileexist"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
-                "error"  => "<div class='popup warning fit'><span style='color:black;'>//</span></div>",
+                "ok" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['image_saved']}</div>",
+                "typeerr"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_type_error']}</span></div>",
+                "sizeerr"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_size_error']}</span></div>",
+                "writeerr"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_write_error']}</span></div>",
+                "fileexist"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_exists']}</span></div>",
+                "error"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_error']}</span></div>",
                 default => ""
             },
         );
