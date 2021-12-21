@@ -1,42 +1,57 @@
 <?php
 session_start();
-require_once __DIR__.'\..\src\vendor\autoload.php';
+
+$lang = [];
+
+require_once __DIR__ . '\..\src\vendor\autoload.php';
+require_once __DIR__ . '\..\src\i18n\langs.php';
 
 use \mywishlist\bd\Eloquent as Eloquent;
 use \mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem};
-use \mywishlist\exceptions\{ExceptionHandler, ForbiddenException, CookieNotSetException};
+use \mywishlist\exceptions\{ExceptionHandler, CookieNotSetException};
 use Slim\{App, Container};
 
 #Container
 //todo remove errors
 $container = new Container(['settings' => ['displayErrorDetails' => true]]);
-$container['notFoundHandler'] = function () {
-    return function ($request, $response) {
-        return $response->withStatus(404)->write(file_get_contents('..\errors\404.html'));
+//end todo
+$container['notFoundHandler'] = function () use ($lang) {
+    return function ($request, $response) use ($lang) {
+        $html = file_get_contents('..\errors\404.html');
+        preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+        foreach ($matches[0] as $match)
+            $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+        return $response->withStatus(404)->write($html);
     };
 };
-$container['notAllowedHandler'] = function () {
-    return function ($request, $response) {
-        return $response->withStatus(405)->write(file_get_contents('..\errors\405.html'));
+$container['notAllowedHandler'] = function () use ($lang) {
+    return function ($request, $response) use ($lang) {
+        $html = file_get_contents('..\errors\405.html');
+        preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+        foreach ($matches[0] as $match)
+            $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+        return $response->withStatus(405)->write($html);
     };
 };
-$container['errorHandler'] = function () {
-    return new ExceptionHandler();
+$container['errorHandler'] = function () use ($lang){
+    return new ExceptionHandler($lang);
 };
-$container['items_upload_dir'] = __DIR__.'\..\assets\img\items';
-$container['users_upload_dir'] = __DIR__.'\..\assets\img\avatars';
+$container['items_upload_dir'] = __DIR__ . '\..\assets\img\items';
+$container['users_upload_dir'] = __DIR__ . '\..\assets\img\avatars';
+$container['lang'] = $lang;
 
 #Launch
 Eloquent::start('..\src\conf\conf.ini');
 $app = new App($container);
 
 #Modifications temporaires de variables
+//TODO REMOVE BIENTOT
 $app->get('/participant', function ($request, $response, $args) {
-    setcookie("typeUser", 'participant', time()+3600*24);
+    setcookie("typeUser", 'participant', time() + 3600 * 24);
     return $response->write("<h1>Participant</h1><a href='/'>Retour</a>");
 });
 $app->get('/createur', function ($request, $response, $args) {
-    setcookie("typeUser", 'createur', time()+3600*24);
+    setcookie("typeUser", 'createur', time() + 3600 * 24);
     return $response->write("<h1>Createur</h1> <a href='/'>Retour</a>");
 });
 
@@ -59,10 +74,6 @@ $app->any("/lists/new[/]", function ($request, $response, $args) {
 $app->get("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerList($this))->show($request, $response, $args);
 })->setName('lists_show_id');
-
-/*$app->any("/items/new[/]", function ($request, $response, $args) {
-    return (new ControllerItem($this))->create($request, $response, $args);
-})->setName('items_list_add');*/
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this))->delete($request, $response, $args);
 })->setName('items_delete_id');
@@ -73,37 +84,42 @@ $app->post("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerItem($this))->show($request, $response, $args);
 })->setName('items_show_id');
 
-$app->get('/', function ($request, $response, $args){
+$app->get('/', function ($request, $response, $args) use ($lang) {
     //TODO REMOVE
-    if(empty($request->getCookieParam('typeUser'))){
+    if (empty($request->getCookieParam('typeUser')))
         throw new CookieNotSetException();
-    }
+    //END TODO
     $routeCreate = $this->router->pathFor('lists_create');
-    $html = genererHeader("MyWishList",["style.css"]).file_get_contents(__DIR__.'\..\src\content\sidebar.phtml');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
+    $html = genererHeader("{$lang['home_title']} MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
     $phtmlVars = array(
-        'user_name' => $_SESSION["USER_NAME"] ?? "Se connecter",
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
-        'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts',["action" => "login"]) : $this->router->pathFor('accounts',["action" => "logout"]),
+        'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
+        'create_list_route' => $routeCreate,
+        'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),
         'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<EOD
 
                     <li>
                         <a href="$routeProfile">
                             <i class='bx bxs-user'></i>
-                            <span class="links_name">Mon Profil</span>
+                            <span class="links_name">{$lang['home_my_profile']}</span>
                         </a>
-                        <span class="tooltip">Mon Profil</span>
+                        <span class="tooltip">{$lang['home_my_profile']}</span>
                     </li>
         EOD
     );
     foreach ($phtmlVars as $key => $value) {
-        $html = str_replace("%".$key."%", $value, $html);
-    };  
-    $html.= <<<EOD
+        $html = str_replace("%" . $key . "%", $value, $html);
+    };
+    preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+    foreach ($matches[0] as $match) {
+        $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+    }
+    $html .= <<<EOD
         <div class="main_container">
-            <h3>Bienvenue sur MyWishList</h3>
-            <span><a id="createBtn" href="$routeCreate"></a></span>
-            <span><a class="disabled" id="lookBtn" href="#"></a></span>
+            <h3>{$lang["home_welcome"]}</h3>
+            <span><a id="createBtn" style="--content:{$lang['phtml_lists_create']};" href="$routeCreate"></a></span>
+            <span><a class="disabled" style="--content:{$lang['html_btn_list']};" id="lookBtn" href="#"></a></span>
         </div>
     </body>
     EOD;
@@ -112,7 +128,8 @@ $app->get('/', function ($request, $response, $args){
 
 $app->run();
 
-function genererHeader($title, $styles = []) {
+function genererHeader($title, $styles = [])
+{
     $html = <<<EOD
     <!DOCTYPE html>
     <html lang="fr">
@@ -127,7 +144,7 @@ function genererHeader($title, $styles = []) {
         <link href="/assets/css/navbar.css" rel="stylesheet">
         <title>$title</title>
     EOD;
-    foreach($styles as $style)
+    foreach ($styles as $style)
         $html .= "\t<link rel='stylesheet' href='/assets/css/$style'>\n";
-    return $html."\n</head>\n<body>\n";   
+    return $html . "\n</head>\n<body>\n";
 }

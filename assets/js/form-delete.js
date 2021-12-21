@@ -8,7 +8,7 @@ let checkForm = () => {
             if (link.match(/^((https?:\/{2})?(\w[\w\-\/\.]+).(jpe?g|png))?$/)) {
                 return true;
             } else {
-                alert("Lien doit matcher [http(s)://]nomimage.(jpe?g|png)");
+                alert("Link must match [http(s)://]nomimage.(jpe?g|png)");
                 document.getElementById("url_img").focus();
             }
             break;
@@ -17,7 +17,7 @@ let checkForm = () => {
             if (name.match(/^(\w[\w\-\/\.]+).(jpe?g|png)$/)) {
                 return true;
             } else {
-                alert("Lien doit matcher [nomimage.(jpe?g|png)]");
+                alert("Link must match [nomimage.(jpe?g|png)]");
                 document.getElementById("file_img").focus();
             }
             break;
