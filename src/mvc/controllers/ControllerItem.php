@@ -7,7 +7,7 @@ use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use Slim\Container;
 use \mywishlist\mvc\Renderer;
 use \mywishlist\mvc\views\ItemView;
-use \mywishlist\mvc\models\Item;
+use \mywishlist\mvc\models\{Item,Reserved};
 use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
 
 class ControllerItem
@@ -37,8 +37,14 @@ class ControllerItem
                 $item = Item::where("id", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
                 $liste = $item->liste()->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
-                if (empty($item) || !password_verify($private_key, $liste->private_key))
-                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
+                if (empty($item))
+                    throw new NotFoundException($request, $response);
+                if (!password_verify($private_key, $liste->private_key)){
+                    $renderer = new ItemView($this->container, $item, $request);
+                    return $response->withRedirect($this->container->router->pathFor('items_delete_id',['id' => $item->id],["info"=>"err"]));
+                }
+                if(!empty(Reserved::find($item->id)))
+                    return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "resItem"]));
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
                     $file = $request->getUploadedFiles()['file_img'];
                     $filename = $file->getClientFilename();
@@ -79,9 +85,15 @@ class ControllerItem
                 $item = Item::where("id", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
                 $liste = $item->liste()->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
-                if (empty($item) || !password_verify($private_key, $liste->private_key))
-                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
+                if (empty($item))
+                    throw new NotFoundException($request, $response);
+                if (!password_verify($private_key, $liste->private_key)){
+                    $renderer = new ItemView($this->container, $item, $request, $public_key);
+                    return $response->withRedirect($this->container->router->pathFor('items_delete_id',['id' => $item->id],["public_key" => $public_key,"info"=>"err"]));
+                }
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
+                    if(!empty(Reserved::find($item->id)))
+                        return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "resItem"]));
                     $item->delete();
                     return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "delItem"]));
                 } else {
@@ -103,16 +115,16 @@ class ControllerItem
                 Récupération de la liste associée
                 */
                 $item = Item::where("id", "LIKE", filter_var(filter_var($args["id"], FILTER_SANITIZE_STRING), FILTER_SANITIZE_NUMBER_INT))->first();
+                if (empty($item) )
+                    throw new NotFoundException($request, $response);
                 if (empty($item->liste))
                     throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
-                $liste = $item->liste->whereNo(filter_var($request->getParsedBodyParam('liste_id'), FILTER_SANITIZE_STRING) ?? "")->first() ?? null;
+                $liste = $item->liste()->first();
                 /*
                 Si la liste a un token de visibilite, on verifie celui saisi par l'utilisateur
                 Si il n'en saisi pas ou que le token est incorrect alors on renvoie une erreur 403
                 */
-                if (!empty($liste->public_key))
-                    $liste = $liste->where("public_key", filter_var($request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) ?? "")->first();
-                if (empty($liste))
+                if ($liste->no != filter_var($request->getParsedBodyParam('liste_id'), FILTER_SANITIZE_STRING) ?? "" || (!empty($liste->public_key) && $liste->public_key !== filter_var($request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) ?? ""))
                     throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 //TODO REMOVE
                 if (!in_array($request->getCookieParam('typeUser'), ['createur', 'participant']))
@@ -121,7 +133,7 @@ class ControllerItem
                 $renderer = new ItemView($this->container, $item, $request);
                 return $response->write($renderer->render(Renderer::SHOW));
             default:
-                throw new MethodNotAllowedException($request, $response, ['GET']);
+                throw new MethodNotAllowedException($request, $response, ['POST']);
         }
     }
 }

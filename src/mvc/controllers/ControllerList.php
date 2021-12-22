@@ -36,7 +36,9 @@ class ControllerList
             case 'POST':
                 $liste = Liste::where("no", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
-                if (empty($liste) || !password_verify($private_key, $liste->private_key))
+                if (empty($liste))
+                    throw new NotFoundException($request, $response);
+                if (!password_verify($private_key, $liste->private_key))
                     throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
                     $liste->update([
@@ -73,7 +75,9 @@ class ControllerList
             case 'POST':
                 $liste = Liste::where("no", "LIKE", $list_id)->first();
                 $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
-                if (empty($liste) || !password_verify($private_key, $liste->private_key))
+                if (empty($liste))
+                    throw new NotFoundException($request, $response);
+                if (!password_verify($private_key, $liste->private_key))
                     throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
                     $liste->items()->create([
@@ -129,9 +133,9 @@ class ControllerList
                 Si la liste a un token, on verifie celui saisi par l'utilisateur
                 Si il n'en saisi pas ou que le token est incorrect alors on renvoie une erreur 403
                 */
-                if (!empty($liste->public_key))
-                    $liste = Liste::whereNoAndPublicKey($liste->no, $public_key)->first();
                 if (empty($liste))
+                    throw new NotFoundException($request, $response);
+                if (!empty($liste->public_key) && $liste->public_key !== $public_key)
                     throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
                 //TODO REMOVE
                 if (!in_array($request->getCookieParam('typeUser'), ['createur', 'participant']))
