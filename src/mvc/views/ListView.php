@@ -34,6 +34,7 @@ class ListView
             "newItem"  => "<div class='popup'>{$this->container->lang['list_item_added']}</div>",
             "modItem"  => "<div class='popup'>{$this->container->lang['list_item_updated']}</div>",
             "delItem"  => "<div class='popup warning'>{$this->container->lang['list_item_deleted']}</div>",
+            "resItem"  => "<div class='popup warning'>{$this->container->lang['list_item_reserved_action']}</div>",
             default => ""
         };    
         $warnEdit = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
@@ -163,7 +164,7 @@ class ListView
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $routeListEdit = $this->container->router->pathFor('lists_edit_id',["id" => $this->list->no]);
         return genererHeader("{$this->container->lang['list']} $l->no | {$this->container->lang["editing"]}", ["list.css"]). <<<EOD
-            <h2>{$this->container->lang["liste_editing"]} $l->no</h2>
+            <h2>{$this->container->lang["list_editing"]} $l->no</h2>
             <div>
                 <form class='form_container' method="post" action="$routeListEdit">
                     <label for="title">{$this->container->lang['title']}</label>

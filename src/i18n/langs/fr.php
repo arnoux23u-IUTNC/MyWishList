@@ -87,6 +87,7 @@ $lang = array(
     "list_editing" => "Edition de liste",
     "list_item_added" => "Nouvel item ajouté",
     "list_item_deleted" => "Item supprimé",
+    "list_item_reserved_action" => "Impossible d'intéragir avec un item reservé",
     "list_item_updated" => "Item mis à jour",
     "list_associated_user" => "Utilisateur associé",
     "list_add_item" => "Ajouter un item",

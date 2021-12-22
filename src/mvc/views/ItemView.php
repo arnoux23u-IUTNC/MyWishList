@@ -70,8 +70,12 @@ class ItemView
         $i = $this->item;
         $l = $i->liste()->first();
         $from = $this->container->router->pathFor('items_delete_id',['id' => $i->id],["public_key" => $this->public_key]);
+        $info = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
+            "err"  => "<div class='popup warning'>{$this->container->lang['exception_incorrect_token']}</div>",
+            default => ""
+        };        
         return genererHeader("{$this->container->lang['item_deleting']}", ["list.css"]). <<<EOD
-            <h2>{$this->container->lang['item_deleting']}</h2>
+            <h2>{$this->container->lang['item_deleting']}</h2>$info
             <div>
                 <form class='form_container' method="post" action="$from">
                     <label for="private_key">{$this->container->lang['private_token_for']} $l->no</label>
