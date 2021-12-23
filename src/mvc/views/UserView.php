@@ -4,7 +4,7 @@ namespace mywishlist\mvc\views;
 
 use Slim\Container;
 use OTPHP\TOTP;
-use \mywishlist\mvc\models\{User, RescueCode};
+use \mywishlist\mvc\models\{User, Liste, RescueCode};
 use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
 use mywishlist\mvc\Renderer;
 
@@ -132,20 +132,28 @@ class UserView
     {
         $html = genererHeader("{$this->container->lang['profile_title']} - MyWishList", ["profile.css"]) . file_get_contents(__DIR__ . '\..\..\content\profile.phtml');
         $user = $this->user;
+        $lists = Liste::whereUserId($user->user_id)->get();
+        $htmlLists = "";
+        foreach ($lists as $k=>$list) {
+          $k++;
+          $route = $this->container->router->pathFor('lists_show_id', ["id" => $list->no]);
+          $htmlLists .= "<a href='$route'><div class='list form-control form-control-alternative'><span class='form-control-label'>$k | $list->titre</span></div></a>";
+        }
         $phtmlVars = array(
             "main_route"=> $this->container->router->pathFor('home'),
+            "mylists"=> $htmlLists,
             "profile_route"=> $this->container->router->pathFor('accounts',["action" => 'profile']),
             "logout_route"=> $this->container->router->pathFor('accounts',["action" => 'logout']),
             "2fa_route"=> $this->container->router->pathFor('2fa', ["action" => 'manage']),
             "avatar_src"=> (!empty($user->avatar) && file_exists($this->container['users_upload_dir'].DIRECTORY_SEPARATOR."$user->avatar")) ? "/assets/img/avatars/$user->avatar" : "https://www.gravatar.com/avatar/".md5(strtolower(trim($user->mail)))."?size=120",
-            "user_username"=>$this->user->username,
-            "user_firstname"=>$this->user->firstname,
-            "user_lastname"=>$this->user->lastname,
-            "user_email"=>$this->user->mail,
-            "user_created_at"=>$this->user->created_at,
-            "user_updated_at"=>$this->user->updated ?? "Jamais",
-            "user_lastlogged_at"=>$this->user->last_login,
-            "user_lastlogged_ip"=>long2ip($this->user->last_ip),
+            "user_username"=>$user->username,
+            "user_firstname"=>$user->firstname,
+            "user_lastname"=>$user->lastname,
+            "user_email"=>$user->mail,
+            "user_created_at"=>$user->created_at,
+            "user_updated_at"=>$user->updated ?? "Jamais",
+            "user_lastlogged_at"=>$user->last_login,
+            "user_lastlogged_ip"=>long2ip($user->last_ip),
             "info_msg"=> match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
                 "noavatar" => "<div class='popup warning fit'><span style='color:black;'>Vous n'avez pas d'avatar<br>Nous utilisons automatiquement un Gravatar dans ce cas.</span></div>",
                 "password" => "<div class='popup warning fit'><span style='color:black;'>Mot de passe incorrect</span></div>",
