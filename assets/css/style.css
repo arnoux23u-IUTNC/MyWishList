@@ -84,17 +84,17 @@ span a:after {
 
 #createBtn::before,
 #createBtn::after {
-    content: var(--content);
+    content: attr(content);
 }
 
 #backBtn::before,
 #backBtn::after {
-    content: var(--content);
+    content: attr(content);
 }
 
 #lookBtn::before,
 #lookBtn::after {
-    content: var(--content);
+    content: attr(content);
     margin-top: 2vh;
 }
 
