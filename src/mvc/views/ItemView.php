@@ -36,7 +36,7 @@ class ItemView
                 $reservation_state = "{$this->container->lang['item_reserved']}";
         else
             $reservation_state = "{$this->container->lang['item_unreserved']}";
-        $item_desc = "\t<div>\n\t\t<h2>$i->nom</h2>\n\t\t".(!empty($i->descr) ? "<p>{$this->container->lang['description']} : $i->descr</p>\n\t\t" : "").(!empty($i->url) ? "<p>URL : $i->url</p>\n\t\t" : "").(!empty($i->tarif) ? "<p>{$this->container->lang['price']} : $i->tarif</p>\n\t\t" : "").(!empty($i->img) && file_exists(__DIR__."\..\..\..\assets\img\items\\$i->img") ? "<img alt='$i->nom' src='/assets/img/items/$i->img'>\n\t\t" : "")."<p>{$this->container->lang['item_associated_list']} : $l->titre | $l->description ($l->expiration)</p>\n\t\t"."<p>{$this->container->lang['reservation_state']} : $reservation_state</p>\n\t</div>\n</body>";
+        $item_desc = "\t<div>\n\t\t<h2>$i->nom</h2>\n\t\t".(!empty($i->descr) ? "<p>{$this->container->lang['description']} : $i->descr</p>\n\t\t" : "").(!empty($i->url) ? "<p>URL : $i->url</p>\n\t\t" : "").(!empty($i->tarif) ? "<p>{$this->container->lang['price']} : $i->tarif</p>\n\t\t" : "").(!empty($i->img) ? (file_exists(__DIR__."\..\..\..\assets\img\items\\$i->img") ? "<img alt='$i->nom' src='/assets/img/items/$i->img'>\n\t\t" : (filter_var($i->img, FILTER_VALIDATE_URL) ? "<img alt='$i->nom' src='$i->img'>\n\t\t" : "")) : "")."<p>{$this->container->lang['item_associated_list']} : $l->titre | $l->description ($l->expiration)</p>\n\t\t"."<p>{$this->container->lang['reservation_state']} : $reservation_state</p>\n\t</div>\n</body>";
         return genererHeader("Item $i->id - MyWishList", ["item.css"]).$item_desc;
     }
 
@@ -70,12 +70,8 @@ class ItemView
         $i = $this->item;
         $l = $i->liste()->first();
         $from = $this->container->router->pathFor('items_delete_id',['id' => $i->id],["public_key" => $this->public_key]);
-        $info = "\n\t".match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
-            "err"  => "<div class='popup warning'>{$this->container->lang['exception_incorrect_token']}</div>",
-            default => ""
-        };        
         return genererHeader("{$this->container->lang['item_deleting']}", ["list.css"]). <<<EOD
-            <h2>{$this->container->lang['item_deleting']}</h2>$info
+            <h2>{$this->container->lang['item_deleting']}</h2>
             <div>
                 <form class='form_container' method="post" action="$from">
                     <label for="private_key">{$this->container->lang['private_token_for']} $l->no</label>
