@@ -7,7 +7,7 @@ use Slim\Container;
 use \mywishlist\mvc\views\UserView;
 use \mywishlist\mvc\Renderer;
 use \mywishlist\Validator;
-use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
+use \mywishlist\exceptions\ForbiddenException;
 use mywishlist\mvc\models\{User, RescueCode};
 use OTPHP\TOTP;
 

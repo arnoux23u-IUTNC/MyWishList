@@ -8,7 +8,7 @@ require_once __DIR__ . '\..\src\i18n\langs.php';
 
 use \mywishlist\bd\Eloquent as Eloquent;
 use \mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem};
-use \mywishlist\exceptions\{ExceptionHandler, CookieNotSetException};
+use \mywishlist\exceptions\ExceptionHandler;
 use Slim\{App, Container};
 
 #Container
@@ -44,17 +44,6 @@ $container['lang'] = $lang;
 Eloquent::start('..\src\conf\conf.ini');
 $app = new App($container);
 
-#Modifications temporaires de variables
-//TODO REMOVE BIENTOT
-$app->get('/participant', function ($request, $response, $args) {
-    setcookie("typeUser", 'participant', time() + 3600 * 24);
-    return $response->write("<h1>Participant</h1><a href='/'>Retour</a>");
-});
-$app->get('/createur', function ($request, $response, $args) {
-    setcookie("typeUser", 'createur', time() + 3600 * 24);
-    return $response->write("<h1>Createur</h1> <a href='/'>Retour</a>");
-});
-
 #Redirection du traffic dans l'application
 $app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this))->auth2FA($request, $response, $args);
@@ -85,10 +74,6 @@ $app->post("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
 })->setName('items_show_id');
 
 $app->get('/', function ($request, $response, $args) use ($lang) {
-    //TODO REMOVE
-    if (empty($request->getCookieParam('typeUser')))
-        throw new CookieNotSetException();
-    //END TODO
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
     $html = genererHeader("{$lang['home_title']} MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
@@ -118,8 +103,8 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
     $html .= <<<EOD
         <div class="main_container">
             <h3>{$lang["home_welcome"]}</h3>
-            <span><a id="createBtn" style="--content:{$lang['phtml_lists_create']};" href="$routeCreate"></a></span>
-            <span><a class="disabled" style="--content:{$lang['html_btn_list']};" id="lookBtn" href="#"></a></span>
+            <span><a id="createBtn" content="{$lang['phtml_lists_create']}" href="$routeCreate"></a></span>
+            <span><a class="disabled" content="{$lang['html_btn_list']}" id="lookBtn" href="#"></a></span>
         </div>
     </body>
     EOD;
@@ -127,6 +112,10 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
 })->setName('home');
 
 $app->run();
+
+//TODO REMOVE
+if(empty($_SESSION['LOGGED_IN']))
+    print_r("ATTENTION VOUS ETES EN MODE INVITE");
 
 function genererHeader($title, $styles = [])
 {
