@@ -42,7 +42,8 @@
 
 html {
     line-height: 1.15;
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -412,6 +413,11 @@ a>code {
     max-width: 100%;
     flex-basis: 0;
     flex-grow: 1;
+}
+
+.col-2 {
+    max-width: 40%;
+    flex: 0 0 40%;
 }
 
 .col-4 {
@@ -1034,7 +1040,7 @@ textarea.form-control {
 
 .card-header {
     margin-bottom: 0;
-    padding: 1.25rem 1.5rem 0;
+    padding: 1.25rem 1.5rem 0.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, .05);
     background-color: #fff;
 }
@@ -1159,6 +1165,10 @@ button.bg-white:focus {
 
 .float-right {
     float: right !important;
+}
+
+.float-left {
+    float: left !important;
 }
 
 .shadow,
@@ -1631,6 +1641,10 @@ a.text-white:focus {
     color: #525f7f;
 }
 
+.form-control-alternative.choose {
+    margin: 0 2vw;
+}
+
 .form-control {
     font-size: .875rem;
 }
@@ -2098,4 +2112,41 @@ p {
 
 .fw {
     width: 100%;
+}
+
+.item-desc {
+    font-size: 1.5rem;
+}
+
+.item-info {
+    font-size: 1.2rem;
+}
+
+p.item-info {
+    padding-left: 1vw;
+    padding-top: 1vh;
+}
+
+.item-img {
+    height: auto;
+    max-width: 15vw;
+}
+
+.flex {
+    display: flex;
+    margin: auto;
+    align-items: center;
+    flex-direction: column;
+}
+
+.file {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: auto;
+}
+
+.dimg {
+    height: auto;
+    width: 2vw;
 }
