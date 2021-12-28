@@ -5,135 +5,135 @@ namespace mywishlist\mvc\controllers;
 use \mywishlist\Validator;
 use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use Slim\Container;
+use Slim\Http\{Request, Response};
 use \mywishlist\mvc\Renderer;
 use \mywishlist\mvc\views\ItemView;
-use \mywishlist\mvc\models\{Item,Reserved};
-use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
+use \mywishlist\mvc\models\{Item, User, Reserved};
+use \mywishlist\exceptions\ForbiddenException;
 
 class ControllerItem
 {
 
     private Container $container;
+    private ?User $user;
+    private ?Item $item;
+    private ItemView $renderer;
+    private Request $request;
+    private Response $response;
 
-    public function __construct(Container $c)
+    public function __construct(Container $c, Request $request, Response $response, array $args)
     {
         $this->container = $c;
+        $this->item = Item::where("id", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
+        $this->user = !empty($_SESSION['USER_ID']) ? User::find($_SESSION['USER_ID']) : new User();
+        $this->renderer = new ItemView($this->container, $this->item, $request);
+        $this->request = $request;
+        $this->response = $response;
     }
 
-    public function edit($request, $response, $args)
+    public function edit()
     {
-        //TODO REMOVE
-        if ($request->getCookieParam('typeUser') !== "createur")
-            throw new CookieNotSetException("Vous n'êtes pas connecté", "Vous devez être connecté pour accéder à cette ressource");
-        //END TODO REMOVE
-        switch ($request->getMethod()) {
+        $liste = $this->item->liste;
+        //Si l'item n'existe pas, on declenche une erreur
+        if (empty($this->item))
+            throw new NotFoundException($this->request, $this->response);
+        //On verifie donc si l'item est attribué à une liste et n'est pas reservé. Si non : on déclenche une erreur
+        $reserved = Reserved::where("item_id", "LIKE", $this->item->id)->first();
+        if(!$this->user->isAdmin() && (empty($liste) || !empty($reserved)))
+            throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);  
+        switch($this->request->getMethod()){
             case 'GET':
-                $item = Item::where("id", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
-                if (empty($item))
-                    throw new NotFoundException($request, $response);
-                $renderer = new ItemView($this->container, $item, $request);
-                return $response->write($renderer->render(Renderer::REQUEST_AUTH));
+                //Si l'utilisateur est admin, on lui affiche le formulaire d'edition
+                if($this->user->isAdmin())
+                    return $this->response->write($this->renderer->render(Renderer::EDIT, Renderer::ADMIN_MODE));
+                //Si l'utilisateur peut interragir avec la liste, on lui affiche le formulaire d'edition
+                if($this->user->canInteractWithList($liste))
+                    return $this->response->write($this->renderer->render(Renderer::EDIT, Renderer::OWNER_MODE));
+                //Sinon, on demande l'authentification
+                return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH, Renderer::OTHER_MODE));
             case 'POST':
-                $item = Item::where("id", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
-                $liste = $item->liste()->first();
-                $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
-                if (empty($item))
-                    throw new NotFoundException($request, $response);
-                if (!password_verify($private_key, $liste->private_key)){
-                    $renderer = new ItemView($this->container, $item, $request);
-                    return $response->withRedirect($this->container->router->pathFor('items_delete_id',['id' => $item->id],["info"=>"err"]));
+                /*Trois cas de figure :
+                - L'utilisateur est admin ou peut modifier la liste, on passe a l'edition
+                - L'utilisateur est inconnu, et a saisi le token privé
+                - L'utilisateur est inconnu, et n'a pas saisi le token privé, on lui affiche le formulaire d'authentification*/
+                if(!$this->user->isAdmin() && !$this->user->canInteractWithList($liste) && empty($this->request->getParsedBodyParam('private_key')))
+                    return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH, Renderer::OTHER_MODE));
+                if(!$this->user->isAdmin() && !$this->user->canInteractWithList($liste) && !password_verify(filter_var($this->request->getParsedBodyParam('private_key') ?? "", FILTER_SANITIZE_STRING), $liste->private_key))
+                    return $this->response->withRedirect($this->container->router->pathFor('items_edit_id',['id'=>$liste->no],["info" => "errtoken"]));
+                //On verifie une valeur provenant directement du formulaire. Soit on valide, soit on montre le formulaire.
+                if(!$this->user->isAdmin() && !$this->user->canInteractWithList($liste) && (empty($this->request->getParsedBodyParam('auth')) || filter_var($this->request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING) !== '1'))
+                    return $this->response->write($this->renderer->render(Renderer::EDIT, Renderer::OTHER_MODE));
+                $file = $this->request->getUploadedFiles()['file_img'];
+                //Si un fichier est uploadé, on le traite
+                if(!empty($file->getClientFilename())){
+                    $finfo = [pathinfo($file->getClientFilename(), PATHINFO_FILENAME),strtolower(pathinfo($file->getClientFilename(), PATHINFO_EXTENSION))];
+                    $info = Validator::validateFile($this->container, $file, $finfo, "item");
                 }
-                if(!empty(Reserved::find($item->id)))
-                    return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "resItem"]));
-                if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
-                    $file = $request->getUploadedFiles()['file_img'];
-                    $filename = $file->getClientFilename();
-                    if ($request->getParsedBodyParam('type') === "upload" && !empty($file))
-                        $info = Validator::validateFile($this->container, $file, $filename, "item");
-                    $item->update([
-                        'nom' => filter_var($request->getParsedBodyParam('item_name'), FILTER_SANITIZE_STRING),
-                        'descr' => filter_var($request->getParsedBodyParam('description'), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
-                        'tarif' => filter_var($request->getParsedBodyParam('price'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-                        'url' => filter_var($request->getParsedBodyParam('url') ?? "", FILTER_VALIDATE_URL) ? filter_var($request->getParsedBodyParam('url'), FILTER_SANITIZE_URL) : NULL,
-                        'img' => $request->getParsedBodyParam('type') === "link" ? filter_var($request->getParsedBodyParam('url_img'), FILTER_SANITIZE_URL) : ($request->getParsedBodyParam('type') === "upload" ? ($info === "ok" ? $filename : $item->img) : NULL)
-                    ]);
-                    return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "modItem", "info" => $info]));
-                } else {
-                    $renderer = new ItemView($this->container, $item, $request);
-                    return $response->write($renderer->render(Renderer::EDIT));
-                }
+                //On modifie ensuite l'item
+                $this->item->update([
+                    'liste_id' => $liste->no,
+                    'nom' => filter_var($this->request->getParsedBodyParam('name'), FILTER_SANITIZE_STRING),
+                    'descr' => filter_var($this->request->getParsedBodyParam('description'), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
+                    'tarif' => filter_var($this->request->getParsedBodyParam('price'), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+                    'url' => filter_var($this->request->getParsedBodyParam('url'), FILTER_SANITIZE_URL),
+                    'img' => $this->request->getParsedBodyParam('type') === "link" ? filter_var($this->request->getParsedBodyParam('url_img'), FILTER_SANITIZE_URL) : ($this->request->getParsedBodyParam('type') === "upload" ? ($info === "ok" ? $finfo[0].".".$finfo[1] : $this->item->img) : $this->item->img)
+                ]);
+                return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "modItem", "info" => $info]));
             default:
-                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
-        }
+                throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
+        };
     }
 
-    public function delete($request, $response, $args)
+    public function delete()
     {
-        //TODO REMOVE
-        if ($request->getCookieParam('typeUser') !== "createur")
-            throw new CookieNotSetException("Vous n'êtes pas connecté", "Vous devez être connecté pour accéder à cette ressource");
-        //END TODO REMOVE
-        $public_key = filter_var($request->getQueryParam('public_key'), FILTER_SANITIZE_STRING);
-        switch ($request->getMethod()) {
+        $liste = $this->item->liste;
+        //Si l'item n'existe pas, on declenche une erreur
+        if (empty($this->item))
+            throw new NotFoundException($this->request, $this->response);
+        //On verifie donc si l'item est attribué à une liste et n'est pas reservé. Si non : on déclenche une erreur
+        $reserved = Reserved::where("item_id", "LIKE", $this->item->id)->first();
+        if(!$this->user->isAdmin() && (empty($liste) || (!empty($reserved) && !$liste->isExpired())))
+            throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);  
+        //On genere une exception si la requete n'est pas de type POST
+        if($this->request->getMethod() !== 'POST')
+            throw new MethodNotAllowedException($this->request, $this->response, ['POST']);
+        //On verifie qu'une clé privée ait bien été saisie et qu'elle correspond à celle de la liste
+        if(!$this->user->isAdmin() && !$this->user->canInteractWithList($liste) && (empty($this->request->getParsedBodyParam('private_key')) || !password_verify(filter_var($this->request->getParsedBodyParam('private_key') ?? "", FILTER_SANITIZE_STRING), $liste->private_key)))
+            return $this->response->withRedirect($this->container->router->pathFor('lists_show_id',['id'=>$liste->no],["public_key"=>filter_var($this->request->getQueryParam('public_key'), FILTER_SANITIZE_STRING),"info" => "errtoken"]));
+        //On supprime l'item
+        $this->item->delete();
+        return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "delItem"]));
+    }
+
+    public function show()
+    {
+        $liste = $this->item->liste;
+        //Si l'item n'existe pas, on declenche une erreur
+        if (empty($this->item))
+            throw new NotFoundException($this->request, $this->response);
+        //Si l'utilisateur est admin, on lui montre l'item
+        if($this->user->isAdmin())
+            return $this->response->write($this->renderer->render(Renderer::SHOW, Renderer::ADMIN_MODE));
+        /*On considere ici que l'utilisateur n'est pas admin et que l'item existe
+        On verifie donc si l'item est attribué à une liste. Si non : on déclenche une erreur*/
+        if(empty($liste))
+            throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);    
+        //Si l'utilisateur est le propriétaire de la liste, on lui montre l'item
+        if($this->user->canInteractWithList($liste))
+            return $this->response->write($this->renderer->render(Renderer::SHOW, Renderer::OWNER_MODE));
+        //A ce point, on considere que l'utilisateur est inconnu, on doit donc s'assurer qu'il precise le token de la liste si cette derniere en est pourvue
+        switch ($this->request->getMethod()) {
             case 'GET':
-                $item = Item::where("id", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
-                if (empty($item))
-                    throw new NotFoundException($request, $response);
-                $renderer = new ItemView($this->container, $item, $request, $public_key);
-                return $response->write($renderer->render(Renderer::PREVENT_DELETE));
+                //On genere une exception car un utilisateur inconnu ne peut pas voir un item sans passer par la liste
+                throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
             case 'POST':
-                $item = Item::where("id", "LIKE", filter_var($args['id'], FILTER_SANITIZE_NUMBER_INT))->first();
-                $liste = $item->liste()->first();
-                $private_key = filter_var($request->getParsedBodyParam('auth') ?? $request->getParsedBodyParam('private_key'), FILTER_SANITIZE_STRING);
-                if (empty($item))
-                    throw new NotFoundException($request, $response);
-                if (!password_verify($private_key, $liste->private_key)){
-                    $renderer = new ItemView($this->container, $item, $request, $public_key);
-                    return $response->withRedirect($this->container->router->pathFor('items_delete_id',['id' => $item->id],["public_key" => $public_key,"info"=>"err"]));
-                }
-                if (!empty($request->getParsedBodyParam('auth')) && password_verify(filter_var($request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING), $liste->private_key)) {
-                    if(!empty(Reserved::find($item->id)))
-                        return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "resItem"]));
-                    $item->delete();
-                    return $response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "delItem"]));
-                } else {
-                    $renderer = new ItemView($this->container, $item, $request, $public_key);
-                    return $response->write($renderer->render(Renderer::DELETE));
-                }
-            default:
-                throw new MethodNotAllowedException($request, $response, ['GET', 'POST']);
-        }
-    }
-
-    public function show($request, $response, $args)
-    {
-        #Récuperation des parametres
-        switch ($request->getMethod()) {
-            case 'POST':
-                /*
-                On récupère l'item | utilisation de where plutot que find pour que 01 ne soit pas transformé en 1
-                Récupération de la liste associée
-                */
-                $item = Item::where("id", "LIKE", filter_var(filter_var($args["id"], FILTER_SANITIZE_STRING), FILTER_SANITIZE_NUMBER_INT))->first();
-                if (empty($item) )
-                    throw new NotFoundException($request, $response);
-                if (empty($item->liste))
+                //Si la liste n'est pas publiée, ou que les variables d'accès ne correspondent pas, on genere une exception
+                if ((!$liste->isPublished()) || ($liste->no != filter_var($this->request->getParsedBodyParam('liste_id'), FILTER_SANITIZE_STRING) ?? "") || (!empty($liste->public_key) && $liste->public_key !== filter_var($this->request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) ?? ""))
                     throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
-                $liste = $item->liste()->first();
-                /*
-                Si la liste a un token de visibilite, on verifie celui saisi par l'utilisateur
-                Si il n'en saisi pas ou que le token est incorrect alors on renvoie une erreur 403
-                */
-                if ($liste->no != filter_var($request->getParsedBodyParam('liste_id'), FILTER_SANITIZE_STRING) ?? "" || (!empty($liste->public_key) && $liste->public_key !== filter_var($request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) ?? ""))
-                    throw new ForbiddenException($this->container->lang['exception_incorrect_token'], $this->container->lang['exception_ressource_not_allowed']);
-                //TODO REMOVE
-                if (!in_array($request->getCookieParam('typeUser'), ['createur', 'participant']))
-                    throw new CookieNotSetException();
-                //END TODO REMOVE
-                $renderer = new ItemView($this->container, $item, $request);
-                return $response->write($renderer->render(Renderer::SHOW));
+                //Sinon, on affiche la liste
+                return $this->response->write($this->renderer->render(Renderer::SHOW));
             default:
-                throw new MethodNotAllowedException($request, $response, ['POST']);
+                throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
     }
 }

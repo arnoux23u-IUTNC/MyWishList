@@ -7,7 +7,6 @@ let input = document.getElementById("input-new-password")
 let inputC = document.getElementById("input-new-password-c")
 let block = document.getElementById("message")
 
-
 let display = () => {
     if (input.value.length > 0)
         block.style.display = "block"
@@ -15,22 +14,22 @@ let display = () => {
         block.style.display = "none"
 }
 
-if (inputC !== null) {
-    let matchPwd = () => {
-        if (input.value == inputC.value) {
-            inputC.classList.remove("invalid");
-            return true;
-        } else {
-            inputC.classList.add("invalid");
-            return false;
-        }
+let matchPwd = () => {
+    if (input.value == inputC.value) {
+        inputC.classList.remove("invalid");
+        console.log("match");
+        return true;
+    } else {
+        inputC.classList.add("invalid");
+        console.log("not match");
+        return false;
     }
-    inputC.onkeyup = matchPwd;
-    inputC.onfocus = matchPwd;
+}
+inputC.onkeyup = matchPwd;
+inputC.onfocus = matchPwd;
 
-    inputC.onblur = () => {
-        if (inputC.value.length === 0) inputC.classList.remove("invalid");
-    }
+inputC.onblur = () => {
+    if (inputC.value.length === 0) inputC.classList.remove("invalid");
 }
 
 input.onfocus = () => { block.style.display = "block" }

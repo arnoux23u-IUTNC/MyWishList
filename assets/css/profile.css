@@ -42,7 +42,8 @@
 
 html {
     line-height: 1.15;
-    width: 100%;
+    width: 100vw;
+    height: 100vh;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -378,6 +379,17 @@ a>code {
     flex-wrap: wrap;
 }
 
+.row-2 {
+    display: flex;
+    margin-right: 15px;
+    margin-left: 15px;
+    flex-wrap: wrap;
+}
+
+.row-3 {
+    padding-top: 15px;
+}
+
 .col-4,
 .col-8,
 .col,
@@ -401,6 +413,11 @@ a>code {
     max-width: 100%;
     flex-basis: 0;
     flex-grow: 1;
+}
+
+.col-2 {
+    max-width: 40%;
+    flex: 0 0 40%;
 }
 
 .col-4 {
@@ -1023,7 +1040,7 @@ textarea.form-control {
 
 .card-header {
     margin-bottom: 0;
-    padding: 1.25rem 1.5rem 0;
+    padding: 1.25rem 1.5rem 0.5rem;
     border-bottom: 1px solid rgba(0, 0, 0, .05);
     background-color: #fff;
 }
@@ -1150,6 +1167,10 @@ button.bg-white:focus {
     float: right !important;
 }
 
+.float-left {
+    float: left !important;
+}
+
 .shadow,
 .card-profile-image img {
     box-shadow: 0 0 2rem 0 rgba(136, 152, 170, .15) !important;
@@ -1211,6 +1232,10 @@ button.bg-white:focus {
 
 .pb-0 {
     padding-bottom: 0 !important;
+}
+
+.pt-2 {
+    padding-top: 1rem !important;
 }
 
 .pt-5 {
@@ -1614,6 +1639,10 @@ a.text-white:focus {
     font-size: .999rem;
     font-weight: 600;
     color: #525f7f;
+}
+
+.form-control-alternative.choose {
+    margin: 0 2vw;
 }
 
 .form-control {
@@ -2060,4 +2089,64 @@ p {
 .code>p {
     font-size: 1.4rem;
     font-weight: bold;
+}
+
+.lists {
+    display: flex;
+    margin: auto;
+    align-items: center;
+    flex-direction: column;
+    padding: 0 2vw;
+    width: 100%;
+}
+
+.list {
+    margin: 10px;
+    background-color: #d9d9d973;
+}
+
+.list:hover {
+    background-color: #1654ff73;
+    transition: .5s;
+}
+
+.fw {
+    width: 100%;
+}
+
+.item-desc {
+    font-size: 1.5rem;
+}
+
+.item-info {
+    font-size: 1.2rem;
+}
+
+p.item-info {
+    padding-left: 1vw;
+    padding-top: 1vh;
+}
+
+.item-img {
+    height: auto;
+    max-width: 15vw;
+}
+
+.flex {
+    display: flex;
+    margin: auto;
+    align-items: center;
+    flex-direction: column;
+}
+
+.file {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: auto;
+}
+
+.dimg {
+    height: auto;
+    width: 2vw;
 }

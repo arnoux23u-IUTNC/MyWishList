@@ -5,10 +5,11 @@ namespace mywishlist\mvc;
 abstract class Renderer{
 
     const SHOW = 0;
-    const CREATE = 1;
-    const EDIT = 2;
+    const SHOW_FOR_ITEM = 1;
+    const CREATE = 2;
+    const EDIT = 3;
     const EDIT_ADD_ITEM = 22;
-    const REQUEST_AUTH = 3;
+    const REQUEST_AUTH = 4;
     const PREVENT_DELETE = 41;
     const DELETE = 42;
     const LOGIN = 71;
@@ -19,4 +20,8 @@ abstract class Renderer{
     const MANAGE_2FA = 82;
     const SHOW_2FA_CODES = 83;
     const RECOVER_2FA = 84;
+
+    const OTHER_MODE = 10;
+    const OWNER_MODE = 100;
+    const ADMIN_MODE = 1000;
 }

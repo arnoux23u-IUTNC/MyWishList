@@ -9,7 +9,7 @@ class Liste extends Model
     protected $table = 'liste';
     protected $primaryKey = 'no';
     public $timestamps = false;
-    protected $fillable = ['titre', 'user_id', 'description', 'expiration', 'public_key'];
+    protected $fillable = ['titre', 'user_id', 'description', 'expiration', 'public_key', 'published'];
 
 
     public function items()
@@ -23,6 +23,10 @@ class Liste extends Model
     public function isExpired()
     {
         return !empty($this->expiration) && $this->expiration <= date('Y-m-d');
+    }
+
+    public function isPublished() : bool{
+        return $this->published == 1;
     }
 
 }
