@@ -206,7 +206,7 @@ class ItemView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative">{$this->item->descr}</textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative">{$this->item->descr}</textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">

@@ -241,8 +241,8 @@ class ListView extends View
                 <div class="popup1">
                     <h2 style="padding-bottom:2vh;">--</h2>
                     <a class="close" href="#">&times;</a>
-                    <form method="POST" id='pform' action="" class="content">
-                        <h3></h3>
+                    <form method="POST" id='pform' action="#" class="content">
+                        <h3>--</h3>
                         <div class="form-group focused">
                             <label class="form-control-label" for="private_key"></label>
                             <input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus />
@@ -307,7 +307,7 @@ class ListView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative"></textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative"></textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -377,7 +377,7 @@ class ListView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative"></textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative"></textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -464,7 +464,7 @@ class ListView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative">$l->description</textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative">$l->description</textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">

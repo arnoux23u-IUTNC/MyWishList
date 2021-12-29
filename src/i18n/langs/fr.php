@@ -56,6 +56,7 @@ $lang = array(
     "login_title" => "Connexion",
     "login_to_register" => "Pas de compte ? S'inscrire",
     "logout" => "Déconnexion",
+    "lost_2fa" => "Code 2FA perdu",
     "my_infos_title" => "Mes informations personnelles",
     "name" => "Nom",
     "nc"=>"Non communiqué",
