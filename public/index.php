@@ -118,12 +118,9 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
 
 $app->run();
 
-//TODO REMOVE
-if(empty($_SESSION['LOGGED_IN']))
-    print_r("<header class='guestmode'>{$lang['__invited']}</header>");
-
 function genererHeader($title, $styles = [])
 {
+    global $lang;
     $html = <<<EOD
     <!DOCTYPE html>
     <html lang="fr">
@@ -140,5 +137,6 @@ function genererHeader($title, $styles = [])
     EOD;
     foreach ($styles as $style)
         $html .= "\n\t<link rel='stylesheet' href='/assets/css/$style'>";
-    return $html . "\n</head>\n<body>\n";
+    $html .= "\n</head>\n<body>\n";
+    return empty($_SESSION['LOGGED_IN']) ? $html."\t<header class='guestmode'>{$lang['__invited']}</header>\n" : $html;
 }
