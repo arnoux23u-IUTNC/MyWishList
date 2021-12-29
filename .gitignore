@@ -15,4 +15,5 @@ vendor/
 src/conf/conf.ini
 
 #Apache configuration
-./.htaccess
+.htaccess
+!docs/.htaccess
