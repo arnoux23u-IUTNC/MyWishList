@@ -1384,6 +1384,10 @@ button.bg-white:focus {
     background: linear-gradient(87deg, #172b4d 0, #1a174d 100%) !important;
 }
 
+.fullbg {
+    height: 100vh;
+}
+
 @keyframes floating-lg {
     0% {
         transform: translateY(0px);

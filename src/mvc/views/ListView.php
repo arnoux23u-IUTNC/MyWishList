@@ -49,7 +49,7 @@ class ListView extends View
         $descr_info = $this->list->description ?? $this->container->lang['none'];
         $expiration_info = !empty($this->list->expiration) ? date_format(date_create($this->list->expiration), "d-m-Y") : $this->container->lang['nc'];
         $associated_user = User::find($this->list->user_id);
-        $user_info = $associated_user->lastname.' '.$associated_user->firstname ?? "personne";
+        $user_info = empty($associated_user) ? $this->container->lang['nc'] : $associated_user->lastname.' '.$associated_user->firstname;
         $items_list="";
         foreach ($l->items as $pos=>$item) {
             $pos++;
@@ -241,8 +241,8 @@ class ListView extends View
                 <div class="popup1">
                     <h2 style="padding-bottom:2vh;">--</h2>
                     <a class="close" href="#">&times;</a>
-                    <form method="POST" id='pform' action="" class="content">
-                        <h3></h3>
+                    <form method="POST" id='pform' action="#" class="content">
+                        <h3>--</h3>
                         <div class="form-group focused">
                             <label class="form-control-label" for="private_key"></label>
                             <input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus />

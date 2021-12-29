@@ -42,13 +42,13 @@ class ItemView extends View
         }else{
             $reservation_state = $this->container->lang['item_unreserved'];
         }
-        $liste_info = !empty($this->item->liste) ? (new ListView($this->container, $this->item->liste))->render(Renderer::SHOW_FOR_ITEM, $this->access_level) : $this->container->lang['none'];
+        $liste_info = !empty($this->item->liste) ? (new ListView($this->container, $this->item->liste, $this->request))->render(Renderer::SHOW_FOR_ITEM, $this->access_level) : $this->container->lang['none'];
         $descr_info = $this->item->descr ?? $this->container->lang['none'];
         $url_info = $this->item->url ?? $this->container->lang['none'];
         $tarif_info = $this->item->tarif ?? $this->container->lang['nc'];
         $img_info = !empty($this->item->img) ? (file_exists(__DIR__."\..\..\..\assets\img\items\\{$this->item->img}") ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='{$this->item->img}'>" : "")) : "";
         $html = <<<HTML
-            <div class="main-content bg-gradient-default">
+            <div class="main-content bg-gradient-default fullbg">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
                         <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
