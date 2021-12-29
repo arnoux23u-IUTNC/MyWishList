@@ -217,7 +217,7 @@ class UserView
 
     private function showProfile()
     {
-        $html = genererHeader("{$this->container->lang['profile_title']} - MyWishList", ["profile.css"]) . file_get_contents(__DIR__ . '\..\..\content\profile.phtml');
+        $html = genererHeader("{$this->container->lang['profile_title']} - MyWishList", ["profile.css"]) . file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'content'.DIRECTORY_SEPARATOR.'profile.phtml');
         $user = $this->user;
         $lists = Liste::whereUserId($user->user_id)->get();
         $htmlLists = "";

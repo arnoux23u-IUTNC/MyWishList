@@ -3,8 +3,8 @@ session_start();
 
 $lang = [];
 
-require_once __DIR__ . '\..\src\vendor\autoload.php';
-require_once __DIR__ . '\..\src\i18n\langs.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'src'. DIRECTORY_SEPARATOR .'vendor'. DIRECTORY_SEPARATOR .'autoload.php';
+require_once __DIR__ .  DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'src'. DIRECTORY_SEPARATOR .'i18n'. DIRECTORY_SEPARATOR .'langs.php';
 
 use \mywishlist\bd\Eloquent as Eloquent;
 use \mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem};
@@ -17,7 +17,7 @@ $container = new Container(['settings' => ['displayErrorDetails' => true]]);
 //end todo
 $container['notFoundHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
-        $html = file_get_contents('..\errors\404.html');
+        $html = file_get_contents('..'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.html');
         preg_match_all("/{#(\w|_)+#}/", $html, $matches);
         foreach ($matches[0] as $match)
             $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
@@ -26,7 +26,7 @@ $container['notFoundHandler'] = function () use ($lang) {
 };
 $container['notAllowedHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
-        $html = file_get_contents('..\errors\405.html');
+        $html = file_get_contents('..'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'405.html');
         preg_match_all("/{#(\w|_)+#}/", $html, $matches);
         foreach ($matches[0] as $match)
             $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
@@ -36,12 +36,12 @@ $container['notAllowedHandler'] = function () use ($lang) {
 $container['errorHandler'] = function () use ($lang){
     return new ExceptionHandler($lang);
 };
-$container['items_upload_dir'] = __DIR__ . '\..\assets\img\items';
-$container['users_upload_dir'] = __DIR__ . '\..\assets\img\avatars';
+$container['items_upload_dir'] = __DIR__ .DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'items';
+$container['users_upload_dir'] = __DIR__ .DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'avatars';
 $container['lang'] = $lang;
 
 #Launch
-Eloquent::start('..\src\conf\conf.ini');
+Eloquent::start('..'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'conf'.DIRECTORY_SEPARATOR.'conf.ini');
 $app = new App($container);
 
 #Redirection du traffic dans l'application
@@ -79,7 +79,7 @@ $app->any("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
 $app->get('/', function ($request, $response, $args) use ($lang) {
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("{$lang['home_title']} MyWishList",["style.css","lang.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
+    $html = genererHeader("{$lang['home_title']} MyWishList",["style.css","lang.css"]).file_get_contents(__DIR__ . DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'content'.DIRECTORY_SEPARATOR.'sidebar.phtml');
     $phtmlVars = array(
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
         'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",

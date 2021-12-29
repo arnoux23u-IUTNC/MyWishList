@@ -144,7 +144,7 @@ class ListView extends View
                 }
             }*/
             //$routeDelItem = $this->container->router->pathFor('items_delete_id',['id' => $item->id],["public_key" => $this->public_key]);
-            $item_desc = "<span class='pos'>$pos</span>$item->nom".(!empty($item->img) ? (file_exists(__DIR__."\..\..\..\assets\img\items\\$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/\.]+).(jpe?g|png))?$/",$item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")):"");
+            $item_desc = "<span class='pos'>$pos</span>$item->nom".(!empty($item->img) ? (file_exists(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."assets".DIRECTORY_SEPARATOR."img".DIRECTORY_SEPARATOR."items".DIRECTORY_SEPARATOR."$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/\.]+).(jpe?g|png))?$/",$item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")):"");
             
             // $item_res = !empty($reserved) ? "<p>{$this->container->lang['list_reserved_by']} $reserved->user_id_id -> $reserved->message</p>" : ($l->isExpired() ? "<p><i>{$this->container->lang['reservation_not_possible']}</i></p>" : "\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='#'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t");
                     
