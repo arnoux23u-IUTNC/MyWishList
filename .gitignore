@@ -13,3 +13,6 @@ vendor/
 
 #DB Conf
 src/conf/conf.ini
+
+#Apache configuration
+./.htaccess
