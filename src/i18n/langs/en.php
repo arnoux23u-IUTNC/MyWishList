@@ -1,6 +1,8 @@
 <?php
 
 $lang = array(
+    "__" => "English",
+    "__invited" => "You are in guest mode.",
     "alert_modify_token" => "Your modification token is :",
     "auth" => "Authentication",
     "create" => "Create",

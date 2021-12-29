@@ -1,6 +1,8 @@
 <?php
 
 $lang = array(
+    "__" => "Français",
+    "__invited" => "Vous êtes en mode invité.",
     "alert_modify_token" => "Votre token de modification est :",
     "auth" => "Authentification",
     "create" => "Créer",
@@ -110,7 +112,7 @@ $lang = array(
     "user_not_logged" => "Vous n'êtes pas connecté",
     "user_old_password" => "Ancien mot de passe",
     "user_password" => "Mot de passe",
-    "user_password_changed" => "Mot de passe changé, veuillez vous reconneceter",
+    "user_password_changed" => "Mot de passe changé, veuillez vous reconnecter",
     "user_password_confirm" => "Confirmation du mot de passe",
     "user_password_incorrect" => "Mot de passe incorrect",
     "user_same_password" => "Mot de passe inchangé",

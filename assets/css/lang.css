@@ -44,6 +44,16 @@
     font-size: .7rem;
 }
 
+.lang-menu .links_name {
+    display: none;
+}
+
+.sidebar.open .lang-menu .links_name {
+    display: flex;
+    font-size: 15px;
+    font-weight: 400;
+}
+
 .lang-menu ul img {
     padding-right: 10px;
 }
