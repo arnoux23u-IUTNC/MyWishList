@@ -120,7 +120,7 @@ $app->run();
 
 //TODO REMOVE
 if(empty($_SESSION['LOGGED_IN']))
-    print_r("ATTENTION VOUS ETES EN MODE INVITE");
+    print_r("<header class='guestmode'>{$lang['__invited']}</header>");
 
 function genererHeader($title, $styles = [])
 {

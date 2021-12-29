@@ -99,3 +99,15 @@ input.invalid {
 .pointer {
     cursor: pointer !important;
 }
+
+.guestmode {
+    top: 0;
+    font-size: 20px;
+    color: black;
+    text-align: center;
+    font-weight: bold;
+    width: 100%;
+    z-index: 100;
+    background-color: #ffee02;
+    position: fixed;
+}

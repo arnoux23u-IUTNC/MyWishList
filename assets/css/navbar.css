@@ -26,6 +26,7 @@ body {
 
 .sidebar.open {
     width: 250px;
+    z-index: 101;
 }
 
 .sidebar .logo-details {
