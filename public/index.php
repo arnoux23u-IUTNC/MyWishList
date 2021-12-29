@@ -79,12 +79,13 @@ $app->any("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
 $app->get('/', function ($request, $response, $args) use ($lang) {
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("{$lang['home_title']} MyWishList",["style.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
+    $html = genererHeader("{$lang['home_title']} MyWishList",["style.css","lang.css"]).file_get_contents(__DIR__ . '\..\src\content\sidebar.phtml');
     $phtmlVars = array(
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
         'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
         'my_lists_route' => $this->router->pathFor('lists_home'),
         'create_list_route' => $routeCreate,
+        'flag_img' => "<img class='selected' alt='".strtolower($_SESSION["lang"])."-flag' src='/assets/img/flags/flag-".strtolower($_SESSION["lang"]).".png'>",
         'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),
         'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<EOD
 
