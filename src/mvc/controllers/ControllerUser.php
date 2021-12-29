@@ -250,12 +250,6 @@ class ControllerUser
 
     public function auth2FA()
     {
-        //Si l'utilisateur n'est pas connecté, on lui demande de se connecter
-        if (empty($_SESSION['LOGGED_IN']))
-            return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "not_logged"]));
-        //Si l'utilisateur n'existe pas, on renvoie une erreur
-        if (empty($this->user))
-            throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         //Si l'utilisateur entre dans le mode "RECOVER" (récupération 2FA)
         if ($this->args["action"] == "recover") {
             switch ($this->request->getMethod()) {
@@ -284,6 +278,9 @@ class ControllerUser
             //S'il n'est pas connecté, on le redirige vers une autre page
             if (empty($_SESSION['LOGGED_IN']))
                 return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "not_logged"]));
+            //Si l'utilisateur n'existe pas, on renvoie une erreur
+            if (empty($this->user))
+                throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
             switch ($this->request->getMethod()) {
                 case 'GET':
                     //Si la commande n'est autre que "MANAGE", on renvoie une erreur

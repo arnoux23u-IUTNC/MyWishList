@@ -37,7 +37,7 @@ class UserView
         });
         $username = $authenticator ? filter_var($this->request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
         $password = $authenticator ? filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
-        $auth2FA = $authenticator ? "<div class='row fw'>\n\t\t\t\t\t\t\t\t<div class='form-group focused fw'>\n\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='2fa'>{$this->container->lang['user_2fa_code']}</label>\n\t\t\t\t\t\t\t\t\t<input type='text' class='form-control form-control-alternative' required autofocus name='query-code' required maxlength='6' minlength='6' pattern='^\d{6}$'>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>" : "";
+        $auth2FA = $authenticator ? "<div class='row fw'>\n\t\t\t\t\t\t\t\t<div class='form-group focused fw'>\n\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='2fa'>{$this->container->lang['user_2fa_code']}</label>\n\t\t\t\t\t\t\t\t\t<input type='text' class='form-control form-control-alternative' required autofocus name='query-code' required maxlength='6' minlenght='6' pattern='^\d{6}$'>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>" : "";
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -94,58 +94,25 @@ class UserView
     private function recover2FA()
     {
         $username = filter_var($this->request->getQueryParam('username'), FILTER_SANITIZE_STRING) ?? "";
+        $routeRecover = $this->container->router->pathFor('2fa', ["action" => 'recover']);
         $popup = "\n\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
                 "nok" => "<div class='popup warning'>{$this->container->lang['user_2fa_incorrect_code']}</div>",
                 default => ""
             };
-        $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['user_2fa_recover']}</h1>
-                            $popup
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" action="{$this->container->router->pathFor('2fa', ['action' => 'recover'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
-                                            <input type="text" id="username" name="username" class="form-control form-control-alternative" value="$username" required autofocus>
-                                        </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="rescue">{$this->container->lang['user_2fa_rescue_code']}</label>
-                                            <input type="text" id="rescue" name="rescue" class="form-control form-control-alternative" maxlength="8" minlength="8" pattern="^\d{8}$" required/>
-                                        </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['user_2fa_delete']}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        HTML;
-        return genererHeader("{$this->container->lang['lost_2fa']} - MyWishList", ["profile.css"]).$html;
+        return genererHeader("Auth - MyWishList", ["list.css"]) . <<<EOD
+          <h2>{$this->container->lang['user_2fa_recover']}</h2>
+          <div>
+              <form class='form_container' method="post" action="$routeRecover">$popup
+                  <label for="username">{$this->container->lang['user_username']}</label>
+                  <input type="text" autofocus name="username" value="$username" required>
+                  <label for="rescue">{$this->container->lang['user_2fa_rescue_code']}</label>
+                  <input type="text" name="rescue" required maxlength="8" minlength="8" pattern="^\d{8}$">
+                  <button type="submit" value="OK" name="sendBtn">{$this->container->lang['user_2fa_delete']}</button>
+              </form>
+          <div>
+      </body>
+      </html>
+      EOD;
     }
 
     private function register()
@@ -211,15 +178,15 @@ class UserView
                                     </div>
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="input-new-password">{$this->container->lang['user_password']}</label>
+                                            <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
                                             <input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/>
                                         </div>
                                     </div>
                                     <div class="row fw">
                                         <div id="message">
                                             <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
-                                            <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</p>
-                                            <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</p>
+                                            <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</b></p>
+                                            <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</b></p>
                                             <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
                                             <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
                                             <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
@@ -227,7 +194,7 @@ class UserView
                                     </div>
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
+                                            <label class="form-control-label" for="password-confirm">{$this->container->lang['user_password_confirm']}</label>
                                             <input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/>
                                         </div>
                                     </div>
@@ -309,7 +276,7 @@ class UserView
         $otp = TOTP::create($this->secret);
         $otp->setLabel('MyWishList');
         $img_src = $otp->getQrCodeUri('https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M', '[DATA]');
-        return genererHeader("Activation de 2FA - MyWishList", ["profile.css"]) . <<<HTML
+        return genererHeader("Activation de 2FA - MyWishList", ["profile.css"]) . <<<EOD
         <div class="main-content">
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
           <div class="container-fluid">
@@ -356,19 +323,19 @@ class UserView
                             <input type="text" readonly id="private_key" name="private_key" value="$this->secret">
                         </div>
                     </div>
-                    <input type="text" autofocus name="query-code" required maxlength="6" minlength="6" pattern="^\d{6}$">
+                    <input type="text" autofocus name="query-code" required maxlength="6" minlenght="6" pattern="^\d{6}$">
                     <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-primary">Activer</button>
                 </form>
             </div>
         </div>
-        HTML;
+        EOD;
     }
 
     private function manage2FA()
     {
         $route_main = $this->container->router->pathFor('home');
         $route_2fa = $this->container->router->pathFor('2fa', ["action" => "disable"]);
-        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<HTML
+        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<EOD
       <div class="main-content">
       <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
         <div class="container-fluid">
@@ -407,7 +374,7 @@ class UserView
         </form>
       </div>
       </div>
-      HTML;
+      EOD;
     }
 
     private function show2FACodes()
@@ -418,7 +385,7 @@ class UserView
         foreach (RescueCode::whereUser($this->user->user_id)->get() as $code) {
             $codes .= "<p>$code->code</p>";
         }
-        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<HTML
+        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<EOD
         <div class="main-content">
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
           <div class="container-fluid">
@@ -455,7 +422,7 @@ class UserView
           </div>
         </div>
         </div>
-        HTML;
+        EOD;
     }
 
     public function render($method)

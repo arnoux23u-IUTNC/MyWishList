@@ -56,7 +56,6 @@ $lang = array(
     "login_title" => "Login",
     "login_to_register" => "Don't have an account ? Register",
     "logout" => "Logout",
-    "lost_2fa" => "2FA lost",
     "my_infos_title" => "Personal informations",
     "name" => "Name",
     "nc"=>"Not disclosed",
