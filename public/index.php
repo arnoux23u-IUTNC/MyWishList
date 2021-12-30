@@ -12,9 +12,6 @@ use \mywishlist\exceptions\ExceptionHandler;
 use Slim\{App, Container};
 
 #Container
-//todo remove errors
-$container = new Container(['settings' => ['displayErrorDetails' => true]]);
-//end todo
 $container['notFoundHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
         $html = file_get_contents('..'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.html');
@@ -63,9 +60,9 @@ $app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
 $app->any("/lists/new[/]", function ($request, $response, $args) {
     return (new ControllerList($this,$request, $response, $args))->create();
 })->setName('lists_create');
-$app->any("/lists[/]", function ($request, $response, $args) {
+/*$app->any("/lists[/]", function ($request, $response, $args) {
     //TODO return (new ControllerUser($this,$request, $response, $args))->create();
-})->setName('lists_home');
+})->setName('lists_home');*/
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this,$request, $response, $args))->delete();
 })->setName('items_delete_id');
@@ -76,6 +73,7 @@ $app->any("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerItem($this,$request, $response, $args))->show();
 })->setName('items_show_id');
 
+#Route principale
 $app->get('/', function ($request, $response, $args) use ($lang) {
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
@@ -118,6 +116,12 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
 
 $app->run();
 
+/**
+ * Method who generates the header of the page
+ * @param string $title
+ * @param array $stylesheets
+ * @return string html code
+ */
 function genererHeader($title, $styles = [])
 {
     global $lang;
