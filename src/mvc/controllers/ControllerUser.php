@@ -1,27 +1,45 @@
-<?php
+<?php /** @noinspection PhpUndefinedVariableInspection */
+
+/** @noinspection PhpUndefinedFieldInspection */
 
 namespace mywishlist\mvc\controllers;
 
-use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use Slim\Container;
 use Slim\Http\{Response, Request};
-use \mywishlist\mvc\views\UserView;
-use \mywishlist\mvc\Renderer;
-use \mywishlist\Validator;
-use \mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{User, RescueCode};
+use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use OTPHP\TOTP;
+use mywishlist\Validator;
+use mywishlist\mvc\Renderer;
+use mywishlist\mvc\views\UserView;
+use mywishlist\exceptions\ForbiddenException;
+use mywishlist\mvc\models\{User, RescueCode};
 
+/**
+ * Class ControllerUser
+ * Controller for User Model
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\controllers
+ */
 class ControllerUser
 {
 
     private Container $container;
+    /**
+     * @var User|null User associated to the controller
+     */
     private ?User $user;
     private UserView $renderer;
     private Request $request;
     private Response $response;
     private array $args;
 
+    /**
+     * ControllerUser constructor
+     * @param Container $c
+     * @param Request $request
+     * @param Response $response
+     * @param array $args
+     */
     public function __construct(Container $c, Request $request, Response $response, array $args)
     {
         $this->container = $c;
@@ -32,21 +50,24 @@ class ControllerUser
         $this->args = $args;
     }
 
-    private function profile()
+    /**
+     * Control the display of the user's profile
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     */
+    private function profile(): Response
     {
         //Si l'utilisateur n'est pas connecté, on l'envoie vers la page de connexion
         if (empty($_SESSION['LOGGED_IN']))
             return $this->login();
         //Si l'utilisateur n'existe pas, on affiche une erreur
-        if(empty($this->user))
-            throw new ForbiddenException("Vous n'êtes pas autorisé à accéder à cette page");
+        if (empty($this->user))
+            throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         //Selon le type de requete, on affiche ou on modifie le profil
         switch ($this->request->getMethod()) {
             case 'GET':
-                if (empty($this->user))
-                    throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
                 return $this->response->write($this->renderer->render(Renderer::PROFILE));
-                break;
             case 'POST':
                 //Si l'utilisateur donne l'ordre de supprimer l'avatar, on le supprime
                 if (!empty($this->request->getParsedBodyParam("delete_btn")) && $this->request->getParsedBodyParam("delete_btn") === "delete")
@@ -54,22 +75,22 @@ class ControllerUser
                 //Sinon, on modifier l'utilisateur
                 $file = $this->request->getUploadedFiles()['avatarinput'];
                 //S'il y a un fichier uploadé, on le traite
-                if(!empty($file)){
+                if (!empty($file)) {
                     $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
-                    $finfo = [$this->user->user_id,strtolower($extension)];
-                    $oldfile = $this->container['users_upload_dir'].DIRECTORY_SEPARATOR.$this->user->avatar;
+                    $finfo = [$this->user->user_id, strtolower($extension)];
+                    $oldfile = $this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar;
                     $info = Validator::validateFile($this->container, $file, $finfo, "user");
-                    if($info === "ok"){
-                        if($this->user->avatar !== $finfo[0].".".$finfo[1])
+                    if ($info === "ok") {
+                        if ($this->user->avatar !== $finfo[0] . "." . $finfo[1])
                             unlink($oldfile);
-                        $this->user->update(['avatar' => $finfo[0].".".$finfo[1]]);
+                        $this->user->update(['avatar' => $finfo[0] . "." . $finfo[1]]);
                     }
                     unset($_FILES);
                     return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ['info' => $info]));
                 }
                 //Si l'ancien mot de passe ne correpond pas, on renvoie une erreur
-                if(!password_verify(filter_var($this->request->getParsedBodyParam("input-old-password"), FILTER_SANITIZE_STRING), $this->user->password))
-                    return $this->response->withRedirect($this->container->router->pathFor('accounts',["action" => 'profile'], ["info" => "password"]));
+                if (!password_verify(filter_var($this->request->getParsedBodyParam("input-old-password"), FILTER_SANITIZE_STRING), $this->user->password))
+                    return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "password"]));
                 //On construit un tableau dynamique avec les données à modifier et un itérateur
                 $toUpdate = array();
                 $i = 0;
@@ -100,19 +121,24 @@ class ControllerUser
                     $toUpdate["updated"] = date("Y-m-d H:i:s");
                     $this->user->update($toUpdate);
                     //Si l'utilisateur a modifié son mot de passe, on le déconnecte
-                    if(!empty($toUpdate["password"]))
+                    if (!empty($toUpdate["password"]))
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'logout'], ["info" => "pc"]));
                     return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "success"]));
                 }
                 //Sinon, on renvoie une erreur
                 return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "no-change"]));
-                break;
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
     }
 
-    private function login()
+    /**
+     * Control the login action
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     */
+    private function login(): Response
     {
         //Si la requete est de type GET, on affiche la page de connexion, sinon, on verifie les valeurs passées
         switch ($this->request->getMethod()) {
@@ -120,9 +146,8 @@ class ControllerUser
                 //Si l'utilisateur est deja connecté, on le redirige vers son profil
                 if (!empty($_SESSION['LOGGED_IN']))
                     return $this->profile();
-                else 
+                else
                     return $this->response->write($this->renderer->render(Renderer::LOGIN));
-                break;
             case 'POST':
                 //On verifie une variable venant du formulaire
                 if ($this->request->getParsedBodyParam('sendBtn') !== "OK")
@@ -146,19 +171,20 @@ class ControllerUser
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "2fanok"]));
                 }
                 //Regeneration du token de session et remplissage du tableau de session
-                session_regenerate_id();
-                //On mets a jour certaines variables de l'utilisateur
-                $user->update(['last_ip' => ip2long($_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']), "last_login" => date("Y-m-d H:i:s")]);
-                $_SESSION['LOGGED_IN'] = true;
-                $_SESSION['USER_ID'] = $user->user_id;
-                $_SESSION['USER_NAME'] = $user->username;
+                $user->authenticate();
                 return $this->response->withRedirect($this->container->router->pathFor('home'));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
     }
 
-    private function register()
+    /**
+     * Control the register action
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     */
+    private function register(): Response
     {
         //Si l'utilisateur est connecté, on le redirige vers son profil.
         if (!empty($_SESSION['LOGGED_IN']))
@@ -166,7 +192,6 @@ class ControllerUser
         switch ($this->request->getMethod()) {
             case 'GET':
                 return $this->response->write($this->renderer->render(Renderer::REGISTER));
-                break;
             case 'POST':
                 //On verifie une variable venant du formulaire
                 if ($this->request->getParsedBodyParam('sendBtn') !== "OK")
@@ -191,11 +216,11 @@ class ControllerUser
                 $file = $this->request->getUploadedFiles()['file_img'];
                 if (!empty($file->getClientFilename())) {
                     $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
-                    $finfo = [$this->user->user_id,strtolower($extension)];
+                    $finfo = [$this->user->user_id, strtolower($extension)];
                     $info = Validator::validateFile($this->container, $file, $finfo, "user");
                     //Si le fichier est validé
                     if ($info === "ok")
-                        $user->avatar = $finfo[0].".".$finfo[1];
+                        $user->avatar = $finfo[0] . "." . $finfo[1];
                 }
                 //On vide le tableau FILES pour eviter les abus
                 unset($_FILES);
@@ -207,19 +232,18 @@ class ControllerUser
                 $user->created_at = date("Y-m-d H:i:s");
                 //Sauvegarde dans la base
                 $user->save();
-                session_regenerate_id();
-                $user->update(['last_ip' => ip2long($_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']), "last_login" => date("Y-m-d H:i:s")]);
-                //Remplissage du tableau de session
-                $_SESSION['LOGGED_IN'] = true;
-                $_SESSION['USER_ID'] = $user->user_id;
-                $_SESSION['USER_NAME'] = $user->username;
+                $user->authenticate();
                 return $this->response->withRedirect($this->container->router->pathFor('home'));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
     }
 
-    private function logout()
+    /**
+     * Control the logout action
+     * @return Response
+     */
+    private function logout(): Response
     {
         //Si l'utilisateur n'est pas connecté, on le renvoie vers la page d'accueil
         if (empty($_SESSION['LOGGED_IN']))
@@ -227,28 +251,36 @@ class ControllerUser
         //On deconnecte l'utilisateur
         User::logout();
         //Selon le cas de figure (déconnexion volontaire, changement du mdp, 2fa, ..), on renvoie vers une page différente
-        switch ($this->request->getQueryParam('info')) {
-            case 'pc':
-                return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "pc"]));
-            case '2fa':
-                return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "2fa"]));
-            default:
-                return $this->response->withRedirect($this->container->router->pathFor('home'));
-        }
+        return match ($this->request->getQueryParam('info')) {
+            'pc' => $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "pc"])),
+            '2fa' => $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "2fa"])),
+            default => $this->response->withRedirect($this->container->router->pathFor('home')),
+        };
     }
 
-    private function deleteAvatar()
+    /**
+     * Control delete avatar action
+     * @return Response
+     */
+    private function deleteAvatar(): Response
     {
         //S'il n'a pas d'avatar, on l'informe
         if (empty($this->user->avatar))
             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "noavatar"]));
         //On supprime l'image precedente et on insere NULL dans la DB
-        unlink($this->container['users_upload_dir'].DIRECTORY_SEPARATOR  .$this->user->avatar);
+        unlink($this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
         $this->user->update(["avatar" => NULL]);
         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile']));
     }
 
-    public function auth2FA()
+    /**
+     * Control the 2FA login action
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException
+     */
+    public function auth2FA(): Response
     {
         //Si l'utilisateur entre dans le mode "RECOVER" (récupération 2FA)
         if ($this->args["action"] == "recover") {
@@ -268,12 +300,10 @@ class ControllerUser
                     $rescueObj->delete();
                     $user->remove2FA();
                     return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "2farec"]));
-                    break;
                 default:
                     throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
             }
-        }
-        //Si l'utilisateur ne précise rien
+        } //Si l'utilisateur ne précise rien
         else {
             //S'il n'est pas connecté, on le redirige vers une autre page
             if (empty($_SESSION['LOGGED_IN']))
@@ -294,7 +324,6 @@ class ControllerUser
                     }
                     //Sinon, on le renvoie vers la page de gestion
                     return $this->response->write($this->renderer->render(Renderer::MANAGE_2FA));
-                    break;
                 case 'POST':
                     //On vérifie une valeur venant du formulaire
                     if ($this->request->getParsedBodyParam('sendBtn') !== "ok")
@@ -308,7 +337,6 @@ class ControllerUser
                             //On désaactive le 2FA
                             $this->user->remove2FA();
                             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "2fa_disabled"]));
-                            break;
                         //Activation du 2FA
                         case "enable":
                             //Si l'utilisateur a déjà un 2FA, on le renvoie vers la page de gestion
@@ -326,32 +354,31 @@ class ControllerUser
                                 return $this->response->write($this->renderer->render(Renderer::SHOW_2FA_CODES));
                             }
                             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "2fanok"]));
-                            break;
                         default:
                             throw new NotFoundException($this->request, $this->response);
                     }
-                    break;
                 default:
                     throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
             }
         }
     }
 
-
-    public function process()
+    /**
+     * Process request for the user model
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException
+     */
+    public function process(): Response
     {
-        switch ($this->args['action']) {
-            case 'login':
-                return $this->login();
-            case 'profile':
-                return $this->profile();
-            case 'logout':
-                return $this->logout();
-            case 'register':
-                return $this->register();
-            default:
-                throw new NotFoundException($this->request, $this->response);
-        }
+        return match ($this->args['action']) {
+            'login' => $this->login(),
+            'profile' => $this->profile(),
+            'logout' => $this->logout(),
+            'register' => $this->register(),
+            default => throw new NotFoundException($this->request, $this->response),
+        };
     }
 
 }

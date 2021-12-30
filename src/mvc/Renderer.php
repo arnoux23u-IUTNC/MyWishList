@@ -2,7 +2,14 @@
 
 namespace mywishlist\mvc;
 
-abstract class Renderer{
+/**
+ * Class Renderer
+ * Abstract class for rendering views with constants
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc
+ */
+abstract class Renderer
+{
 
     const SHOW = 0;
     const SHOW_FOR_ITEM = 1;

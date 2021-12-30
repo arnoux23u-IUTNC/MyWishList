@@ -5,7 +5,7 @@ let checkForm = () => {
     switch (formData.get("type")) {
         case "link":
             const link = document.getElementById("url_img").value.toLowerCase();
-            if (link.match(/^((https?:\/{2})?(\w[\w\-\/\.+]+).(jpe?g|png))?$/)) {
+            if (link.match(/^((https?:\/{2})?(\w[\w\-\/+]+).(jpe?g|png))?$/)) {
                 return true;
             } else {
                 alert("Link must match [http(s)://]nomimage.(jpe?g|png)");
@@ -14,14 +14,14 @@ let checkForm = () => {
             break;
         case "upload":
             const name = $("#file_img")[0].files[0] ? $("#file_img")[0].files[0].name.toLowerCase() : "NOLINK";
-            if (name.match(/^(\w[\w\-\/\.+]+).(jpe?g|png)$/)) {
+            if (name.match(/^(\w[\w\-\/+]+).(jpe?g|png)$/)) {
                 return true;
             } else {
                 alert("Link must match [nomimage.(jpe?g|png)]");
                 $("#file_img").click();
             }
             break;
-    };
+    }
     return false;
 }
 
@@ -32,7 +32,7 @@ let hide = () => {
     $('#file_img').addClass('invisible');
 }
 
-$('input[type=radio][name=type]').on('change', function() {
+$('input[type=radio][name=type]').on('change', function () {
     switch ($(this).val()) {
         case 'link':
             hide();
@@ -46,11 +46,11 @@ $('input[type=radio][name=type]').on('change', function() {
     }
 });
 
-$(document).ready(function() {
+$(document).ready(function () {
     $('#link').prop('checked', true);
     hide();
 });
 
-$('#delete').click(function() {
+$('#delete').click(function () {
     $('#url_img').val('');
 });

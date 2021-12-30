@@ -3,27 +3,39 @@
 namespace mywishlist;
 
 use GdImage;
+use Slim\Container;
 
+/**
+ * Image Cropper Class
+ * Utils to circle crop an image
+ * @author Guillaume ARNOUX
+ * @package mywishlist
+ */
 class ImgCropper
 {
 
-    private int $width, $height;
     private GdImage $image;
     private array $finfo;
-    private $container;
+    private Container $container;
 
-    public function __construct($container, $finfo)
+    /**
+     * Constructor
+     * @param Container $container
+     * @param array $finfo file name and extension
+     */
+    public function __construct(Container $container, array $finfo)
     {
-        $this->image = match($finfo[1]){
-            "jpg", "jpeg" => imagecreatefromjpeg($container['users_upload_dir'].DIRECTORY_SEPARATOR.$finfo[0].".".$finfo[1]),
-            "png"=> imagecreatefrompng($container['users_upload_dir'].DIRECTORY_SEPARATOR.$finfo[0].".".$finfo[1])
+        $this->image = match ($finfo[1]) {
+            "jpg", "jpeg" => imagecreatefromjpeg($container['users_upload_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1]),
+            "png" => imagecreatefrompng($container['users_upload_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1])
         };
-        $this->width = imagesx($this->image);
-        $this->height = imagesy($this->image);
         $this->container = $container;
         $this->finfo = $finfo;
     }
 
+    /**
+     * Save image to disk
+     */
     public function save()
     {
         $size = min(imagesx($this->image), imagesy($this->image));
@@ -40,7 +52,7 @@ class ImgCropper
         imagefill($newImg, 0, $size - 1, $dstTransparent);
         imagefill($newImg, $size - 1, $size - 1, $dstTransparent);
         imagecolortransparent($newImg, $dstTransparent);
-        imagepng($newImg, $this->container['users_upload_dir'].DIRECTORY_SEPARATOR.$this->finfo[0].".".$this->finfo[1]);
+        imagepng($newImg, $this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . $this->finfo[0] . "." . $this->finfo[1]);
     }
 
 }

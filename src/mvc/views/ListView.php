@@ -1,59 +1,81 @@
-<?php
+<?php /** @noinspection PhpUndefinedVariableInspection */
+
+/** @noinspection PhpUndefinedFieldInspection */
 
 namespace mywishlist\mvc\views;
 
 use Slim\Container;
-use Slim\Http\{Request, Response};
-use \mywishlist\mvc\models\{Liste, Reserved, User};
-use \mywishlist\exceptions\ForbiddenException;
+use Slim\Http\Request;
+use JetBrains\PhpStorm\Pure;
 use mywishlist\mvc\{Renderer, View};
+use mywishlist\mvc\models\{Liste, Reserved, User};
 
+/**
+ * List View
+ * Inherits from View
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\views
+ */
 class ListView extends View
 {
 
+    /**
+     * @var Liste|null List associated to the view
+     */
     private ?Liste $list;
 
-    public function __construct(Container $c, Liste $list = NULL, Request $request = NULL)
+
+    /**
+     * ListView constructor
+     * @param Container $c
+     * @param Liste|null $list
+     * @param Request|null $request
+     */
+    #[Pure] public function __construct(Container $c, Liste $list = NULL, Request $request = NULL)
     {
         $this->list = $list;
         parent::__construct($c, $request);
     }
 
-    protected function show()
+    /**
+     * Display the list
+     * @return string html code
+     */
+    protected function show(): string
     {
         $l = $this->list;
         $public_key = $this->request->getQueryParam('public_key');
         //$routeAddItem = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
-    
-        //Headers HTML
-        $dataHeader = match(filter_var($this->request->getQueryParam('state'), FILTER_SANITIZE_STRING) ?? ""){
-            "update" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_updated']}</span></div>",
-            "newItem"  => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_item_added']}</span></div>",
-            "modItem"  => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_item_updated']}</span></div>",
-            "delItem"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['list_item_deleted']}</span></div>",
-            "resItem"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['list_item_reserved_action']}</span></div>",
-            default => ""
-        };    
-        $warnEdit = match(filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? ""){
-            "ok" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['image_saved']}</span></div>",
-            "typeerr"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_type_error']}</span></div>",
-            "sizeerr"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_size_error']}</span></div>",
-            "writeerr"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_write_error']}</span></div>",
-            "fileexist"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_exists']}</span></div>",
-            "error"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_error']}</span></div>",
-            "errtoken"  => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
-            default => ""
-        };  
 
-        
+        //Headers HTML
+        $dataHeader = match (filter_var($this->request->getQueryParam('state'), FILTER_SANITIZE_STRING) ?? "") {
+            "update" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_updated']}</span></div>",
+            "newItem" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_item_added']}</span></div>",
+            "modItem" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_item_updated']}</span></div>",
+            "delItem" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['list_item_deleted']}</span></div>",
+            "resItem" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['list_item_reserved_action']}</span></div>",
+            default => ""
+        };
+        $warnEdit = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+            "ok" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['image_saved']}</span></div>",
+            "typeerr" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_type_error']}</span></div>",
+            "sizeerr" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_size_error']}</span></div>",
+            "writeerr" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_write_error']}</span></div>",
+            "fileexist" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_exists']}</span></div>",
+            "error" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_error']}</span></div>",
+            "errtoken" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
+            default => ""
+        };
+
+
         $descr_info = $this->list->description ?? $this->container->lang['none'];
         $expiration_info = !empty($this->list->expiration) ? date_format(date_create($this->list->expiration), "d-m-Y") : $this->container->lang['nc'];
         $associated_user = User::find($this->list->user_id);
-        $user_info = empty($associated_user) ? $this->container->lang['nc'] : $associated_user->lastname.' '.$associated_user->firstname;
-        $items_list="";
-        foreach ($l->items as $pos=>$item) {
+        $user_info = empty($associated_user) ? $this->container->lang['nc'] : $associated_user->lastname . ' ' . $associated_user->firstname;
+        $items_list = "";
+        foreach ($l->items as $pos => $item) {
             $pos++;
-            $routeModItem = $this->container->router->pathFor('items_edit_id',['id' => $item->id]);
+            $routeModItem = $this->container->router->pathFor('items_edit_id', ['id' => $item->id]);
             $reserved = Reserved::find($item->id);
             /*Declaration d'une variable qui donnera le resultat suivant
             *  101 : Liste expirée, Item non reservé
@@ -69,48 +91,48 @@ class ListView extends View
             *  1052 : Propriétaire, Liste non expirée, Item reservé
             *  10052 : Admin, Liste non expirée, Item reservé
             */
-            $state_item = ($this->access_level+(empty($reserved) ? 0 : 5)).($l->isExpired() ? 1 : 2);
+            $state_item = ($this->access_level + (empty($reserved) ? 0 : 5)) . ($l->isExpired() ? 1 : 2);
             $item_mod = "";
             $item_del = "";
-            switch ($state_item){
+            switch ($state_item) {
                 case 101:
                     $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 1001:
                     $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 10001:
                     $reservation_state = $this->container->lang['item_unreserved'];
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 151:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() .' -> '. $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
                     break;
                 case 1051:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() .' -> '. $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
                     break;
                 case 10051:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() .' -> '. $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 102:
                     $reservation_state = $this->container->lang['item_unreserved'];
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 1002:
                     $reservation_state = $this->container->lang['item_unreserved'];
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 10002:
                     $reservation_state = $this->container->lang['item_unreserved'];
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 152:
                     $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user();
@@ -119,9 +141,9 @@ class ListView extends View
                     $reservation_state = $this->container->lang['item_reserved'];
                     break;
                 case 10052:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() .' -> '. $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup{$item->id}' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
             }
 
@@ -144,17 +166,17 @@ class ListView extends View
                 }
             }*/
             //$routeDelItem = $this->container->router->pathFor('items_delete_id',['id' => $item->id],["public_key" => $this->public_key]);
-            $item_desc = "<span class='pos'>$pos</span>$item->nom".(!empty($item->img) ? (file_exists(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."assets".DIRECTORY_SEPARATOR."img".DIRECTORY_SEPARATOR."items".DIRECTORY_SEPARATOR."$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/\.]+).(jpe?g|png))?$/",$item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")):"");
-            
+            $item_desc = "<span class='pos'>$pos</span>$item->nom" . (!empty($item->img) ? (file_exists(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "img" . DIRECTORY_SEPARATOR . "items" . DIRECTORY_SEPARATOR . "$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/.]+).(jpe?g|png))?$/", $item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")) : "");
+
             // $item_res = !empty($reserved) ? "<p>{$this->container->lang['list_reserved_by']} $reserved->user_id_id -> $reserved->message</p>" : ($l->isExpired() ? "<p><i>{$this->container->lang['reservation_not_possible']}</i></p>" : "\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='#'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t");
-                    
+
             $pk = $this->request->getQueryParam('public_key') ?? $this->request->getParsedBodyParam('public_key') ?? "";
             $routeItemShow = $this->container->router->pathFor("items_show_id", ["id" => $item->id]);
             $items_list .= <<<HTML
 
                                                         <li>
                                                             <form class='col-2 float-left' method="post" action="$routeItemShow">
-                                                                <input type="hidden" name="public_key" value="{$pk}" /> 
+                                                                <input type="hidden" name="public_key" value="$pk" /> 
                                                                 <input type="hidden" name="liste_id" value="$l->no" /> 
                                                                 <a onclick="this.parentNode.submit();">$item_desc</a>
                                                             </form>$item_mod$item_del
@@ -194,7 +216,7 @@ class ListView extends View
                                             <h1 class="mb-0">{$this->container->lang['list']} {$this->container->lang['number']} {$this->list->no}</h1>
                                         </div>
                                         <div class="col-4 text-right">
-                                            <a href="{$this->container->router->pathFor('lists_edit_id',['id'=>$this->list->no])}" class="btn btn-sm btn-default">{$this->container->lang['list_edition']}</a>
+                                            <a href="{$this->container->router->pathFor('lists_edit_id', ['id' => $this->list->no])}" class="btn btn-sm btn-default">{$this->container->lang['list_edition']}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -255,11 +277,11 @@ class ListView extends View
             </div>
             <script>
                 $(".pointer").each(function() {
-                    $(this).click(function() {
+                    $(this).on('click', function() {
                         const id = $(this).attr("id");
                         const itemid = id.substr(5);
                         //Exceptionnellement : Utilisation de la route directement plutot que du container pour eviter des conflits JS / PHP 
-                        $('#pform').attr('action', "/items/"+itemid+"/delete/?public_key={$public_key}");
+                        $('#pform').attr('action', "/items/"+itemid+"/delete/?public_key=$public_key");
                         $('.popup1').find('h2').text("{$this->container->lang['item_delete']} "+itemid);
                         $('.popup1').find('h3').text("{$this->container->lang['item_delete_confirm']} "+itemid);
                         $('.popup1').find('label').text("{$this->container->lang['private_token_for']} "+itemid+" {$this->container->lang['token_onlyifnotlogged']}");
@@ -269,10 +291,14 @@ class ListView extends View
         </body>
         </html>
         HTML;
-        return genererHeader("{$this->container->lang['list']} {$this->list->no} - MyWishList", ["list.css","profile.css"]).$html;
+        return genererHeader("{$this->container->lang['list']} {$this->list->no} - MyWishList", ["list.css", "profile.css"]) . $html;
     }
 
-    private function createList()
+    /**
+     * Display list creation page
+     * @return string
+     */
+    private function createList(): string
     {
         $email = User::find($_SESSION['USER_ID'] ?? "")->mail ?? "";
         $html = <<<HTML
@@ -325,7 +351,7 @@ class ListView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="email">{$this->container->lang['list_owner_email']}</label>
-                                            <input type="email" id="email" name="email" class="form-control form-control-alternative" required value="{$email}">
+                                            <input type="email" id="email" name="email" class="form-control form-control-alternative" required value="$email">
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -339,10 +365,15 @@ class ListView extends View
             </div>
         </div>
         HTML;
-        return genererHeader("{$this->container->lang['phtml_lists_create']}", ["profile.css"]).$html;
+        return genererHeader("{$this->container->lang['phtml_lists_create']}", ["profile.css"]) . $html;
     }
 
-    private function addItem(){
+    /**
+     * Display add an item to a list
+     * @return string
+     */
+    private function addItem(): string
+    {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $l = $this->list;
         $html = <<<HTML
@@ -364,7 +395,7 @@ class ListView extends View
             </div>
             <div class="col-lg-6 flex mt--7">
                 <div class="fw">
-                    <form method="post" onsubmit="return checkForm()" enctype="multipart/form-data" action="{$this->container->router->pathFor('lists_edit_items_id',['id' => $l->no])}">
+                    <form method="post" onsubmit="return checkForm()" enctype="multipart/form-data" action="{$this->container->router->pathFor('lists_edit_items_id', ['id' => $l->no])}">
                         <div class="card bg-secondary shadow">
                             <div class="card-body">
                                 <div class="pl-lg-4">
@@ -426,10 +457,15 @@ class ListView extends View
         </div>
         <script src="/assets/js/form-delete.js"></script>
         HTML;
-        return genererHeader("{$this->container->lang["list_add_item"]} | {$this->container->lang['list']} $l->no", ["profile.css","toggle.css"]).$html;    
+        return genererHeader("{$this->container->lang["list_add_item"]} | {$this->container->lang['list']} $l->no", ["profile.css", "toggle.css"]) . $html;
     }
 
-    protected function edit(){
+    /**
+     * Display list edition
+     * @return string
+     */
+    protected function edit(): string
+    {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $l = $this->list;
         $html = <<<HTML
@@ -451,7 +487,7 @@ class ListView extends View
             </div>
             <div class="col-lg-6 flex mt--7">
                 <div class="fw">
-                    <form method="post" action="{$this->container->router->pathFor('lists_edit_id',['id' => $this->list->no])}">
+                    <form method="post" action="{$this->container->router->pathFor('lists_edit_id', ['id' => $this->list->no])}">
                         <div class="card bg-secondary shadow">
                             <div class="card-body">
                                 <div class="pl-lg-4">
@@ -492,28 +528,31 @@ class ListView extends View
             </div>
         </div>
         HTML;
-        return genererHeader("{$this->container->lang['list']} $l->no | {$this->container->lang["editing"]}", ["profile.css"]).$html;
+        return genererHeader("{$this->container->lang['list']} $l->no | {$this->container->lang["editing"]}", ["profile.css"]) . $html;
     }
 
-
-    private function showForItem(){
-        return "[".$this->list->no."] ".$this->list->titre. " | ".$this->list->description;
+    /**
+     * Display the list for an item
+     * @return string
+     */
+    private function showForItem(): string
+    {
+        return "[" . $this->list->no . "] " . $this->list->titre . " | " . $this->list->description;
     }
 
-    public function render(int $method, int $access_level = Renderer::OTHER_MODE){
+    /**
+     * {@inheritDoc}
+     */
+    public function render(int $method, int $access_level = Renderer::OTHER_MODE): string
+    {
         $this->access_level = $access_level;
-        switch ($method) {
-            case Renderer::SHOW_FOR_ITEM:
-                return $this->showForItem();
-            case Renderer::CREATE:
-                return $this->createList();
-            case Renderer::EDIT_ADD_ITEM:
-                return $this->addItem();
-            case Renderer::REQUEST_AUTH:
-                return $this->requestAuth($this->list);
-            default:
-                return parent::render($method, $access_level);
-        }
+        return match ($method) {
+            Renderer::SHOW_FOR_ITEM => $this->showForItem(),
+            Renderer::CREATE => $this->createList(),
+            Renderer::EDIT_ADD_ITEM => $this->addItem(),
+            Renderer::REQUEST_AUTH => $this->requestAuth($this->list),
+            default => parent::render($method, $access_level),
+        };
     }
 
 }

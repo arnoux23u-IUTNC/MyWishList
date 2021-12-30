@@ -3,18 +3,19 @@ session_start();
 
 $lang = [];
 
-require_once __DIR__ . DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'src'. DIRECTORY_SEPARATOR .'vendor'. DIRECTORY_SEPARATOR .'autoload.php';
-require_once __DIR__ .  DIRECTORY_SEPARATOR .'..'. DIRECTORY_SEPARATOR .'src'. DIRECTORY_SEPARATOR .'i18n'. DIRECTORY_SEPARATOR .'langs.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'i18n' . DIRECTORY_SEPARATOR . 'langs.php';
 
-use \mywishlist\bd\Eloquent as Eloquent;
-use \mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem};
-use \mywishlist\exceptions\ExceptionHandler;
+use mywishlist\bd\Eloquent as Eloquent;
+use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem};
+use mywishlist\exceptions\ExceptionHandler;
 use Slim\{App, Container};
 
 #Container
+$container = new Container();
 $container['notFoundHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
-        $html = file_get_contents('..'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'404.html');
+        $html = file_get_contents('..' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . '404.html');
         preg_match_all("/{#(\w|_)+#}/", $html, $matches);
         foreach ($matches[0] as $match)
             $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
@@ -23,22 +24,22 @@ $container['notFoundHandler'] = function () use ($lang) {
 };
 $container['notAllowedHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
-        $html = file_get_contents('..'.DIRECTORY_SEPARATOR.'errors'.DIRECTORY_SEPARATOR.'405.html');
+        $html = file_get_contents('..' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . '405.html');
         preg_match_all("/{#(\w|_)+#}/", $html, $matches);
         foreach ($matches[0] as $match)
             $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
         return $response->withStatus(405)->write($html);
     };
 };
-$container['errorHandler'] = function () use ($lang){
+$container['errorHandler'] = function () use ($lang) {
     return new ExceptionHandler($lang);
 };
-$container['items_upload_dir'] = __DIR__ .DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'items';
-$container['users_upload_dir'] = __DIR__ .DIRECTORY_SEPARATOR.'assets'.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'avatars';
+$container['items_upload_dir'] = __DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'items';
+$container['users_upload_dir'] = __DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'avatars';
 $container['lang'] = $lang;
 
-#Launch
-Eloquent::start('..'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'conf'.DIRECTORY_SEPARATOR.'conf.ini');
+#Connexion à la base de données
+Eloquent::start('..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'conf.ini');
 $app = new App($container);
 
 #Redirection du traffic dans l'application
@@ -49,41 +50,41 @@ $app->any("/accounts/{action:login|profile|logout|register}[/]", function ($requ
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
 $app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
-    return (new ControllerList($this,$request, $response, $args))->addItem();
+    return (new ControllerList($this, $request, $response, $args))->addItem();
 })->setName('lists_edit_items_id');
 $app->any("/lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
-    return (new ControllerList($this,$request, $response, $args))->edit();
+    return (new ControllerList($this, $request, $response, $args))->edit();
 })->setName('lists_edit_id');
 $app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
-    return (new ControllerList($this,$request, $response, $args))->show();
+    return (new ControllerList($this, $request, $response, $args))->show();
 })->setName('lists_show_id');
 $app->any("/lists/new[/]", function ($request, $response, $args) {
-    return (new ControllerList($this,$request, $response, $args))->create();
+    return (new ControllerList($this, $request, $response, $args))->create();
 })->setName('lists_create');
 /*$app->any("/lists[/]", function ($request, $response, $args) {
     //TODO return (new ControllerUser($this,$request, $response, $args))->create();
 })->setName('lists_home');*/
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
-    return (new ControllerItem($this,$request, $response, $args))->delete();
+    return (new ControllerItem($this, $request, $response, $args))->delete();
 })->setName('items_delete_id');
 $app->any("/items/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
-    return (new ControllerItem($this,$request, $response, $args))->edit();
+    return (new ControllerItem($this, $request, $response, $args))->edit();
 })->setName('items_edit_id');
 $app->any("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
-    return (new ControllerItem($this,$request, $response, $args))->show();
+    return (new ControllerItem($this, $request, $response, $args))->show();
 })->setName('items_show_id');
 
 #Route principale
-$app->get('/', function ($request, $response, $args) use ($lang) {
+$app->get('/', function ($request, $response) use ($lang) {
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("{$lang['home_title']} MyWishList",["style.css","lang.css"]).file_get_contents(__DIR__ . DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'content'.DIRECTORY_SEPARATOR.'sidebar.phtml');
+    $html = genererHeader("{$lang['home_title']} MyWishList", ["style.css", "lang.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
     $phtmlVars = array(
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
         'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
         'my_lists_route' => $this->router->pathFor('lists_home'),
         'create_list_route' => $routeCreate,
-        'flag_img' => "<img class='selected' alt='".strtolower($_SESSION["lang"])."-flag' src='/assets/img/flags/flag-".strtolower($_SESSION["lang"]).".png'>",
+        'flag_img' => "<img class='selected' alt='" . strtolower($_SESSION["lang"]) . "-flag' src='/assets/img/flags/flag-" . strtolower($_SESSION["lang"]) . ".png'>",
         'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),
         'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<EOD
 
@@ -98,7 +99,7 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
     );
     foreach ($phtmlVars as $key => $value) {
         $html = str_replace("%" . $key . "%", $value, $html);
-    };
+    }
     preg_match_all("/{#(\w|_)+#}/", $html, $matches);
     foreach ($matches[0] as $match) {
         $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
@@ -114,15 +115,23 @@ $app->get('/', function ($request, $response, $args) use ($lang) {
     return $response->write($html);
 })->setName('home');
 
-$app->run();
+#Demmarage de l'application
+try {
+    $app->run();
+} catch (Throwable $e) {
+    header($_SERVER["SERVER_PROTOCOL"] . ' 500 Internal Server Error', true, 500);
+    echo '<h1>Something went wrong!</h1>';
+    print_r($e);
+    exit;
+}
 
 /**
  * Method who generates the header of the page
- * @param string $title
- * @param array $stylesheets
+ * @param string $title title of the page
+ * @param array $styles stylesheets to include
  * @return string html code
  */
-function genererHeader($title, $styles = [])
+function genererHeader(string $title, array $styles = []): string
 {
     global $lang;
     $html = <<<EOD
@@ -142,5 +151,5 @@ function genererHeader($title, $styles = [])
     foreach ($styles as $style)
         $html .= "\n\t<link rel='stylesheet' href='/assets/css/$style'>";
     $html .= "\n</head>\n<body>\n";
-    return empty($_SESSION['LOGGED_IN']) ? $html."\t<header class='guestmode'>{$lang['__invited']}</header>\n" : $html;
+    return empty($_SESSION['LOGGED_IN']) ? $html . "\t<header class='guestmode'>{$lang['__invited']}</header>\n" : $html;
 }

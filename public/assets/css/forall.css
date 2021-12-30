@@ -26,7 +26,7 @@
     align-items: center;
 }
 
-.popup>span {
+.popup > span {
     font-weight: bold;
     margin-left: .5vw;
 }

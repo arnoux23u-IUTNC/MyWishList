@@ -9,7 +9,7 @@ upload_btn.onclick = () => {
     fileselector.click();
 }
 
-fileselector.addEventListener("change", function() {
+fileselector.addEventListener("change", function () {
     file = fileselector.files[0];
     if (file)
         assertFile();
@@ -18,7 +18,7 @@ fileselector.addEventListener("change", function() {
 let assertFile = () => {
     if (file) {
         if (file.size > 15000000) {
-            alert(`File size is too big (${parseFloat(file.size/1000000).toFixed(2)}Mo) [MAX: 15Mo]`);
+            alert(`File size is too big (${parseFloat(file.size / 1000000).toFixed(2)}Mo) [MAX: 15Mo]`);
             return false;
         }
         form.submit();

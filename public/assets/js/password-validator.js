@@ -32,7 +32,9 @@ inputC.onblur = () => {
     if (inputC.value.length === 0) inputC.classList.remove("invalid");
 }
 
-input.onfocus = () => { block.style.display = "block" }
+input.onfocus = () => {
+    block.style.display = "block"
+}
 input.onblur = display
 
 input.onkeyup = () => {

@@ -1,52 +1,66 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+/** @noinspection PhpUndefinedVariableInspection */
+/** @noinspection PhpUndefinedFieldInspection */
 
 namespace mywishlist\mvc\views;
 
+use mywishlist\exceptions\ForbiddenException;
 use Slim\Container;
 use Slim\Http\Request;
-use \mywishlist\mvc\models\{Item, Reserved};
-use \mywishlist\mvc\views\ListView;
-use \mywishlist\exceptions\{ForbiddenException, CookieNotSetException};
-use \mywishlist\mvc\{Renderer, View};
+use JetBrains\PhpStorm\Pure;
+use mywishlist\mvc\{Renderer, View};
+use mywishlist\mvc\models\{Item, Reserved};
 
-
+/**
+ * Item View
+ * Inherits from View
+ * @property $public_key
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\views
+ */
 class ItemView extends View
 {
 
+    /**
+     * @var Item|null Item associated with the view
+     */
     private ?Item $item;
 
-    public function __construct(Container $c, Item $item = NULL, Request $request = null)
+    /**
+     * Constructor
+     * @param Container $c
+     * @param Item|null $item
+     * @param Request|null $request
+     */
+    #[Pure] public function __construct(Container $c, Item $item = NULL, Request $request = null)
     {
         $this->item = $item;
         parent::__construct($c, $request);
     }
 
-    protected function show()
+    /**
+     * Display an item
+     * @return string html code
+     * @throws ForbiddenException
+     */
+    protected function show(): string
     {
         $reserved = Reserved::find($this->item->id);
-        if(!empty($reserved)){
-            switch ($this->access_level){
-                case Renderer::ADMIN_MODE:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user .' -> '. $reserved->message;
-                    break;
-                case Renderer::OWNER_MODE:
-                    $reservation_state = $this->item->liste->isExpired() ? $this->container->lang['list_reserved_by'] . $reserved->user .' -> '. $reserved->message : $this->container->lang['item_reserved'];
-                    break;
-                case Renderer::OTHER_MODE:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user;
-                    break;
-                default:
-                    $reservation_state = $this->container->lang['item_unreserved'];
-                    break;
-            }
-        }else{
+        if (!empty($reserved)) {
+            $reservation_state = match ($this->access_level) {
+                Renderer::ADMIN_MODE => $this->container->lang['list_reserved_by'] . $reserved->user . ' -> ' . $reserved->message,
+                Renderer::OWNER_MODE => $this->item->liste->isExpired() ? $this->container->lang['list_reserved_by'] . $reserved->user . ' -> ' . $reserved->message : $this->container->lang['item_reserved'],
+                Renderer::OTHER_MODE => $this->container->lang['list_reserved_by'] . $reserved->user,
+                default => $this->container->lang['item_unreserved'],
+            };
+        } else {
             $reservation_state = $this->container->lang['item_unreserved'];
         }
         $liste_info = !empty($this->item->liste) ? (new ListView($this->container, $this->item->liste, $this->request))->render(Renderer::SHOW_FOR_ITEM, $this->access_level) : $this->container->lang['none'];
         $descr_info = $this->item->descr ?? $this->container->lang['none'];
         $url_info = $this->item->url ?? $this->container->lang['none'];
         $tarif_info = $this->item->tarif ?? $this->container->lang['nc'];
-        $img_info = !empty($this->item->img) ? (file_exists(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."assets".DIRECTORY_SEPARATOR."img".DIRECTORY_SEPARATOR."items".DIRECTORY_SEPARATOR."{$this->item->img}") ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='{$this->item->img}'>" : "")) : "";
+        $img_info = !empty($this->item->img) ? (file_exists(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "img" . DIRECTORY_SEPARATOR . "items" . DIRECTORY_SEPARATOR . "{$this->item->img}") ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='{$this->item->img}'>" : "")) : "";
         $html = <<<HTML
             <div class="main-content bg-gradient-default fullbg">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -121,8 +135,6 @@ class ItemView extends View
         HTML;
 
 
-
-
         /*if(!empty($reserved))
             if(($l->isExpired() || $this->request->getCookieParam('typeUser') == "participant") && !empty($reserved->user_id))
                 $reservation_state = "{$this->container->lang['list_reserved_by']} $reserved->user_id";
@@ -131,14 +143,18 @@ class ItemView extends View
         else
             $reservation_state = "{$this->container->lang['item_unreserved']}";*/
         //$item_desc = "\t<div>\n\t\t<h2>{$this->item->nom}</h2>\n\t\t".(!empty($this->item->descr) ? "<p>{$this->container->lang['description']} : {$this->item->descr}</p>\n\t\t" : "").(!empty($this->item->url) ? "<p>URL : {$this->item->url}</p>\n\t\t" : "").(!empty($this->item->tarif) ? "<p>{$this->container->lang['price']} : {$this->item->tarif}</p>\n\t\t" : "").(!empty($this->item->img) ? (file_exists(__DIR__."\..\..\..\assets\img\items\\{$this->item->img}") ? "<img alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>\n\t\t" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "<img alt='{$this->item->nom}' src='{$this->item->img}'>\n\t\t" : "")) : "")."<p>{$this->container->lang['item_associated_list']} : {!empty($l->titre) ? $l->titre | $l->description ($l->expiration)) : NULL}</p>\n\t\t"."<p>{$this->container->lang['reservation_state']} : $reservation_state</p>\n\t</div>\n</body>";
-        return genererHeader("Item {$this->item->id} - MyWishList", ["profile.css"]).$html;
+        return genererHeader("Item {$this->item->id} - MyWishList", ["profile.css"]) . $html;
     }
 
-    private function preventDelete(){
-        $i = $this->item;
+    /**
+     * Display prevent delete item page
+     * @return string html code
+     */
+    private function preventDelete(): string
+    {
         $l = $this->item->liste()->first();
-        $from = $this->container->router->pathFor('items_delete_id',['id' => $this->item->id],["public_key" => $this->public_key]);
-        return genererHeader("{$this->container->lang['item_deleting']}", ["list.css"]). <<<EOD
+        $from = $this->container->router->pathFor('items_delete_id', ['id' => $this->item->id], ["public_key" => $this->public_key]);
+        return genererHeader("{$this->container->lang['item_deleting']}", ["list.css"]) . <<<EOD
             <h2>{$this->container->lang['item_deleting']}</h2>
             <div>
                 <form class='form_container' method="post" action="$from">
@@ -152,12 +168,16 @@ class ItemView extends View
         EOD;
     }
 
-    private function confirmDelete(){
-        $i = $this->item;
+    /**
+     * Display delete item page
+     * @return string html code
+     */
+    private function confirmDelete(): string
+    {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
-        $delete = $this->container->router->pathFor('items_delete_id',['id' => $this->item->id]);
-        $back = $this->container->router->pathFor('lists_show_id',['id' => $this->item->liste()->first()->no],["public_key" => $this->public_key]);
-        return genererHeader("{$this->container->lang['item_delete']} $this->item->id", ["list.css"]). <<<EOD
+        $delete = $this->container->router->pathFor('items_delete_id', ['id' => $this->item->id]);
+        $back = $this->container->router->pathFor('lists_show_id', ['id' => $this->item->liste()->first()->no], ["public_key" => $this->public_key]);
+        return genererHeader("{$this->container->lang['item_delete']} $this->item->id", ["list.css"]) . <<<EOD
             <h2>{$this->container->lang['item_delete']} $this->item->id</h2>
             <div>
                 <p class="warning">{$this->container->lang['item_delete_confirm']} $this->item->id ?</p>
@@ -172,7 +192,12 @@ class ItemView extends View
         EOD;
     }
 
-    protected function edit(){
+    /**
+     * Display edit item page
+     * @return string html code
+     */
+    protected function edit(): string
+    {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $html = <<<HTML
         <div class="main-content">
@@ -193,7 +218,7 @@ class ItemView extends View
             </div>
             <div class="col-lg-6 flex mt--7">
                 <div class="fw">
-                    <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('items_edit_id',['id' => $this->item->id])}">
+                    <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('items_edit_id', ['id' => $this->item->id])}">
                         <div class="card bg-secondary shadow">
                             <div class="card-body">
                                 <div class="pl-lg-4">
@@ -255,23 +280,21 @@ class ItemView extends View
         </div>
         <script src="/assets/js/form-delete.js"></script>
         HTML;
-        return genererHeader("Item {$this->item->id} | {$this->container->lang["editing"]}", ["profile.css","toggle.css"]).$html;
+        return genererHeader("Item {$this->item->id} | {$this->container->lang["editing"]}", ["profile.css", "toggle.css"]) . $html;
     }
 
-
-    public function render(int $method, int $access_level = Renderer::OTHER_MODE){
+    /**
+     * {@inheritDoc}
+     */
+    public function render(int $method, int $access_level = Renderer::OTHER_MODE): string
+    {
         $this->access_level = $access_level;
-        switch ($method) {
-            case Renderer::PREVENT_DELETE:
-                return $this->preventDelete();
-            case Renderer::DELETE:
-                return $this->confirmDelete();
-            case Renderer::REQUEST_AUTH:
-                return $this->requestAuth($this->item);
-            default:
-                return parent::render($method, $access_level);
-        }
+        return match ($method) {
+            Renderer::PREVENT_DELETE => $this->preventDelete(),
+            Renderer::DELETE => $this->confirmDelete(),
+            Renderer::REQUEST_AUTH => $this->requestAuth($this->item),
+            default => parent::render($method, $access_level),
+        };
     }
-
 
 }

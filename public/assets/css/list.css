@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap');
+
 body {
     /*BACKGROUNDS VERSIONNING*/
     background: #4b6cb7;
@@ -105,7 +106,7 @@ h4 {
     text-align: right;
 }
 
-.lists_value>span {
+.lists_value > span {
     opacity: 0.8;
     font-weight: 600;
     font-size: 13px;
@@ -210,7 +211,7 @@ h4 {
     align-items: center;
 }
 
-.form_container>* {
+.form_container > * {
     margin: 20px;
 }
 

@@ -1,18 +1,29 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+
+/** @noinspection PhpUndefinedFieldInspection */
 
 namespace mywishlist\mvc;
 
 use Slim\Container;
 use Slim\Http\Request;
 use Illuminate\Database\Eloquent\Model;
-use \mywishlist\exceptions\ForbiddenException;
-use \mywishlist\mvc\Renderer;
+use mywishlist\mvc\models\Liste;
+use mywishlist\exceptions\ForbiddenException;
 
+/**
+ * Abstract class View
+ * Instanciate a view
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc
+ */
 abstract class View
 {
 
     protected Request $request;
     protected Container $container;
+    /**
+     * @var int $access_level depends on the users permissions
+     */
     protected int $access_level;
 
     public function __construct(Container $c, Request $request = null)
@@ -25,30 +36,37 @@ abstract class View
 
     protected abstract function edit();
 
-    protected function requestAuth(Model $model){
+    /**
+     * Display the general auth page
+     * @param Model $model associated model (list, item or user)
+     * @return string html code
+     * @throws ForbiddenException
+     */
+    protected function requestAuth(Model $model): string
+    {
         $from = $this->request->getRequestTarget();
         switch ($from) {
-            case (preg_match('/^\/lists\/[0-9]+\/edit\/items(\/?)/', $from) ? true : false) :
-                $from = $this->container->router->pathFor('lists_edit_items_id',['id' => $model->no]);
+            case (bool)preg_match('/^\/lists\/[0-9]+\/edit\/items(\/?)/', $from) :
+                $from = $this->container->router->pathFor('lists_edit_items_id', ['id' => $model->no]);
                 break;
-            case (preg_match('/^\/lists\/[0-9]+\/edit(\/?)/', $from) ? true : false) :
-                $from = $this->container->router->pathFor('lists_edit_id',['id' => $model->no]);
+            case (bool)preg_match('/^\/lists\/[0-9]+\/edit(\/?)/', $from) :
+                $from = $this->container->router->pathFor('lists_edit_id', ['id' => $model->no]);
                 break;
-            case (preg_match('/^\/items\/[0-9]+\/edit(\/?)/', $from) ? true : false) :
-                $from = $this->container->router->pathFor('items_edit_id',['id' => $model->id]);
+            case (bool)preg_match('/^\/items\/[0-9]+\/edit(\/?)/', $from) :
+                $from = $this->container->router->pathFor('items_edit_id', ['id' => $model->id]);
                 break;
-            default: 
+            default:
                 print_r($from);
                 throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         }
-        $header = match($this->request->getQueryParam('info')){
+        $header = match ($this->request->getQueryParam('info')) {
             "errtoken" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
             default => ""
         };
-        if(get_class($model) == Liste::class){
+        if (get_class($model) == Liste::class) {
             $title = $this->container->lang['list_editing'];
             $dataModel = $model->no;
-        }else{
+        } else {
             $title = $this->container->lang['item_editing'];
             $dataModel = $model->id;
         }
@@ -72,7 +90,7 @@ abstract class View
             </div>
             <div class="col-lg-6 flex mt--7">
                 <div class="fw">
-                    <form method="post" action="{$from}">
+                    <form method="post" action="$from">
                         <div class="card bg-secondary shadow">
                             <div class="card-body">
                                 <div class="pl-lg-4">
@@ -93,19 +111,24 @@ abstract class View
             </div>
         </div>
         HTML;
-        return genererHeader("{$this->container->lang['list_editing']} - {$this->container->lang['auth']}", ["profile.css"]).$html;
+        return genererHeader("{$this->container->lang['list_editing']} - {$this->container->lang['auth']}", ["profile.css"]) . $html;
     }
 
-    public function render(int $method, int $access_level = Renderer::OTHER_MODE){
+    /**
+     * Render the page
+     * @param int $method method to render
+     * @param int $access_level access level of the user
+     * @return string html code
+     * @throws ForbiddenException
+     */
+    public function render(int $method, int $access_level = Renderer::OTHER_MODE): string
+    {
         $this->access_level = $access_level;
-        switch ($method) {
-            case Renderer::SHOW:
-                return $this->show();
-            case Renderer::EDIT:
-                return $this->edit();
-            default:
-                throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
-        }
+        return match ($method) {
+            Renderer::SHOW => $this->show(),
+            Renderer::EDIT => $this->edit(),
+            default => throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']),
+        };
     }
 
 

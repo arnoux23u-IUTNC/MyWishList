@@ -11,7 +11,7 @@ let assertFile = () => {
             return false;
         }
         if (file.size > 15000000) {
-            alert(`File size is too big (${parseFloat(file.size/1000000).toFixed(2)}Mo) [MAX: 15Mo]`);
+            alert(`File size is too big (${parseFloat(file.size / 1000000).toFixed(2)}Mo) [MAX: 15Mo]`);
             return false;
         }
         return true;

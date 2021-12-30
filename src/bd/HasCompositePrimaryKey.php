@@ -4,8 +4,14 @@ namespace mywishlist\bd;
 
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * Generic class for all the classes that have a composite primary key
+ * @author Mark Potter
+ * @author Guillaume ARNOUX
+ * @package mywishlist\bd
+ * Source : https://github.com/mopo922/LaravelTreats/blob/master/src/Model/Traits/HasCompositePrimaryKey.php
+ */
 trait HasCompositePrimaryKey
 {
     /**
@@ -13,7 +19,7 @@ trait HasCompositePrimaryKey
      *
      * @return bool
      */
-    public function getIncrementing()
+    public function getIncrementing(): bool
     {
         return false;
     }
@@ -37,7 +43,7 @@ trait HasCompositePrimaryKey
     /**
      * Set the keys for a save update query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function setKeysForSaveQuery($query)
@@ -55,8 +61,8 @@ trait HasCompositePrimaryKey
     /**
      * Execute a query for a single record by ID.
      *
-     * @param  array  $ids Array of keys, like [column => value].
-     * @param  array  $columns
+     * @param array $ids Array of keys, like [column => value].
+     * @param array $columns
      * @return mixed|static
      */
     public static function find($ids, $columns = ['*'])

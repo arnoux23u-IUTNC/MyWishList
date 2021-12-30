@@ -3,7 +3,25 @@
 namespace mywishlist\mvc\models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Liste Model
+ * Inherits from the Model class of Laravel
+ * @property int $no
+ * @property int $user_id
+ * @property string $titre
+ * @property string $description
+ * @property mixed $expiration
+ * @property string $public_key
+ * @property string $private_key
+ * @property mixed $published
+ * @property mixed $items Goes to items(), eloquent relation
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\models
+ * @method static where(string $string, string $string1, string $string2) Eloquent method
+ * @method static whereUserId(int $user_id) Eloquent method
+ */
 class Liste extends Model
 {
     protected $table = 'liste';
@@ -11,21 +29,30 @@ class Liste extends Model
     public $timestamps = false;
     protected $fillable = ['titre', 'user_id', 'description', 'expiration', 'public_key', 'published'];
 
-
-    public function items()
+    /**
+     * Get items associated to the list
+     * @return HasMany items has many relation
+     */
+    public function items(): HasMany
     {
-        //hasMany(quoi, qui a quelle cle)
-        //verifie que primaryKey = liste_id
-        //cle etrangere de first param
         return $this->hasMany('\mywishlist\mvc\models\Item', 'liste_id');
     }
 
-    public function isExpired()
+    /**
+     * Check if a list is expired
+     * @return bool
+     */
+    public function isExpired(): bool
     {
         return !empty($this->expiration) && $this->expiration <= date('Y-m-d');
     }
 
-    public function isPublished() : bool{
+    /**
+     * Check if a list is published
+     * @return bool
+     */
+    public function isPublished(): bool
+    {
         return $this->published == 1;
     }
 
