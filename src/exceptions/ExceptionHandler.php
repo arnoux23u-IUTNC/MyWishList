@@ -15,7 +15,7 @@ class ExceptionHandler
 {
 
     /**
-     * @var array languages transliations array
+     * @var array languages translations array
      */
     private static array $lang;
 

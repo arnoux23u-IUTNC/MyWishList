@@ -13,6 +13,7 @@ use mywishlist\exceptions\ForbiddenException;
 /**
  * Abstract class View
  * Instanciate a view
+ * @absract
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc
  */

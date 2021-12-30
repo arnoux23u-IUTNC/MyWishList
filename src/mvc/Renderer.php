@@ -5,6 +5,7 @@ namespace mywishlist\mvc;
 /**
  * Class Renderer
  * Abstract class for rendering views with constants
+ * @absract
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc
  */

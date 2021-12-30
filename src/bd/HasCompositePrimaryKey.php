@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * Generic class for all the classes that have a composite primary key
+ * Source : https://github.com/mopo922/LaravelTreats/blob/master/src/Model/Traits/HasCompositePrimaryKey.php
  * @author Mark Potter
  * @author Guillaume ARNOUX
  * @package mywishlist\bd
- * Source : https://github.com/mopo922/LaravelTreats/blob/master/src/Model/Traits/HasCompositePrimaryKey.php
  */
 trait HasCompositePrimaryKey
 {
