@@ -159,10 +159,11 @@ class ItemView extends View
             <div>
                 <form class='form_container' method="post" action="$from">
                     <label for="private_key">{$this->container->lang['private_token_for']} $l->no</label>
-                    <input type="password" name="private_key" id="private_key" required />
+                    <div class="pfield"><input type="password" name="private_key" id="private_key" required /><i onclick="pwd('private_key', event)" class="pwdicon far fa-eye"></i></div>
                     <button type="submit" name="sendBtn">{$this->container->lang['delete']}</button>
                 </form>
             <div>
+            <script src="/assets/js/password-viewer.js"></script>
         </body>
         </html>
         EOD;
