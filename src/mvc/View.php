@@ -98,7 +98,7 @@ abstract class View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="private_key">{$this->container->lang['private_token_for']} $dataModel</label>
-                                            <input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required />
+                                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required /><i onclick="pwd('private_key', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -111,6 +111,7 @@ abstract class View
                 </div>
             </div>
         </div>
+        <script src="/assets/js/password-viewer.js"></script>
         HTML;
         return genererHeader("{$this->container->lang['list_editing']} - {$this->container->lang['auth']}", ["profile.css"]) . $html;
     }

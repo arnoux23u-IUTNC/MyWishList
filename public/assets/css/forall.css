@@ -26,7 +26,7 @@
     align-items: center;
 }
 
-.popup > span {
+.popup>span {
     font-weight: bold;
     margin-left: .5vw;
 }
@@ -110,4 +110,10 @@ input.invalid {
     z-index: 100;
     background-color: #ffee02;
     position: fixed;
+}
+
+.pwdicon {
+    margin-left: -30px !important;
+    cursor: pointer;
+    margin: auto;
 }

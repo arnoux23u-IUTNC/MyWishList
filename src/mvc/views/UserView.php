@@ -97,7 +97,7 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
-                                            <input type="password" id="password" name="password" value="$password" class="form-control form-control-alternative" required/>
+                                            <div class="pfield"><input type="password" id="password" name="password" value="$password" class="form-control form-control-alternative" required/><i onclick="pwd('password', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     $auth2FA
@@ -114,6 +114,7 @@ class UserView
                 </div>
             </div>
         </div>
+        <script src="/assets/js/password-viewer.js"></script>
         HTML;
         return genererHeader("{$this->container->lang['login_title']} - MyWishList", ["profile.css"]) . $html;
     }
@@ -222,7 +223,7 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="input-new-password">{$this->container->lang['user_new_password']}</label>
-                                            <input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative">
+                                            <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative"><i onclick="pwd('input-new-password', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -238,7 +239,7 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
-                                            <input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative">
+                                            <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative"><i onclick="pwd('input-new-password-c', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -257,6 +258,7 @@ class UserView
             </div>
         </div>
         <script src="/assets/js/password-validator.js"></script>
+        <script src="/assets/js/password-viewer.js"></script>
         HTML;
         return genererHeader("{$this->container->lang['forgot_password_title']} - MyWishList", ["profile.css"]) . $html;
     }
@@ -357,7 +359,7 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
-                                            <input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/>
+                                            <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/><i onclick="pwd('input-new-password', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -373,7 +375,7 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="password-confirm">{$this->container->lang['user_password_confirm']}</label>
-                                            <input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/>
+                                            <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/><i onclick="pwd('input-new-password-c', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -388,6 +390,7 @@ class UserView
             </div>
         </div>
         <script src="/assets/js/password-validator.js"></script>
+        <script src="/assets/js/password-viewer.js"></script>
         <script src="/assets/js/avatar-register.js"></script>
         HTML;
         return genererHeader("{$this->container->lang['title_register']} - MyWishList", ["profile.css"]) . $html;
