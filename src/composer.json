@@ -7,7 +7,8 @@
         "php": "^8.0.0",
         "tokenly/token-generator": "^1.0",
         "spomky-labs/otphp": "^10.0",
-      "ext-gd": "*"
+        "ext-gd": "*",
+        "phpmailer/phpmailer": "^6.5"
     },
     "autoload": {
         "psr-4": {

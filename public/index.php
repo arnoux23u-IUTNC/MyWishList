@@ -13,6 +13,7 @@ use Slim\{App, Container};
 
 #Container
 $container = new Container();
+$container['settings']['displayErrorDetails'] = true;
 $container['notFoundHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
         $html = file_get_contents('..' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . '404.html');
@@ -46,7 +47,7 @@ $app = new App($container);
 $app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->auth2FA();
 })->setName('2fa');
-$app->any("/accounts/{action:login|profile|logout|register}[/]", function ($request, $response, $args) {
+$app->any("/accounts/{action:login|profile|logout|register|forgot_password|reset_password}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
 $app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
@@ -61,9 +62,9 @@ $app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
 $app->any("/lists/new[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->create();
 })->setName('lists_create');
-/*$app->any("/lists[/]", function ($request, $response, $args) {
+$app->any("/lists[/]", function ($request, $response, $args) {
     //TODO return (new ControllerUser($this,$request, $response, $args))->create();
-})->setName('lists_home');*/
+})->setName('lists_home');
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->delete();
 })->setName('items_delete_id');
@@ -144,6 +145,7 @@ function genererHeader(string $title, array $styles = []): string
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
         <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link href="/assets/css/forall.css" rel="stylesheet">
         <link href="/assets/css/navbar.css" rel="stylesheet">
         <title>$title</title>

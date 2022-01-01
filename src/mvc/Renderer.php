@@ -28,6 +28,8 @@ abstract class Renderer
     const MANAGE_2FA = 82;
     const SHOW_2FA_CODES = 83;
     const RECOVER_2FA = 84;
+    const LOST_PASSWORD = 85;
+    const RESET_PASSWORD = 86;
 
     const OTHER_MODE = 10;
     const OWNER_MODE = 100;

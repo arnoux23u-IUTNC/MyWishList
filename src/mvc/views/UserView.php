@@ -61,6 +61,7 @@ class UserView
             default => ""
         });
         $username = $authenticator ? filter_var($this->request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
+        $auth2FAReset = $authenticator ? "<a href=\"{$this->container->router->pathFor('2fa', ['action' => 'recover'], ['username' => $username])}\" class='btn btn-sm btn-default'>{$this->container->lang['login_lost_2FA']}</a>" : "";
         $password = $authenticator ? filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
         $auth2FA = $authenticator ? "<div class='row fw'>\n\t\t\t\t\t\t\t\t<div class='form-group focused fw'>\n\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='2fa'>{$this->container->lang['user_2fa_code']}</label>\n\t\t\t\t\t\t\t\t\t<input type='text' class='form-control form-control-alternative' required autofocus name='query-code' required maxlength='6' minlength='6' pattern='^\d{6}$'>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>" : "";
         $html = <<<HTML
@@ -96,14 +97,76 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
-                                            <input type="password" id="password" name="password" value="$password" class="form-control form-control-alternative" required/>
+                                            <div class="pfield"><input type="password" id="password" name="password" value="$password" class="form-control form-control-alternative" required/><i onclick="pwd('password', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     $auth2FA
                                     <div class="row fw">
                                         <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['login_title']}</button>
+                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}" class="btn btn-sm btn-danger">{$this->container->lang['login_lost_password']} ?</a>
                                         <a href="{$this->container->router->pathFor('accounts', ['action' => 'register'])}" class="btn btn-sm btn-default">{$this->container->lang['login_to_register']}</a>
-                                        <a href="{$this->container->router->pathFor('2fa', ['action' => 'recover'], ['username' => $username])}" class="btn btn-sm btn-default">{$this->container->lang['login_lost_2FA']}</a>
+                                        $auth2FAReset
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script src="/assets/js/password-viewer.js"></script>
+        HTML;
+        return genererHeader("{$this->container->lang['login_title']} - MyWishList", ["profile.css"]) . $html;
+    }
+
+    /**
+     * Display forgot password page
+     * @return string html code
+     */
+    private function forgotPassword(): string
+    {
+        $popup = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+            "nouser" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_user_notfound']}</span></div>",
+            "sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_sent']}</span></div>",
+            "not_sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
+            "already" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['reset_already_asked']}</span></div>",
+            "invalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['token_invalid']}</span></div>",
+            "emailnovalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['email_not_valid']}</span></div>",
+            default => ""
+        };
+        $html = <<<HTML
+        <div class="main-content">
+            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                </div>
+            </nav>
+            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+                <div class="container-fluid align-items-center">
+                    <div class="row">
+                        <div class="fw" style="position:relative;">
+                            <h1 class="text-center text-white">{$this->container->lang['login_lost_password']}</h1>
+                            $popup
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 flex mt--7">
+                <div class="fw">
+                    <form method="post" action="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}">
+                        <div class="card bg-secondary shadow">
+                            <div class="card-body">
+                                <div class="pl-lg-4">
+                                    <div class="row fw">
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
+                                            <input type="email" id="email" name="email" class="form-control form-control-alternative mb-4" required autofocus>
+                                            <span class="form-text mt-4" style="color:var(--red);">{$this->container->lang['email_warn_microsoft']}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['validate']}</button>
                                     </div>
                                 </div>
                             </div>
@@ -113,7 +176,91 @@ class UserView
             </div>
         </div>
         HTML;
-        return genererHeader("{$this->container->lang['login_title']} - MyWishList", ["profile.css"]) . $html;
+        return genererHeader("{$this->container->lang['login_lost_password']} - MyWishList", ["profile.css"]) . $html;
+    }
+
+    /**
+     * Display reset password page
+     * @return string html code
+     */
+    private function resetPassword(): string
+    {
+        $mail = filter_var($this->request->getQueryParam('mail'), FILTER_VALIDATE_EMAIL) ? filter_var($this->request->getQueryParam('mail'), FILTER_SANITIZE_EMAIL) ?? "" : "";
+        $token = filter_var($this->request->getQueryParam('token'), FILTER_SANITIZE_STRING) ?? "";
+        $popup = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+            "nouser" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_user_notfound']}</span></div>",
+            "sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_sent']}</span></div>",
+            "not_sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
+            "already" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['reset_already_asked']}</span></div>",
+            "invalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['token_invalid']}</span></div>",
+            "emailnovalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['email_not_valid']}</span></div>",
+            default => ""
+        };
+        $html = <<<HTML
+        <div class="main-content">
+            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                </div>
+            </nav>
+            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+                <div class="container-fluid align-items-center">
+                    <div class="row">
+                        <div class="fw" style="position:relative;">
+                            <h1 class="text-center text-white">{$this->container->lang['forgot_password_title']}</h1>
+                            $popup
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 flex mt--7">
+                <div class="fw">
+                    <form method="post" onsubmit="return matchPwd()" action="{$this->container->router->pathFor('accounts', ['action' => 'reset_password'])}">
+                        <div class="card bg-secondary shadow">
+                            <div class="card-body">
+                                <div class="pl-lg-4">
+                                    <div class="row fw">
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="input-new-password">{$this->container->lang['user_new_password']}</label>
+                                            <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative"><i onclick="pwd('input-new-password', event)" class="pwdicon far fa-eye"></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <div id="message">
+                                            <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
+                                            <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</p>
+                                            <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</p>
+                                            <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
+                                            <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
+                                            <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
+                                            <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative"><i onclick="pwd('input-new-password-c', event)" class="pwdicon far fa-eye"></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['validate']}</button>
+                                    </div>
+                                    <div class="row fw">
+                                        <input type="hidden" id="mail" name="mail" value="$mail" class="form-control form-control-alternative"/>
+                                        <input type="hidden" id="token" name="token" value="$token" class="form-control form-control-alternative"/>
+                                        <input type="hidden" id="auth" name="auth" value="1" class="form-control form-control-alternative"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script src="/assets/js/password-validator.js"></script>
+        <script src="/assets/js/password-viewer.js"></script>
+        HTML;
+        return genererHeader("{$this->container->lang['forgot_password_title']} - MyWishList", ["profile.css"]) . $html;
     }
 
     /**
@@ -212,14 +359,14 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
-                                            <input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/>
+                                            <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/><i onclick="pwd('input-new-password', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
                                         <div id="message">
                                             <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
-                                            <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</b></p>
-                                            <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</b></p>
+                                            <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</p>
+                                            <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</p>
                                             <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
                                             <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
                                             <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
@@ -228,7 +375,7 @@ class UserView
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="password-confirm">{$this->container->lang['user_password_confirm']}</label>
-                                            <input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/>
+                                            <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/><i onclick="pwd('input-new-password-c', event)" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -243,6 +390,7 @@ class UserView
             </div>
         </div>
         <script src="/assets/js/password-validator.js"></script>
+        <script src="/assets/js/password-viewer.js"></script>
         <script src="/assets/js/avatar-register.js"></script>
         HTML;
         return genererHeader("{$this->container->lang['title_register']} - MyWishList", ["profile.css"]) . $html;
@@ -491,6 +639,8 @@ class UserView
             Renderer::MANAGE_2FA => $this->manage2FA(),
             Renderer::SHOW_2FA_CODES => $this->show2FACodes(),
             Renderer::RECOVER_2FA => $this->recover2FA(),
+            Renderer::LOST_PASSWORD => $this->forgotPassword(),
+            Renderer::RESET_PASSWORD => $this->resetPassword(),
             default => throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']),
         };
     }

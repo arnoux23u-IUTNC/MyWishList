@@ -267,7 +267,7 @@ class ListView extends View
                         <h3>--</h3>
                         <div class="form-group focused">
                             <label class="form-control-label" for="private_key"></label>
-                            <input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus />
+                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus /><i onclick="pwd('private_key', event)" class="pwdicon far fa-eye"></i></div>
                         </div>
                         <a href="#" class="btn btn-sm btn-default">{$this->container->lang['html_btn_back']}</a>
                         <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-danger">{$this->container->lang['delete']}</button>
@@ -288,6 +288,7 @@ class ListView extends View
                     });
                 });
             </script>
+            <script src="/assets/js/password-viewer.js"></script>
         </body>
         </html>
         HTML;
