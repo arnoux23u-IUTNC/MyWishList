@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @package mywishlist\mvc\models
  * @method static find(int $USER_ID) Eloquent method
  * @method static where(string $string, string $string1, string $string2) Eloquent method
+ * @method static whereMail(string $email) Eloquent method
  * @method static whereUsername(string $username) Eloquent method
  */
 class User extends Model

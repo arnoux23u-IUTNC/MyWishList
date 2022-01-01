@@ -92,7 +92,7 @@ ALTER TABLE `totp_rescue_codes`
 INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `last_ip`, `is_admin`, `totp_key`)
 VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'admin@mail.com', NULL, 0, 1, NULL);
 
-GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'%';
+GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost';
 
 FLUSH PRIVILEGES;
 
