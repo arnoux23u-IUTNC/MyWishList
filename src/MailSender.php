@@ -13,6 +13,14 @@ use PHPMailer\PHPMailer\{PHPMailer, Exception, SMTP};
 class MailSender
 {
 
+    /**
+     * Send an email
+     * @param string $subject subject of the mail
+     * @param string $body body of the mail
+     * @param array $recipients list of recipients
+     * @param bool $debug at false. if true, show smtp transaction
+     * @return bool true if mail was sent
+     */
     public static function sendMail(string $subject, string $body, array $recipients, bool $debug = false): bool{
         $mail = new PHPMailer(true);
         $mail->CharSet = 'UTF-8';

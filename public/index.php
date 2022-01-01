@@ -13,6 +13,7 @@ use Slim\{App, Container};
 
 #Container
 $container = new Container();
+$container['settings']['displayErrorDetails'] = true;
 $container['notFoundHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
         $html = file_get_contents('..' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . '404.html');
@@ -46,7 +47,7 @@ $app = new App($container);
 $app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->auth2FA();
 })->setName('2fa');
-$app->any("/accounts/{action:login|profile|logout|register}[/]", function ($request, $response, $args) {
+$app->any("/accounts/{action:login|profile|logout|register|forgot_password|reset_password}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
 $app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
@@ -61,9 +62,9 @@ $app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
 $app->any("/lists/new[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->create();
 })->setName('lists_create');
-/*$app->any("/lists[/]", function ($request, $response, $args) {
+$app->any("/lists[/]", function ($request, $response, $args) {
     //TODO return (new ControllerUser($this,$request, $response, $args))->create();
-})->setName('lists_home');*/
+})->setName('lists_home');
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->delete();
 })->setName('items_delete_id');
