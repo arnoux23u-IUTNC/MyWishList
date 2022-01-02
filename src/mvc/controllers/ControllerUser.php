@@ -378,22 +378,22 @@ class ControllerUser
         $token = filter_var($this->request->getQueryParam('token') ?? $this->request->getParsedBodyParam('token'), FILTER_SANITIZE_STRING);
         $mail = filter_var($this->request->getQueryParam('mail') ?? $this->request->getParsedBodyParam('mail'), FILTER_SANITIZE_EMAIL);
         //On verifie la validité des elements
-        if(empty($token) || empty($mail))
+        if (empty($token) || empty($mail))
             throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
-        if(strlen($token) != 32 || !ctype_xdigit($token) || !filter_var($mail, FILTER_VALIDATE_EMAIL))
+        if (strlen($token) != 32 || !ctype_xdigit($token) || !filter_var($mail, FILTER_VALIDATE_EMAIL))
             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "invalid"]));
         //On recupere l'utilisateur associé à l'email
         $user = User::whereMail($mail)->first();
         //Si l'utilisateur n'existe pas ou que son mail ne correspond pas à celui passé en paramètre, on renvoie une erreur
-        if(empty($user) || $user->mail !== $mail)
+        if (empty($user) || $user->mail !== $mail)
             throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         //On recupere l'objet de reinitialisation associé à l'utilisateur    
         $reset = PasswordReset::where("user_id", "LIKE", $user->id)->whereToken($token)->first();
         //Si l'objet n'existe pas, est expiré ou que les tokens ne correspondent pas, on renvoie une erreur
-        if(empty($reset))
+        if (empty($reset))
             throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         //On vérifie l'expiration du token
-        if($reset->isExpired())
+        if ($reset->isExpired())
             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "invalid"]));
         //Si la requete est de type GET, on affiche la page de reinitialisation, sinon, on verifie les valeurs passées
         switch ($this->request->getMethod()) {
@@ -407,7 +407,7 @@ class ControllerUser
                     throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
                 //On mets a jour le mot de passe de l'utilisateur
                 $password = $this->request->getParsedBodyParam('input-new-password');
-                if(Validator::validatePassword($password, $this->request->getParsedBodyParam('input-new-password-c')))
+                if (Validator::validatePassword($password, $this->request->getParsedBodyParam('input-new-password-c')))
                     $user->update(["password" => password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]), "updated" => date("Y-m-d H:i:s")]);
                 return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "pc"]));
             default:
@@ -438,24 +438,24 @@ class ControllerUser
                 //On recupere les informations passées
                 $rq_email = $this->request->getParsedBodyParam('email');
                 //Si l'email n'est pas valide, on renvoie une erreur
-                if(filter_var($rq_email, FILTER_VALIDATE_EMAIL)){
+                if (filter_var($rq_email, FILTER_VALIDATE_EMAIL)) {
                     //On verifie que l'utilisateur existe, et qu'il n'aie pas deja demandé de reinitialisation
                     $rq_email = filter_var($rq_email, FILTER_SANITIZE_EMAIL);
                     $user = User::whereMail($rq_email)->first();
-                    if(empty($user))
+                    if (empty($user))
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "nouser"]));
-                    $reset = PasswordReset::where("user_id","LIKE",$user->user_id)->first();
-                    if(!empty($reset) && !$reset->isExpired())
+                    $reset = PasswordReset::where("user_id", "LIKE", $user->user_id)->first();
+                    if (!empty($reset) && !$reset->isExpired())
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "already"]));
                     //Generation d'un token
                     $token = md5($user->mail . time());
                     //Récuperation d'une template HTML
-                    $html = file_get_contents(__DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."content".DIRECTORY_SEPARATOR."forgotpassword.phtml");
-                    $link = $this->request->getUri()->getBaseUrl().$this->container->router->pathFor('accounts', ["action" => 'reset_password'], ["token" => $token, "mail" => $rq_email]);
+                    $html = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "content" . DIRECTORY_SEPARATOR . "forgotpassword.phtml");
+                    $link = $this->request->getUri()->getBaseUrl() . $this->container->router->pathFor('accounts', ["action" => 'reset_password'], ["token" => $token, "mail" => $rq_email]);
                     $email_vars = array(
                         'title' => $this->container->lang['forgot_password_title'],
                         'message' => $this->container->lang['forgot_password_message'],
-                        'message_alt' => $this->container->lang['forgot_password_message_alt']." : ".$link,
+                        'message_alt' => $this->container->lang['forgot_password_message_alt'] . " : " . $link,
                         'link' => $link
                     );
                     foreach ($email_vars as $old => $new) {
@@ -464,7 +464,7 @@ class ControllerUser
                     /*On envoie un email à l'utilisateur. S'il est envoyé, on enregistre le token dans la base de données
                     sleep(2) correspond à la durée de l'envoie de l'email, afin d'éviter les spam
                     */
-                    if(MailSender::sendMail($this->container->lang['forgot_password_title'], $html, [$rq_email, 'test-6s2wjknyg@srv1.mail-tester.com'])){
+                    if (MailSender::sendMail($this->container->lang['forgot_password_title'], $html, [$rq_email, 'test-6s2wjknyg@srv1.mail-tester.com'])) {
                         $reset = new PasswordReset();
                         $reset->user_id = $user->user_id;
                         $reset->token = $token;
@@ -476,8 +476,8 @@ class ControllerUser
                         sleep(2);
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => 'not_sent']));
                     }
-                }else
-                    return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "emailnovalid"])); 
+                } else
+                    return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "emailnovalid"]));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
