@@ -23,5 +23,7 @@ class RescueCode extends Model
     protected $table = 'totp_rescue_codes';
     protected $primaryKey = ['user', 'code'];
     public $timestamps = false;
+    public $incrementing = false;
+    protected $keyType = 'string';
     protected $guarded = ['created_at'];
 }

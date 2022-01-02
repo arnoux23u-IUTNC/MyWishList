@@ -19,6 +19,7 @@ class Reserved extends Model
 {
     protected $table = 'reserve';
     protected $primaryKey = 'item_id';
+    public $incrementing = false;
     protected $guarded = [];
 
     /**

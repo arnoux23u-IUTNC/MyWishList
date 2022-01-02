@@ -18,6 +18,7 @@ class UserTemporaryResolver extends Model
 {
     protected $table = 'temporary_waiting_users';
     protected $primaryKey = 'data_id';
+    public $incrementing = false;
     public $timestamps = false;
     protected $guarded = [];
 
@@ -26,7 +27,6 @@ class UserTemporaryResolver extends Model
      * @param Model $object Liste or Item
      * @param string $email Email of the user
      * @throws Exception
-     * @noinspection PhpPossiblePolymorphicInvocationInspection
      */
     public function __construct(Model $object, string $email)
     {
