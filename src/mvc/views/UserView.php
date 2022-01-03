@@ -413,6 +413,7 @@ class UserView
         }
         $phtmlVars = array(
             "main_route" => $this->container->router->pathFor('home'),
+            "api_key_route" => $this->container->router->pathFor('accounts', ['action' => 'api_key']),
             "mylists" => $htmlLists,
             "profile_route" => $this->container->router->pathFor('accounts', ["action" => 'profile']),
             "logout_route" => $this->container->router->pathFor('accounts', ["action" => 'logout']),
@@ -424,6 +425,7 @@ class UserView
             "user_email" => $user->mail,
             "user_created_at" => $user->created_at,
             "user_updated_at" => $user->updated ?? "Jamais",
+            "user_api_key" => !empty($user->api_key) ? "<span class='hidden'>$user->api_key</span>" : "Aucune",
             "user_lastlogged_at" => $user->last_login,
             "user_lastlogged_ip" => long2ip($user->last_ip),
             "info_msg" => match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {

@@ -2160,3 +2160,15 @@ p.item-info {
 .pfield {
     display: inline-flex;
 }
+
+.hidden {
+    font-size: .8rem;
+    margin: auto;
+    height: 100%;
+    background: grey;
+    color: grey;
+}
+
+.hidden:hover {
+    color: white;
+}
