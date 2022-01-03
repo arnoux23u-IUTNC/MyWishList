@@ -133,6 +133,30 @@ class ControllerUser
     }
 
     /**
+     * Control the user api key generation
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     */
+    private function createApiKey(): Response
+    {
+        //Si l'utilisateur n'est pas connecté, on l'envoie vers la page de connexion
+        if (empty($_SESSION['LOGGED_IN']))
+            return $this->login();
+        //Si l'utilisateur n'existe pas, on affiche une erreur
+        if (empty($this->user))
+            throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
+        //On intedit certaines requetes
+        if($this->request->getMethod() !== 'GET')
+            throw new MethodNotAllowedException($this->request, $this->response, ['GET']);
+        //On génère une clé d'API
+        $key = bin2hex(random_bytes(16));
+        //On l'enregistre dans la base de données
+        $this->user->update(['api_key' => $key]);
+        return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile']));
+    }
+
+    /**
      * Control the login action
      * @return Response
      * @throws ForbiddenException
@@ -499,6 +523,7 @@ class ControllerUser
             'register' => $this->register(),
             'forgot_password' => $this->forgot_password(),
             'reset_password' => $this->reset_password(),
+            'api_key' => $this->createApiKey(),
             default => throw new NotFoundException($this->request, $this->response),
         };
     }
