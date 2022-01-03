@@ -5,6 +5,7 @@ $lang = array(
     "__invited" => "Vous êtes en mode invité.",
     "alert_modify_token" => "Votre token de modification est :",
     "api_key" => "Votre clé API",
+    "api_warning" => "Votre clé API est confidentielle, ne la partagez pas et veillez à ne pas l'exposer.",
     "auth" => "Authentification",
     "create" => "Créer",
     "creation_date" => "Date de création :",

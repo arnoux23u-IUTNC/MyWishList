@@ -153,7 +153,7 @@ class ControllerUser
         $key = bin2hex(random_bytes(16));
         //On l'enregistre dans la base de données
         $this->user->update(['api_key' => $key]);
-        return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile']));
+        return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "api"]));
     }
 
     /**

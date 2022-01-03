@@ -443,6 +443,7 @@ class UserView
                 "writeerr" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_write_error']}</span></div>",
                 "fileexist" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_exists']}</span></div>",
                 "error" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_error']}</span></div>",
+                "api" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['api_warning']}</span></div>",
                 default => ""
             },
         );
