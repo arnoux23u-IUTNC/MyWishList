@@ -20,7 +20,8 @@ CREATE TABLE `accounts`
     `last_login` timestamp    NULL     DEFAULT NULL,
     `last_ip`    int(20)      NOT NULL,
     `is_admin`   tinyint(1)   NOT NULL DEFAULT 0,
-    `totp_key`   varchar(255)          DEFAULT NULL UNIQUE
+    `totp_key`   varchar(255)          DEFAULT NULL UNIQUE,
+    `api_key`   varchar(255)           DEFAULT NULL UNIQUE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 

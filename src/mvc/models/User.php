@@ -108,4 +108,14 @@ class User extends Model
         $_SESSION['USER_NAME'] = $this->username;
     }
 
+    /**
+     * Check if the api key correspond to user key
+     * @param string $api_key api key provided
+     * @return bool true if match, false otherwise
+     */
+    public function validApiKey(string $api_key): bool
+    {
+        return $this->api_key === $api_key;
+    }
+
 }
