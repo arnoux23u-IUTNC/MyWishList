@@ -79,7 +79,6 @@ $app->any("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
 })->setName('items_show_id');
 //Api
 $app->any("/api/v1/lists/{path:.*}[/]", function ($request, $response, $args) {
-    
     return (new ControllerAPI($this, $request, $response, $args))->listsV1();
 })->setName('api_v1_lists');
 $app->any("/api/v1/items/{path:.*}[/]", function ($request, $response, $args) {

@@ -45,7 +45,6 @@ class Item extends Model
      * @param int $access_level
      * @param bool $object if true, returns an object, else a string
      * @return stdClass|string state of the reservation, object or string
-     * @noinspection PhpUnused
      */
     public function getReservationState(Container $container, int $access_level, bool $object = false): stdClass|string
     {

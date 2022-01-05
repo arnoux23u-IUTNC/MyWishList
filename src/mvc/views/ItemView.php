@@ -303,8 +303,12 @@ class ItemView extends View
      */
     public function encode(int $access_level): string
     {
-        //TODO DATA
-        $data = "";
+        if (!empty($this->item->liste))
+            $this->item->reservation_state = $this->item->getReservationState($this->container, $access_level, true);
+        $this->item->list_id = $this->item->liste_id;
+        $data = $this->item->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        /*$data = $this->list->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        */
         return "<pre>" . $data . "</pre>";
     }
 }
