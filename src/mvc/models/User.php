@@ -85,9 +85,18 @@ class User extends Model
     }
 
     /**
+     * Return the user's firstname and lastname
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->lastname . " " . $this->firstname;
+    }
+
+    /**
      * Check if the user can interact with a list
      * @param Liste $list List to check
-     * @return bool true if can interact, false otherwise
+     * @return bool true if user can interact, false otherwise
      */
     public function canInteractWithList(Liste $list): bool
     {
@@ -106,16 +115,6 @@ class User extends Model
         $_SESSION['LOGGED_IN'] = true;
         $_SESSION['USER_ID'] = $this->user_id;
         $_SESSION['USER_NAME'] = $this->username;
-    }
-
-    /**
-     * Check if the api key correspond to user key
-     * @param string $api_key api key provided
-     * @return bool true if match, false otherwise
-     */
-    public function validApiKey(string $api_key): bool
-    {
-        return $this->api_key === $api_key;
     }
 
 }

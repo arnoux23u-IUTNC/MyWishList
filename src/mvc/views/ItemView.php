@@ -298,4 +298,13 @@ class ItemView extends View
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function encode(int $access_level): string
+    {
+        //TODO DATA
+        $data = "";
+        return "<pre>" . $data . "</pre>";
+    }
 }

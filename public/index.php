@@ -7,7 +7,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' 
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'i18n' . DIRECTORY_SEPARATOR . 'langs.php';
 
 use mywishlist\bd\Eloquent as Eloquent;
-use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem};
+use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem, ControllerAPI};
 use mywishlist\exceptions\ExceptionHandler;
 use Slim\{App, Container};
 
@@ -44,12 +44,14 @@ Eloquent::start('..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'conf
 $app = new App($container);
 
 #Redirection du traffic dans l'application
+//Utilisateurs
 $app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->auth2FA();
 })->setName('2fa');
 $app->any("/accounts/{action:login|profile|logout|register|forgot_password|reset_password|api_key}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
+//Listes
 $app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->addItem();
 })->setName('lists_edit_items_id');
@@ -65,6 +67,7 @@ $app->any("/lists/new[/]", function ($request, $response, $args) {
 $app->any("/lists[/]", function ($request, $response, $args) {
     //TODO return (new ControllerUser($this,$request, $response, $args))->create();
 })->setName('lists_home');
+//Items
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->delete();
 })->setName('items_delete_id');
@@ -74,6 +77,14 @@ $app->any("/items/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
 $app->any("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->show();
 })->setName('items_show_id');
+//Api
+$app->any("/api/v1/lists/{path:.*}[/]", function ($request, $response, $args) {
+    
+    return (new ControllerAPI($this, $request, $response, $args))->listsV1();
+})->setName('api_v1_lists');
+$app->any("/api/v1/items/{path:.*}[/]", function ($request, $response, $args) {
+    return (new ControllerAPI($this, $request, $response, $args))->itemsV1();
+})->setName('api_v1_items');
 
 #Route principale
 $app->get('/', function ($request, $response) use ($lang) {

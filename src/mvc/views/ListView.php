@@ -66,8 +66,6 @@ class ListView extends View
             "errtoken" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
             default => ""
         };
-
-
         $descr_info = $this->list->description ?? $this->container->lang['none'];
         $expiration_info = !empty($this->list->expiration) ? date_format(date_create($this->list->expiration), "d-m-Y") : $this->container->lang['nc'];
         $associated_user = User::find($this->list->user_id);
@@ -282,9 +280,10 @@ class ListView extends View
                         const itemid = id.substr(5);
                         //Exceptionnellement : Utilisation de la route directement plutot que du container pour eviter des conflits JS / PHP 
                         $('#pform').attr('action', "/items/"+itemid+"/delete/?public_key=$public_key");
-                        $('.popup1').find('h2').text("{$this->container->lang['item_delete']} "+itemid);
-                        $('.popup1').find('h3').text("{$this->container->lang['item_delete_confirm']} "+itemid);
-                        $('.popup1').find('label').text("{$this->container->lang['private_token_for']} "+itemid+" {$this->container->lang['token_onlyifnotlogged']}");
+                        let popup = $('.popup1');
+                        popup.find('h2').text("{$this->container->lang['item_delete']} "+itemid);
+                        popup.find('h3').text("{$this->container->lang['item_delete_confirm']} "+itemid);
+                        popup.find('label').text("{$this->container->lang['private_token_for']} "+itemid+" {$this->container->lang['token_onlyifnotlogged']}");
                     });
                 });
             </script>
@@ -556,4 +555,17 @@ class ListView extends View
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function encode(int $access_level): string
+    {
+        $items = $this->list->items->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        foreach ($this->list->items as $item) {
+            $item->reservation_state = $item->getReservationState($this->container, $access_level, true);
+        }
+        $this->list->items = $items;
+        $data = $this->list->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return "<pre>" . $data . "</pre>";
+    }
 }
