@@ -57,7 +57,6 @@ abstract class View
                 $from = $this->container->router->pathFor('items_edit_id', ['id' => $model->id]);
                 break;
             default:
-                print_r($from);
                 throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         }
         $header = match ($this->request->getQueryParam('info')) {

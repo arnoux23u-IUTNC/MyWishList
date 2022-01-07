@@ -169,8 +169,8 @@ class ControllerItem
                 //On genere une exception car un utilisateur inconnu ne peut pas voir un item sans passer par la liste
                 throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
             case 'POST':
-                //Si la liste n'est pas publiée, ou que les variables d'accès ne correspondent pas, on genere une exception
-                if ((!$liste->isPublished()) || ($liste->no != filter_var($this->request->getParsedBodyParam('liste_id'), FILTER_SANITIZE_STRING) ?? "") || (!empty($liste->public_key) && $liste->public_key !== filter_var($this->request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING) ?? ""))
+                //Si la liste n'est pas publiée, ou que les variables d'accès ne correspondent pas, on genere une exception?? php
+                if ((!$liste->isPublished()) || ($liste->no != filter_var($this->request->getParsedBodyParam('liste_id'), FILTER_SANITIZE_STRING) ?? "") || (!empty($liste->public_key) && $liste->public_key !== filter_var($this->request->getParsedBodyParam('public_key') ?? "", FILTER_SANITIZE_STRING)))
                     throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
                 //Sinon, on affiche la liste
                 return $this->response->write($this->renderer->render(Renderer::SHOW));

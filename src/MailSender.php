@@ -21,14 +21,15 @@ class MailSender
      * @param bool $debug at false. if true, show smtp transaction
      * @return bool true if mail was sent
      */
-    public static function sendMail(string $subject, string $body, array $recipients, bool $debug = false): bool{
+    public static function sendMail(string $subject, string $body, array $recipients, bool $debug = false): bool
+    {
         $mail = new PHPMailer(true);
         $mail->CharSet = 'UTF-8';
         try {
             //enable debug
-            if($debug)
+            if ($debug)
                 $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-            $conf = parse_ini_file(__DIR__.DIRECTORY_SEPARATOR."conf".DIRECTORY_SEPARATOR."conf.ini");
+            $conf = parse_ini_file(__DIR__ . DIRECTORY_SEPARATOR . "conf" . DIRECTORY_SEPARATOR . "conf.ini");
             $mail->isSMTP();
             $mail->Host = $conf['smtp_host'];
             $mail->SMTPAuth = true;
@@ -46,11 +47,10 @@ class MailSender
             $mail->Body = $body;
             $mail->send();
             return true;
-        } catch (Exception $e) {
-            echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        } catch (Exception) {
+            echo "Message could not be sent. Mailer Error: $mail->ErrorInfo";
             return false;
         }
-        return false;
     }
 
 }

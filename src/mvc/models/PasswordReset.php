@@ -26,9 +26,9 @@ class PasswordReset extends Model
 
     /**
      * Check if a list is expired
-     * @return bool
+     * @return bool true if the token is expired, false otherwise
      */
-    public function isExpired(): bool
+    public function expired(): bool
     {
         return !empty($this->expiration) && $this->expiration <= date('Y-m-d H:i:s');
     }
