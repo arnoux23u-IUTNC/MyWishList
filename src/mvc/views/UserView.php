@@ -4,9 +4,11 @@
 
 namespace mywishlist\mvc\views;
 
+use JetBrains\PhpStorm\Pure;
 use Slim\Container;
 use Slim\Http\Request;
 use OTPHP\TOTP;
+use mywishlist\mvc\View;
 use mywishlist\mvc\Renderer;
 use mywishlist\exceptions\ForbiddenException;
 use mywishlist\mvc\models\{User, Liste, RescueCode};
@@ -16,15 +18,13 @@ use mywishlist\mvc\models\{User, Liste, RescueCode};
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\views
  */
-class UserView
+class UserView extends View
 {
 
     /**
      * @var User|null User associated with the view
      */
     private ?User $user;
-    private Container $container;
-    private Request $request;
     /**
      * @var string 2fa secret key
      */
@@ -36,11 +36,10 @@ class UserView
      * @param User|null $user
      * @param Request|null $request
      */
-    public function __construct(Container $c, User $user = NULL, Request $request = null)
+    #[Pure] public function __construct(Container $c, User $user = NULL, Request $request = null)
     {
         $this->user = $user;
-        $this->container = $c;
-        $this->request = $request;
+        parent::__construct($c, $request);
     }
 
     /**
@@ -125,15 +124,7 @@ class UserView
      */
     private function forgotPassword(): string
     {
-        $popup = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-            "nouser" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_user_notfound']}</span></div>",
-            "sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_sent']}</span></div>",
-            "not_sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
-            "already" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['reset_already_asked']}</span></div>",
-            "invalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['token_invalid']}</span></div>",
-            "emailnovalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['email_not_valid']}</span></div>",
-            default => ""
-        };
+        $popup = $this->getHeaderInfo();
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -187,15 +178,7 @@ class UserView
     {
         $mail = filter_var($this->request->getQueryParam('mail'), FILTER_VALIDATE_EMAIL) ? filter_var($this->request->getQueryParam('mail'), FILTER_SANITIZE_EMAIL) ?? "" : "";
         $token = filter_var($this->request->getQueryParam('token'), FILTER_SANITIZE_STRING) ?? "";
-        $popup = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-            "nouser" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_user_notfound']}</span></div>",
-            "sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_sent']}</span></div>",
-            "not_sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
-            "already" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['reset_already_asked']}</span></div>",
-            "invalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['token_invalid']}</span></div>",
-            "emailnovalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['email_not_valid']}</span></div>",
-            default => ""
-        };
+        $popup = $this->getHeaderInfo();
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -400,7 +383,7 @@ class UserView
      * Display the profile page
      * @return string html code
      */
-    private function showProfile(): string
+    protected function show(): string
     {
         $html = genererHeader("{$this->container->lang['profile_title']} - MyWishList", ["profile.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'profile.phtml');
         $user = $this->user;
@@ -631,20 +614,19 @@ class UserView
      * @return string html code
      * @throws ForbiddenException
      */
-    public function render(int $method): string
+    public function render(int $method, int $access_level = Renderer::OTHER_MODE): string
     {
         return match ($method) {
             Renderer::LOGIN => $this->login(),
             Renderer::LOGIN_2FA => $this->login(true),
             Renderer::REGISTER => $this->register(),
-            Renderer::PROFILE => $this->showProfile(),
             Renderer::ENABLE_2FA => $this->enable2FA(),
             Renderer::MANAGE_2FA => $this->manage2FA(),
             Renderer::SHOW_2FA_CODES => $this->show2FACodes(),
             Renderer::RECOVER_2FA => $this->recover2FA(),
             Renderer::LOST_PASSWORD => $this->forgotPassword(),
             Renderer::RESET_PASSWORD => $this->resetPassword(),
-            default => throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']),
+            default => parent::render($method, $access_level),
         };
     }
 
@@ -659,4 +641,38 @@ class UserView
         return $this;
     }
 
+    /**
+     * Get the info parameter in the request
+     * @return string info parameter
+     */
+    private function getHeaderInfo(): string
+    {
+        return match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+            "nouser" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_user_notfound']}</span></div>",
+            "sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_sent']}</span></div>",
+            "not_sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
+            "already" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['reset_already_asked']}</span></div>",
+            "invalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['token_invalid']}</span></div>",
+            "emailnovalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['email_not_valid']}</span></div>",
+            default => ""
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function encode(int $access_level): string
+    {
+        return "";
+    }
+
+    /**
+     * [NEXISTS] Edit user function
+     * @return void
+     * @throws ForbiddenException
+     */
+    protected function edit()
+    {
+        throw new ForbiddenException(message: $this->container->lang['error_forbidden']);
+    }
 }
