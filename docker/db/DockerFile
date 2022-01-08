@@ -1,0 +1,8 @@
+FROM mariadb:10.7
+
+ARG MYSQL_ROOT_PASSWORD
+
+COPY /sql/wishlist.sql /docker-entrypoint-initdb.d/
+#COPY /docker/db/sql-init.sh /init-sql.sh
+#RUN chmod +x /init-sql.sh
+#RUN /init-sql.sh
