@@ -18,7 +18,7 @@ CREATE TABLE `accounts`
     `created_at` timestamp    NOT NULL DEFAULT current_timestamp(),
     `updated`    timestamp    NULL     DEFAULT NULL,
     `last_login` timestamp    NULL     DEFAULT NULL,
-    `last_ip`    int(20)      NOT NULL,
+    `last_ip`    bigint(20)   NOT NULL,
     `is_admin`   tinyint(1)   NOT NULL DEFAULT 0,
     `totp_key`   varchar(255)          DEFAULT NULL UNIQUE
 ) ENGINE = InnoDB
@@ -94,7 +94,7 @@ INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`,
 VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW',
         'admin@mail.com', NULL, 0, 1, NULL);
 
-GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost';
+GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
 
 FLUSH PRIVILEGES;
 
