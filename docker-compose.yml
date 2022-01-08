@@ -16,10 +16,7 @@ services:
     container_name: mywl_php-fpm
     build:
       dockerfile: ./docker/php/Dockerfile
-    volumes:
-      - ./public:/var/www/mywishlist/public
-      - ./errors:/var/www/mywishlist/errors
-      - ./src:/var/www/mywishlist/src
+      context: .
   db:
     image: mariadb:10.7
     restart: always
