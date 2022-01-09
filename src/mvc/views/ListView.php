@@ -265,7 +265,7 @@ class ListView extends View
                         <h3>--</h3>
                         <div class="form-group focused">
                             <label class="form-control-label" for="private_key"></label>
-                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus /><i onclick="pwd('private_key', event)" class="pwdicon far fa-eye"></i></div>
+                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus /><i data-associated="private_key" class="pwdicon far fa-eye"></i></div>
                         </div>
                         <a href="#" class="btn btn-sm btn-default">{$this->container->lang['html_btn_back']}</a>
                         <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-danger">{$this->container->lang['delete']}</button>
@@ -280,10 +280,10 @@ class ListView extends View
                         const itemid = id.substr(5);
                         //Exceptionnellement : Utilisation de la route directement plutot que du container pour eviter des conflits JS / PHP 
                         $('#pform').attr('action', "/items/"+itemid+"/delete/?public_key=$public_key");
-                        let popup = $('.popup1');
-                        popup.find('h2').text("{$this->container->lang['item_delete']} "+itemid);
-                        popup.find('h3').text("{$this->container->lang['item_delete_confirm']} "+itemid);
-                        popup.find('label').text("{$this->container->lang['private_token_for']} "+itemid+" {$this->container->lang['token_onlyifnotlogged']}");
+                        let popups = $(".popup1");
+                        popups.find('h2').text("{$this->container->lang['item_delete']} "+itemid);
+                        popups.find('h3').text("{$this->container->lang['item_delete_confirm']} "+itemid);
+                        popups.find('label').text("{$this->container->lang['private_token_for']} "+itemid+" {$this->container->lang['token_onlyifnotlogged']}");
                     });
                 });
             </script>

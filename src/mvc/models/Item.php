@@ -18,9 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $url
  * @property float $tarif
  * @property mixed $liste Goes to liste() method, eloquent relation
+ * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\models
- * @method static where(string $string, string $string1, string $string2) Eloquent method
  */
 class Item extends Model
 {
@@ -32,7 +32,7 @@ class Item extends Model
 
     /**
      * Get the associated list of an item
-     * @return BelongsTo liste belongsTo
+     * @return BelongsTo liste belongsTo relation
      */
     public function liste(): BelongsTo
     {

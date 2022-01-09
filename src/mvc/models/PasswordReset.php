@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $token
  * @property int $user_id
  * @property mixed $expiration
- * @author Guillaume ARNOUX
- * @package mywishlist\mvc\models
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @method static whereToken(string $token) Eloquent method
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\models
  */
 class PasswordReset extends Model
 {
@@ -26,9 +26,9 @@ class PasswordReset extends Model
 
     /**
      * Check if a list is expired
-     * @return bool
+     * @return bool true if the token is expired, false otherwise
      */
-    public function isExpired(): bool
+    public function expired(): bool
     {
         return !empty($this->expiration) && $this->expiration <= date('Y-m-d H:i:s');
     }

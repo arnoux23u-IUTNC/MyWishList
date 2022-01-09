@@ -18,7 +18,7 @@ CREATE TABLE `accounts`
     `created_at` timestamp    NOT NULL DEFAULT current_timestamp(),
     `updated`    timestamp    NULL     DEFAULT NULL,
     `last_login` timestamp    NULL     DEFAULT NULL,
-    `last_ip`    int(20)      NOT NULL,
+    `last_ip`    bigint(20)   NOT NULL,
     `is_admin`   tinyint(1)   NOT NULL DEFAULT 0,
     `totp_key`   varchar(255)          DEFAULT NULL UNIQUE,
     `api_key`   varchar(255)           DEFAULT NULL UNIQUE
@@ -74,7 +74,8 @@ CREATE TABLE `temporary_waiting_users`
 (
     `data_id` int(11)                              NOT NULL,
     `type`    int(1)                               NOT NULL,
-    `email`   varchar(255) COLLATE utf8_unicode_ci NOT NULL
+    `email`   varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+    PRIMARY KEY (`data_id`, `type`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
@@ -90,12 +91,10 @@ ALTER TABLE `reserve`
 ALTER TABLE `totp_rescue_codes`
     ADD CONSTRAINT `totp_useridfk` FOREIGN KEY (`user`) REFERENCES `accounts` (`user_id`);
 
-INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `last_ip`, `is_admin`,
-                        `totp_key`)
-VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW',
-        'admin@mail.com', NULL, 0, 1, NULL);
+INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `last_ip`, `is_admin`, `totp_key`)
+VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'admin@mail.com', NULL, 0, 1, NULL);
 
-GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost';
+GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
 
 FLUSH PRIVILEGES;
 

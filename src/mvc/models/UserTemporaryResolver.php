@@ -4,6 +4,7 @@ namespace mywishlist\mvc\models;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use mywishlist\bd\HasCompositePrimaryKey;
 
 /**
  * UserTemp Model
@@ -16,10 +17,13 @@ use Illuminate\Database\Eloquent\Model;
  */
 class UserTemporaryResolver extends Model
 {
+    use HasCompositePrimaryKey;
+
     protected $table = 'temporary_waiting_users';
-    protected $primaryKey = 'data_id';
+    protected $primaryKey = ['user', 'code'];
     public $incrementing = false;
     public $timestamps = false;
+    protected $keyType = 'string';
     protected $guarded = [];
 
     /**

@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Reserved Model
  * Inherits from the Model class of Laravel
- * @author Guillaume ARNOUX
- * @package mywishlist\mvc\models
  * @property int $item_id
  * @property int $user_id
  * @property string $message
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @method static find(int $user_id) Eloquent method
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\models
  */
 class Reserved extends Model
 {
