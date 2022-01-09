@@ -73,7 +73,8 @@ CREATE TABLE `temporary_waiting_users`
 (
     `data_id` int(11)                              NOT NULL,
     `type`    int(1)                               NOT NULL,
-    `email`   varchar(255) COLLATE utf8_unicode_ci NOT NULL
+    `email`   varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+    PRIMARY KEY (`data_id`, `type`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
@@ -89,10 +90,8 @@ ALTER TABLE `reserve`
 ALTER TABLE `totp_rescue_codes`
     ADD CONSTRAINT `totp_useridfk` FOREIGN KEY (`user`) REFERENCES `accounts` (`user_id`);
 
-INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `last_ip`, `is_admin`,
-                        `totp_key`)
-VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW',
-        'admin@mail.com', NULL, 0, 1, NULL);
+INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `last_ip`, `is_admin`, `totp_key`)
+VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'admin@mail.com', NULL, 0, 1, NULL);
 
 GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
 
