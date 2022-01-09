@@ -116,7 +116,7 @@
                                         <div class="col-lg-4">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-old-password">{#user_old_password#}</label>
-                                                <div class='pfield'><input type="password" id="input-old-password" name="input-old-password" class="form-control form-control-alternative" required placeholder="{#required#}"><i onclick="pwd('input-old-password', event)" class="pwdicon far fa-eye"></i></div>
+                                                <div class='pfield'><input type="password" id="input-old-password" name="input-old-password" class="form-control form-control-alternative" required placeholder="{#required#}"><i data-associated="input-old-password" class="pwdicon far fa-eye"></i></div>
                                             </div>
                                             <div>
                                                 <a href="%2fa_route%" class="btn btn-sm btn-default">{#user_2fa_code#}</a>
@@ -125,7 +125,7 @@
                                         <div class="col-lg-4">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-new-password">{#user_new_password#}</label>
-                                                <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative"><i onclick="pwd('input-new-password', event)" class="pwdicon far fa-eye"></i></div>
+                                                <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative"><i data-associated="input-new-password" class="pwdicon far fa-eye"></i></div>
                                             </div>
                                             <div id="message">
                                                 <h6 class="heading-small text-muted mb-4">{#password_form_valid#}</h6>
@@ -139,7 +139,7 @@
                                         <div class="col-lg-4">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-new-password-c">{#user_password_confirm#}</label>
-                                                <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative"><i onclick="pwd('input-new-password-c', event)" class="pwdicon far fa-eye"></i></div>
+                                                <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative"><i data-associated="input-new-password-c" class="pwdicon far fa-eye"></i></div>
                                             </div>
                                         </div>
                                     </div>

@@ -23,6 +23,7 @@ abstract class Renderer
     const LOGIN = 71;
     const LOGIN_2FA = 71_1;
     const REGISTER = 72;
+    const PROFILE = 73;
     const ENABLE_2FA = 81;
     const MANAGE_2FA = 82;
     const SHOW_2FA_CODES = 83;

@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $token
  * @property int $user_id
  * @property mixed $expiration
- * @author Guillaume ARNOUX
- * @package mywishlist\mvc\models
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @method static whereToken(string $token) Eloquent method
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\models
  */
 class PasswordReset extends Model
 {

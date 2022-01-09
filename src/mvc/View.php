@@ -46,6 +46,7 @@ abstract class View
     protected function requestAuth(Model $model): string
     {
         $from = $this->request->getRequestTarget();
+        /** @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection */
         switch ($from) {
             case (bool)preg_match('/^\/lists\/[0-9]+\/edit\/items(\/?)/', $from) :
                 $from = $this->container->router->pathFor('lists_edit_items_id', ['id' => $model->no]);
@@ -97,7 +98,7 @@ abstract class View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="private_key">{$this->container->lang['private_token_for']} $dataModel</label>
-                                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required /><i onclick="pwd('private_key', event)" class="pwdicon far fa-eye"></i></div>
+                                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required /><i data-associated="private_key" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -131,6 +132,5 @@ abstract class View
             default => throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']),
         };
     }
-
 
 }

@@ -15,7 +15,7 @@ let display = () => {
 }
 
 let matchPwd = () => {
-    if (input.value == inputC.value) {
+    if (input.value === inputC.value) {
         inputC.classList.remove("invalid");
         console.log("match");
         return true;
