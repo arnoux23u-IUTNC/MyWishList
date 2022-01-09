@@ -85,6 +85,15 @@ class User extends Model
     }
 
     /**
+     * Return the user's firstname and lastname
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->lastname . " " . $this->firstname;
+    }
+
+    /**
      * Check if the user can interact with a list
      * @param Liste $list List to check
      * @return bool true if user can interact, false otherwise

@@ -66,8 +66,6 @@ class ListView extends View
             "errtoken" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
             default => ""
         };
-
-
         $descr_info = $this->list->description ?? $this->container->lang['none'];
         $expiration_info = !empty($this->list->expiration) ? date_format(date_create($this->list->expiration), "d-m-Y") : $this->container->lang['nc'];
         $associated_user = User::find($this->list->user_id);
@@ -557,4 +555,17 @@ class ListView extends View
         };
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function encode(int $access_level): string
+    {
+        $items = $this->list->items->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        foreach ($this->list->items as $item) {
+            $item->reservation_state = $item->getReservationState($this->container, $access_level, true);
+        }
+        $this->list->items = $items;
+        $data = $this->list->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return "<pre>" . $data . "</pre>";
+    }
 }

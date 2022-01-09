@@ -27,6 +27,8 @@ class Liste extends Model
     protected $table = 'liste';
     protected $primaryKey = 'no';
     public $timestamps = false;
+    protected $hidden = ['user_id', 'private_key'];
+    protected $appends = ['user_name'];
     protected $fillable = ['titre', 'user_id', 'description', 'expiration', 'public_key', 'published'];
 
     /**
@@ -54,6 +56,17 @@ class Liste extends Model
     public function isPublished(): bool
     {
         return $this->published == 1;
+    }
+
+    /**
+     * Internal method for toJSON() method of Slim
+     * @return string|null user's name if exists, null otherwise
+     * @noinspection PhpUnused
+     */
+    protected function getUserNameAttribute(): ?string
+    {
+        $user = User::find($this->user_id);
+        return !empty($user) ? $user->name() : null;
     }
 
 }

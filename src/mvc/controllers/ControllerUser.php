@@ -4,6 +4,7 @@
 
 namespace mywishlist\mvc\controllers;
 
+use Exception;
 use Slim\Container;
 use Slim\Http\{Response, Request};
 use Slim\Exception\{NotFoundException, MethodNotAllowedException};
@@ -67,7 +68,7 @@ class ControllerUser
         //Selon le type de requete, on affiche ou on modifie le profil
         switch ($this->request->getMethod()) {
             case 'GET':
-                return $this->response->write($this->renderer->render(Renderer::PROFILE));
+                return $this->response->write($this->renderer->render(Renderer::SHOW));
             case 'POST':
                 //Si l'utilisateur donne l'ordre de supprimer l'avatar, on le supprime
                 if (!empty($this->request->getParsedBodyParam("delete_btn")) && $this->request->getParsedBodyParam("delete_btn") === "delete")
@@ -130,6 +131,31 @@ class ControllerUser
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
+    }
+
+    /**
+     * Control the user api key generation
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     * @throws Exception when generating the api key
+     */
+    private function createApiKey(): Response
+    {
+        //Si l'utilisateur n'est pas connecté, on l'envoie vers la page de connexion
+        if (empty($_SESSION['LOGGED_IN']))
+            return $this->login();
+        //Si l'utilisateur n'existe pas, on affiche une erreur
+        if (empty($this->user))
+            throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
+        //On intedit certaines requetes
+        if ($this->request->getMethod() !== 'GET')
+            throw new MethodNotAllowedException($this->request, $this->response, ['GET']);
+        //On génère une clé d'API
+        $key = bin2hex(random_bytes(16));
+        //On l'enregistre dans la base de données
+        $this->user->update(['api_key' => $key]);
+        return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "api"]));
     }
 
     /**
@@ -393,7 +419,7 @@ class ControllerUser
         if (empty($reset))
             throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         //On vérifie l'expiration du token
-        if ($reset->isExpired())
+        if ($reset->expired())
             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "invalid"]));
         //Si la requete est de type GET, on affiche la page de reinitialisation, sinon, on verifie les valeurs passées
         switch ($this->request->getMethod()) {
@@ -445,7 +471,7 @@ class ControllerUser
                     if (empty($user))
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "nouser"]));
                     $reset = PasswordReset::where("user_id", "LIKE", $user->user_id)->first();
-                    if (!empty($reset) && !$reset->isExpired())
+                    if (!empty($reset) && !$reset->expired())
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "already"]));
                     //Generation d'un token
                     $token = md5($user->mail . time());
@@ -499,6 +525,7 @@ class ControllerUser
             'register' => $this->register(),
             'forgot_password' => $this->forgot_password(),
             'reset_password' => $this->reset_password(),
+            'api_key' => $this->createApiKey(),
             default => throw new NotFoundException($this->request, $this->response),
         };
     }

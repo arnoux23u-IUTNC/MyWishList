@@ -27,6 +27,11 @@ abstract class View
      */
     protected int $access_level;
 
+    /**
+     * View constructor
+     * @param Container $c
+     * @param Request|null $request
+     */
     public function __construct(Container $c, Request $request = null)
     {
         $this->container = $c;
@@ -132,5 +137,12 @@ abstract class View
             default => throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']),
         };
     }
+
+    /**
+     * JSON Encoding method
+     * @param int $access_level depends on the user's privileges
+     * @return string json encoded string of the object
+     */
+    public abstract function encode(int $access_level): string;
 
 }
