@@ -35,8 +35,8 @@ $container['notAllowedHandler'] = function () use ($lang) {
 $container['errorHandler'] = function () use ($lang) {
     return new ExceptionHandler($lang);
 };
-$container['items_upload_dir'] = __DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'items';
-$container['users_upload_dir'] = __DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'avatars';
+$container['items_img_dir'] = __DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'items';
+$container['users_img_dir'] = __DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'avatars';
 $container['lang'] = $lang;
 
 #Connexion à la base de données

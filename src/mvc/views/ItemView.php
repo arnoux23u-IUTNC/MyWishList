@@ -60,7 +60,7 @@ class ItemView extends View
         $descr_info = $this->item->descr ?? $this->container->lang['none'];
         $url_info = $this->item->url ?? $this->container->lang['none'];
         $tarif_info = $this->item->tarif ?? $this->container->lang['nc'];
-        $img_info = !empty($this->item->img) ? (file_exists(__DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . "assets" . DIRECTORY_SEPARATOR . "img" . DIRECTORY_SEPARATOR . "items" . DIRECTORY_SEPARATOR . "{$this->item->img}") ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='{$this->item->img}'>" : "")) : "";
+        $img_info = !empty($this->item->img) ? (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . "{$this->item->img}") ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='{$this->item->img}'>" : "")) : "";
         $html = <<<HTML
             <div class="main-content bg-gradient-default fullbg">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">

@@ -401,7 +401,7 @@ class UserView extends View
             "profile_route" => $this->container->router->pathFor('accounts', ["action" => 'profile']),
             "logout_route" => $this->container->router->pathFor('accounts', ["action" => 'logout']),
             "2fa_route" => $this->container->router->pathFor('2fa', ["action" => 'manage']),
-            "avatar_src" => (!empty($user->avatar) && file_exists($this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . "$user->avatar")) ? "/assets/img/avatars/$user->avatar" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($user->mail))) . "?size=120",
+            "avatar_src" => (!empty($user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . "$user->avatar")) ? "/assets/img/avatars/$user->avatar" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($user->mail))) . "?size=120",
             "user_username" => $user->username,
             "user_firstname" => $user->firstname,
             "user_lastname" => $user->lastname,

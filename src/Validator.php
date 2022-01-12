@@ -32,23 +32,23 @@ class Validator
         if ($file->getSize() > 10000000 || $file->getSize() < 2000)
             return "sizeerr";
         if ($type === "user") {
-            $dir = $container['users_upload_dir'] . DIRECTORY_SEPARATOR;
+            $dir = $container['users_img_dir'] . DIRECTORY_SEPARATOR;
             if (!is_writable($dir))
                 return "writeerr";
             try {
-                $file->moveTo($container['users_upload_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1]);
+                $file->moveTo($container['users_img_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1]);
                 (new ImgCropper($container, $finfo))->save();
                 return "ok";
             } catch (Exception) {
                 return "error";
             }
         } else {
-            if (file_exists($container['items_upload_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1]))
+            if (file_exists($container['items_img_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1]))
                 return "fileexist";
-            if (!is_writable($container['items_upload_dir'] . DIRECTORY_SEPARATOR))
+            if (!is_writable($container['items_img_dir'] . DIRECTORY_SEPARATOR))
                 return "writeerr";
             try {
-                $file->moveTo($container['items_upload_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1]);
+                $file->moveTo($container['items_img_dir'] . DIRECTORY_SEPARATOR . $finfo[0] . "." . $finfo[1]);
                 return "ok";
             } catch (Exception) {
                 return "error";

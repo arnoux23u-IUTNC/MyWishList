@@ -79,7 +79,7 @@ class ControllerUser
                 if (!empty($file)) {
                     $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
                     $finfo = [$this->user->user_id, strtolower($extension)];
-                    $oldfile = $this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar;
+                    $oldfile = $this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar;
                     $info = Validator::validateFile($this->container, $file, $finfo, "user");
                     if ($info === "ok") {
                         if ($this->user->avatar !== $finfo[0] . "." . $finfo[1])
@@ -294,7 +294,7 @@ class ControllerUser
         if (empty($this->user->avatar))
             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "noavatar"]));
         //On supprime l'image precedente et on insere NULL dans la DB
-        unlink($this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
+        unlink($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
         $this->user->update(["avatar" => NULL]);
         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile']));
     }
