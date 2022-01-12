@@ -149,10 +149,10 @@ class ControllerItem
      */
     public function show(): Response
     {
-        $liste = $this->item->liste;
         //Si l'item n'existe pas, on declenche une erreur
         if (empty($this->item))
             throw new NotFoundException($this->request, $this->response);
+        $liste = $this->item->liste;
         //Si l'utilisateur est admin, on lui montre l'item
         if ($this->user->isAdmin())
             return $this->response->write($this->renderer->render(Renderer::SHOW, Renderer::ADMIN_MODE));
