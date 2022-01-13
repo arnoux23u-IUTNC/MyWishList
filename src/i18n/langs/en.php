@@ -137,6 +137,7 @@ $lang = array(
     "user_avatar" => "Avatar",
     "user_delete_account" => "Delete my account",
     "user_delete_account_confirm" => "Are you sure you want to delete your account ?",
+    "user_deleted" => "User deleted",
     "user_email" => "Email",
     "user_firstname" => "Firstname",
     "user_lastname" => "Lastname",
