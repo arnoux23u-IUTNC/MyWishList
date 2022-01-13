@@ -68,6 +68,9 @@ $app->any("/lists[/]", function ($request, $response, $args) {
     //TODO return (new ControllerUser($this,$request, $response, $args))->create();
 })->setName('lists_home');
 //Items
+$app->any("/items/{id:[0-9]+}/reserve[/]", function ($request, $response, $args) {
+    return (new ControllerItem($this, $request, $response, $args))->reserve();
+})->setName('items_reserve_id');
 $app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->delete();
 })->setName('items_delete_id');
