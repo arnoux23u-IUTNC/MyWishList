@@ -52,12 +52,26 @@ CREATE TABLE `liste`
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
+CREATE TABLE `cagnotte` (
+  `item_id` int(11) NOT NULL,
+  `montant` decimal(7,2) NOT NULL,
+  `limite` date DEFAULT NULL,
+  PRIMARY KEY (`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `participe` (
+  `cagnotte_itemid` int(11) NOT NULL,
+  `user_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `montant` decimal(7,2) NOT NULL,
+  PRIMARY KEY (`cagnotte_itemid`,`user_email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `reserve`
 (
     `item_id` int(11) NOT NULL,
-    `user_id` int(11) NOT NULL,
-    `message` text    NOT NULL,
-    PRIMARY KEY (`item_id`, `user_id`)
+    `user_email` varchar(255) NOT NULL,
+    `message` varchar(255)    DEFAULT NULL, 
+    PRIMARY KEY (`item_id`, `user_email`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -80,30 +94,34 @@ CREATE TABLE `temporary_waiting_users`
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
+ALTER TABLE `participe`
+  ADD CONSTRAINT `fkparticipe_cagnotte` FOREIGN KEY (`cagnotte_itemid`) REFERENCES `cagnotte` (`item_id`);
+COMMIT;
+ALTER TABLE `cagnotte`
+  ADD CONSTRAINT `fkcagnotte_item` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
+COMMIT;
 ALTER TABLE `item`
     ADD CONSTRAINT `item_listeidfk` FOREIGN KEY (`liste_id`) REFERENCES `liste` (`no`);
 ALTER TABLE `liste`
     ADD CONSTRAINT `liste_useridfk` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`user_id`);
-ALTER TABLE `reserve`
-    ADD CONSTRAINT `reserve_useridfk` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`user_id`);
 ALTER TABLE `reserve`
     ADD CONSTRAINT `reserve_itemidfk` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
 ALTER TABLE `totp_rescue_codes`
     ADD CONSTRAINT `totp_useridfk` FOREIGN KEY (`user`) REFERENCES `accounts` (`user_id`);
 
 INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `created_at`, `updated`, `last_login`, `last_ip`, `is_admin`, `totp_key`) VALUES
-('admin', 'admin', 'admin', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'arnouxguillaume54@hotmail.fr', NULL, '2021-12-21 18:23:50', NULL, '2021-12-23 18:20:04', NULL, 1, NULL),
-('guigz', 'ARNOUX', 'Guillaume', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'arnouxguillaume54@gmail.com', NULL, '2021-12-21 18:23:50', NULL, '2021-12-23 19:44:01', NULL, 0, NULL);
+('admin', 'admin', 'admin', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'admin@admin.fr', NULL, '2021-12-21 18:23:50', NULL, '2021-12-23 18:20:04', NULL, 1, NULL),
+('user', 'user', 'user', '$2y$10$R8Fw2COUhWIQ22y/oY2M2On2snA1ysICUvwxsHRLzpmVQIZzakj.O', 'user@user.fr', NULL, '2021-12-21 18:23:50', NULL, '2021-12-23 19:44:01', NULL, 0, NULL);
 
 INSERT INTO `liste` (`user_id`, `titre`, `description`, `expiration`, `public_key`, `private_key`, `published`) VALUES
-(NULL, 'Pour fêter le bac !', 'Pour un week-end à Nancy qui nous fera oublier les épreuves. ', '2018-06-27', 'nosecure1', '$2y$12$cZTnuOiMTg4tybmTxGCAU.eSIh65U2E87dT6gxnehBLQArs15/rSW', 0),
-(2, 'yapuka', 'Super', '2025-12-10', 'no', '$2y$12$cZTnuOiMTg4tybmTxGCAU.eSIh65U2E87dT6gxnehBLQArs15/rSW', 1),
-(NULL, 'C\'est l\'anniversaire de Charlie', 'Pour lui préparer une fête dont il se souviendra :)', '2017-12-12', 'nosecure3', 'jdfl', 0);
+(NULL, 'Pour fêter le bac !', 'Pour un week-end à Nancy qui nous fera oublier les épreuves. ', '2018-06-27', 'nosecure1', '$2y$10$Pzc4/hsbV80hay1WwkyFeur59FMvGMOxsA15SyPZKzXtuLPndGAVa', 0),
+(2, 'yapuka', 'Super', '2025-12-10', 'nosecure2', '$2y$10$zKQw9Wlybed46a0fuG1yROGrJQ0yLc52dq3wv1kvyZeZ9Xj3tCJJS', 1),
+(NULL, 'C\'est l\'anniversaire de Charlie', 'Pour lui préparer une fête dont il se souviendra :)', '2027-12-12', 'nosecure3', '$2y$10$ZbpWIWak4vWZKQ9zjgjvgu8NDR9VciPiF1xKqQZtVLfatl2Plny8S', 0);
 
 INSERT INTO `item` (`liste_id`, `nom`, `descr`, `img`, `url`, `tarif`) VALUES
 (2, 'Champagne', 'Bouteille de champagne + flutes + jeux &agrave; gratter', 'champagne.jpg', NULL, '20.00'),
 (2, 'Musique', 'Partitions de piano à 4 mains', 'musique.jpg', NULL, '25.00'),
-(2, 'Exposition', 'Visite guidée de l’exposition ‘REGARDER’ à la galerie Poirel', 'poirelregarder.jpg', NULL, '14.00'),
+(2, 'Exposition', 'Visite guidée de l’exposition \'REGARDER\' à la galerie Poirel', 'poirelregarder.jpg', NULL, '14.00'),
 (3, 'Goûter', 'Goûter au FIFNL', 'gouter.jpg', NULL, '20.00'),
 (3, 'Projection', 'Projection courts-métrages au FIFNL', 'film.jpg', NULL, '10.00'),
 (2, 'Bouquet', 'Bouquet de roses et Mots de Marion Renaud', 'rose.jpg', NULL, '16.00'),
@@ -120,6 +138,19 @@ INSERT INTO `item` (`liste_id`, `nom`, `descr`, `img`, `url`, `tarif`) VALUES
 (1, 'Planètes Laser', 'Laser game : Gilet électronique et pistolet laser comme matériel, vous voilà équipé.', 'laser.jpg', NULL, '15.00'),
 (1, 'Fort Aventure', 'Découvrez Fort Aventure à Bainville-sur-Madon, un site Accropierre unique en Lorraine ! Des Parcours Acrobatiques pour petits et grands, Jeu Mission Aventure, Crypte de Crapahute, Tyrolienne, Saut à l\'élastique inversé, Toboggan géant... et bien plus encore.', 'fort.jpg', NULL, '25.00');
 
+INSERT INTO `cagnotte` (`item_id`, `montant`, `limite`) VALUES
+(4, 45.00, '2018-06-29'),
+(6, 2.00, '2025-12-10'),
+(7, 800.00, '2025-12-12');
+
+INSERT INTO `participe` (`cagnotte_itemid`, `user_email`, `montant`) VALUES
+(4, 'user@user.fr', 20.00),
+(6, 'user@user.fr', 0.50),
+(6, 'user2@user.fr', 0.75);
+
+INSERT INTO `reserve` (`item_id`, `user_email`, `message`) VALUES
+(7, 'user@user.fr', NULL),
+(8, 'user@user.fr', 'Joyeux Noel');
 
 GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
 

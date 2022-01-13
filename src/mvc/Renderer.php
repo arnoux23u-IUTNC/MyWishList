@@ -33,6 +33,7 @@ abstract class Renderer
     const RECOVER_2FA = 84;
     const LOST_PASSWORD = 85;
     const RESET_PASSWORD = 86;
+    const DELETE_ACCOUNT_CONFIRM = 87;
 
     const OTHER_MODE = 10;
     const OWNER_MODE = 100;
