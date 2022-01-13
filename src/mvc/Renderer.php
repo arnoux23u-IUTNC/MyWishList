@@ -17,6 +17,7 @@ abstract class Renderer
     const CREATE = 2;
     const EDIT = 3;
     const EDIT_ADD_ITEM = 22;
+    const RESERVATION_FORM = 23;
     const REQUEST_AUTH = 4;
     const PREVENT_DELETE = 41;
     const DELETE = 42;

@@ -5,7 +5,7 @@ namespace mywishlist\mvc\models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Reserved Model
+ * User Model
  * Inherits from the Model class of Laravel
  * @property int $user_id
  * @property string $username
