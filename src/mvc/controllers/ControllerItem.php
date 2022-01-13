@@ -10,7 +10,7 @@ use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use mywishlist\Validator;
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\ItemView;
-use mywishlist\mvc\models\{Item, User, Reserved, Cagnotte, Participation};
+use mywishlist\mvc\models\{Item, User, Reservation, Cagnotte, Participation, UserTemporaryResolver};
 use mywishlist\exceptions\ForbiddenException;
 
 /**
@@ -68,7 +68,7 @@ class ControllerItem
             throw new NotFoundException($this->request, $this->response);
         $liste = $this->item->liste;
         //On verifie donc si l'item est attribué à une liste et n'est pas reservé. Si non : on déclenche une erreur
-        $reserved = Reserved::where("item_id", "LIKE", $this->item->id)->first();
+        $reserved = Reservation::where("item_id", "LIKE", $this->item->id)->first();
         if (!$this->user->isAdmin() && (empty($liste) || !empty($reserved)))
             throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
         switch ($this->request->getMethod()) {
@@ -113,7 +113,7 @@ class ControllerItem
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
     }
-
+  
     /**
      * Control creation of pot for an item
      * @return Response
@@ -263,6 +263,46 @@ class ControllerItem
     }
 
     /**
+     * Control reservation of an item
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException
+     */
+    public function reserve(): Response
+    {
+        //Si l'item n'existe pas, on declenche une erreur
+        if (empty($this->item))
+            throw new NotFoundException($this->request, $this->response);
+        $liste = $this->item->liste;
+        //On verifie donc si l'item est attribué à une liste. Si non : on déclenche une erreur
+        if (!$this->user->isAdmin() && empty($liste))
+            throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
+        if($this->request->getMethod() != 'POST')
+            throw new MethodNotAllowedException($this->request, $this->response, ['POST']);
+        /*Deux cas de figure :
+        - L'utilisateur est admin ou peut modifier la liste, on passe a l'edition
+        - L'utilisateur est inconnu, on verifie le token provenant du formulaire*/
+        $public_key = filter_var($this->request->getQueryParam('public_key', ''), FILTER_SANITIZE_STRING);
+        if (!$this->user->isAdmin() && !$this->user->canInteractWithList($liste) && (empty($public_key) || $public_key !== $liste->public_key))
+            throw new ForbiddenException(message: $this->container->lang['exception_ressource_not_allowed']);
+        if (empty($this->request->getParsedBodyParam('sendBtn')) || filter_var($this->request->getParsedBodyParam('sendBtn'), FILTER_SANITIZE_STRING) !== 'OK')
+            return $this->response->write($this->renderer->render(Renderer::RESERVATION_FORM));
+        $email = filter_var($this->request->getParsedBodyParam('email'), FILTER_SANITIZE_EMAIL);
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+            return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ['id' => $liste->no], ["state" => "error"]));
+        //Si l'utilisateur n'est pas loggé, on enregistre son email dans un cookie pendant 1h
+        if(empty($_SESSION["LOGGED_IN"]))
+            setcookie("user_email", $email, time() + 3600, "/", "");
+        $res = new Reservation();
+        $res->item_id = $this->item->id;
+        $res->user_email = $email;
+        $res->message = $this->request->getParsedBodyParam('message') != "" ? filter_var($this->request->getParsedBodyParam('message'), FILTER_SANITIZE_STRING) : NULL;
+        $res->save();
+        return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "state" => "reserved"]));
+    }
+
+    /**
      * Control the deletion of an item
      * @return Response
      * @throws ForbiddenException
@@ -276,7 +316,7 @@ class ControllerItem
             throw new NotFoundException($this->request, $this->response);
         $liste = $this->item->liste;
         //On verifie donc si l'item est attribué à une liste et n'est pas reservé. Si non : on déclenche une erreur
-        $reserved = Reserved::where("item_id", "LIKE", $this->item->id)->first();
+        $reserved = Reservation::where("item_id", "LIKE", $this->item->id)->first();
         if (!$this->user->isAdmin() && (empty($liste) || (!empty($reserved) && !$liste->isExpired())))
             throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
         //On genere une exception si la requete n'est pas de type POST

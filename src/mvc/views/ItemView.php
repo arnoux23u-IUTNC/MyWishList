@@ -9,7 +9,7 @@ use Slim\Container;
 use Slim\Http\Request;
 use JetBrains\PhpStorm\Pure;
 use mywishlist\mvc\{Renderer, View};
-use mywishlist\mvc\models\{Item, Reserved, User, Cagnotte};
+use mywishlist\mvc\models\{Item, Reservation, User, Cagnotte};
 
 /**
  * Item View
@@ -49,9 +49,9 @@ class ItemView extends View
         $pot = Cagnotte::find($this->item->id);
         if (!empty($reserved)) {
             $reservation_state = match ($this->access_level) {
-                Renderer::ADMIN_MODE => $this->container->lang['list_reserved_by'] . $reserved->user . ' -> ' . $reserved->message,
-                Renderer::OWNER_MODE => $this->item->liste->isExpired() ? $this->container->lang['list_reserved_by'] . $reserved->user . ' -> ' . $reserved->message : $this->container->lang['item_reserved'],
-                Renderer::OTHER_MODE => $this->container->lang['list_reserved_by'] . $reserved->user,
+                Renderer::ADMIN_MODE => $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message),
+                Renderer::OWNER_MODE => $this->item->liste->isExpired() ? $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message) : $this->container->lang['item_reserved'],
+                Renderer::OTHER_MODE => $this->container->lang['list_reserved_by'] . $reserved->getUser(),
                 default => $this->container->lang['item_unreserved'],
             };
         } else {
@@ -364,6 +364,63 @@ class ItemView extends View
     }
 
     /**
+     * Display item reservation form
+     * @return string html code
+     */
+    protected function reserve(): string
+    {
+        $email = User::find($_SESSION['USER_ID'] ?? "")->mail ?? $_COOKIE['user_email'] ?? "";
+        $public_key = filter_var($this->request->getQueryParam("public_key", ''), FILTER_SANITIZE_STRING);
+        $html = <<<HTML
+        <div class="main-content">
+            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                </div>
+            </nav>
+            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+                <div class="container-fluid align-items-center">
+                    <div class="row">
+                        <div class="fw" style="position:relative;">
+                            <h1 class="text-center text-white">{$this->container->lang["item_reservation"]} {$this->item->id}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 flex mt--7">
+                <div class="fw">
+                    <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('items_reserve_id', ['id' => $this->item->id], ['public_key' => $public_key])}">
+                        <div class="card bg-secondary shadow">
+                            <div class="card-body">
+                                <div class="pl-lg-4">
+                                <div class="row fw">
+                                    <div class="form-group focused fw">
+                                            <label class="form-control-label" for="name">{$this->container->lang['user_email']}</label>
+                                            <input type="email" id="email" name="email" class="form-control form-control-alternative" value="$email" required autofocus>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="description">{$this->container->lang['message']}</label>
+                                            <input type="text" name="message" class="form-control form-control-alternative"/>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['reserve']}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        HTML;
+        return genererHeader("Item {$this->item->id} | {$this->container->lang["reservation"]}", ["profile.css", "toggle.css"]) . $html;
+    }
+
+    /**
      * Display edit item page
      * @return string html code
      */
@@ -463,6 +520,7 @@ class ItemView extends View
         return match ($method) {
             Renderer::PREVENT_DELETE => $this->preventDelete(),
             Renderer::DELETE => $this->confirmDelete(),
+            Renderer::RESERVATION_FORM => $this->reserve(),
             Renderer::REQUEST_AUTH => $this->requestAuth($this->item),
             Renderer::POT_CREATE => $this->createPot(),
             Renderer::POT_PARTICIPATE => $this->participatePot(),

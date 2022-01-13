@@ -48,7 +48,7 @@ class Item extends Model
      */
     public function getReservationState(Container $container, int $access_level, bool $object = false): stdClass|string
     {
-        $reservation = Reserved::find($this->id);
+        $reservation = Reservation::find($this->id);
         /*Declaration d'une variable qui donnera le resultat suivant
         *  101 : Liste expirée, Item non reservé
         *  1001 : Propriétaire, Liste expirée, Item non reservé
@@ -80,17 +80,17 @@ class Item extends Model
             case 10052:
                 if ($object) {
                     $reservation_state = new stdClass();
-                    $reservation_state->user = ltrim($reservation->user(), ' ');
+                    $reservation_state->user = ltrim($reservation->getUser(), ' ');
                     $reservation_state->message = $reservation->message;
                 } else
-                    $reservation_state = $container->lang['list_reserved_by'] . $reservation->user() . ' -> ' . $reservation->message;
+                    $reservation_state = $container->lang['list_reserved_by'] . $reservation->getUser() . (empty($reservation->message) ? "" : ' -> ' . $reservation->message);
                 break;
             case 152:
                 if ($object) {
                     $reservation_state = new stdClass();
-                    $reservation_state->user = ltrim($reservation->user(), ' ');
+                    $reservation_state->user = ltrim($reservation->getUser(), ' ');
                 } else
-                    $reservation_state = $container->lang['list_reserved_by'] . $reservation->user();
+                    $reservation_state = $container->lang['list_reserved_by'] . $reservation->getUser();
                 break;
             case 1052:
                 if ($object) {
