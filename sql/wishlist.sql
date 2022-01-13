@@ -55,9 +55,9 @@ CREATE TABLE `liste`
 CREATE TABLE `reserve`
 (
     `item_id` int(11) NOT NULL,
-    `user_id` int(11) NOT NULL,
-    `message` text    NOT NULL,
-    PRIMARY KEY (`item_id`, `user_id`)
+    `user_email` varchar(255) NOT NULL,
+    `message` varchar(255)    DEFAULT NULL, 
+    PRIMARY KEY (`item_id`, `user_email`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -70,6 +70,20 @@ CREATE TABLE `totp_rescue_codes`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+CREATE TABLE `cagnotte` (
+  `item_id` int(11) NOT NULL,
+  `montant` decimal(7,2) NOT NULL,
+  `limite` date DEFAULT NULL,
+  PRIMARY KEY (`item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+CREATE TABLE `participe` (
+  `cagnotte_itemid` int(11) NOT NULL,
+  `user_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `montant` decimal(7,2) NOT NULL,
+  PRIMARY KEY (`cagnotte_itemid`,`user_email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `temporary_waiting_users`
 (
     `data_id` int(11)                              NOT NULL,
@@ -80,12 +94,16 @@ CREATE TABLE `temporary_waiting_users`
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
+ALTER TABLE `participe`
+  ADD CONSTRAINT `fkparticipe_cagnotte` FOREIGN KEY (`cagnotte_itemid`) REFERENCES `cagnotte` (`item_id`);
+COMMIT;
+ALTER TABLE `cagnotte`
+  ADD CONSTRAINT `fkcagnotte_item` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
+COMMIT;
 ALTER TABLE `item`
     ADD CONSTRAINT `item_listeidfk` FOREIGN KEY (`liste_id`) REFERENCES `liste` (`no`);
 ALTER TABLE `liste`
     ADD CONSTRAINT `liste_useridfk` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`user_id`);
-ALTER TABLE `reserve`
-    ADD CONSTRAINT `reserve_useridfk` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`user_id`);
 ALTER TABLE `reserve`
     ADD CONSTRAINT `reserve_itemidfk` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
 ALTER TABLE `totp_rescue_codes`

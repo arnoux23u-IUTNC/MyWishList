@@ -55,12 +55,28 @@ abstract class View
         switch ($from) {
             case (bool)preg_match('/^\/lists\/[0-9]+\/edit\/items(\/?)/', $from) :
                 $from = $this->container->router->pathFor('lists_edit_items_id', ['id' => $model->no]);
+                $title = $this->container->lang['list_editing'];
+                $dataModel = $model->no;
                 break;
             case (bool)preg_match('/^\/lists\/[0-9]+\/edit(\/?)/', $from) :
                 $from = $this->container->router->pathFor('lists_edit_id', ['id' => $model->no]);
+                $title = $this->container->lang['list_editing'];
+                $dataModel = $model->no;
                 break;
             case (bool)preg_match('/^\/items\/[0-9]+\/edit(\/?)/', $from) :
                 $from = $this->container->router->pathFor('items_edit_id', ['id' => $model->id]);
+                $title = $this->container->lang['item_editing'];
+                $dataModel = $model->liste->no;
+                break;
+            case (bool)preg_match('/^\/items\/[0-9]+\/pot\/create(\/?)/', $from) :
+                $from = $this->container->router->pathFor('items_pot_id', ['id' => $model->id, "action" => "create"]);
+                $title = $this->container->lang['create_pot'];
+                $dataModel = $model->liste->no;
+                break;
+            case (bool)preg_match('/^\/items\/[0-9]+\/pot\/delete(\/?)/', $from) :
+                $from = $this->container->router->pathFor('items_pot_id', ['id' => $model->id, "action" => "delete"]);
+                $title = $this->container->lang['delete_pot'];
+                $dataModel = $model->liste->no;
                 break;
             default:
                 throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
@@ -69,13 +85,6 @@ abstract class View
             "errtoken" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
             default => ""
         };
-        if (get_class($model) == Liste::class) {
-            $title = $this->container->lang['list_editing'];
-            $dataModel = $model->no;
-        } else {
-            $title = $this->container->lang['item_editing'];
-            $dataModel = $model->id;
-        }
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
