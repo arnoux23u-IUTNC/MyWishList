@@ -8,7 +8,7 @@ use Slim\Container;
 use Slim\Http\Request;
 use JetBrains\PhpStorm\Pure;
 use mywishlist\mvc\{Renderer, View};
-use mywishlist\mvc\models\{Liste, Reserved, User};
+use mywishlist\mvc\models\{Liste, Reservation, User};
 
 /**
  * List View
@@ -54,6 +54,8 @@ class ListView extends View
             "modItem" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_item_updated']}</span></div>",
             "delItem" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['list_item_deleted']}</span></div>",
             "resItem" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['list_item_reserved_action']}</span></div>",
+            "reserved" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['item_reserved']}</span></div>",
+            "error" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['phtml_error_error']}</span></div>",
             default => ""
         };
         $warnEdit = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
@@ -74,7 +76,7 @@ class ListView extends View
         foreach ($l->items as $pos => $item) {
             $pos++;
             $routeModItem = $this->container->router->pathFor('items_edit_id', ['id' => $item->id]);
-            $reserved = Reserved::find($item->id);
+            $reserved = Reservation::find($item->id);
             /*Declaration d'une variable qui donnera le resultat suivant
             *  101 : Liste expirée, Item non reservé
             *  1001 : Propriétaire, Liste expirée, Item non reservé
@@ -92,6 +94,7 @@ class ListView extends View
             $state_item = ($this->access_level + (empty($reserved) ? 0 : 5)) . ($l->isExpired() ? 1 : 2);
             $item_mod = "";
             $item_del = "";
+            $item_res = "";
             switch ($state_item) {
                 case 101:
                     $reservation_state = $this->container->lang['item_unreserved'];
@@ -107,18 +110,19 @@ class ListView extends View
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 151:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message);
                     break;
                 case 1051:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message);
                     break;
                 case 10051:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message);
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 102:
                     $reservation_state = $this->container->lang['item_unreserved'];
+                    $item_res = "<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => $public_key])}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
@@ -129,17 +133,18 @@ class ListView extends View
                     break;
                 case 10002:
                     $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class=>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_res = "<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => $public_key])}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 152:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user();
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser();
                     break;
                 case 1052:
                     $reservation_state = $this->container->lang['item_reserved'];
                     break;
                 case 10052:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->user() . ' -> ' . $reserved->message;
+                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message);
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
@@ -166,7 +171,7 @@ class ListView extends View
             //$routeDelItem = $this->container->router->pathFor('items_delete_id',['id' => $item->id],["public_key" => $this->public_key]);
             $item_desc = "<span class='pos'>$pos</span>$item->nom" . (!empty($item->img) ? (file_exists($this->container['items_img_dir'].DIRECTORY_SEPARATOR . "$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/.]+).(jpe?g|png))?$/", $item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")) : "");
 
-            // $item_res = !empty($reserved) ? "<p>{$this->container->lang['list_reserved_by']} $reserved->user_id_id -> $reserved->message</p>" : ($l->isExpired() ? "<p><i>{$this->container->lang['reservation_not_possible']}</i></p>" : "\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='#'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t");
+            // $item_res = !empty($reserved) ? "<p>{$this->container->lang['list_reserved_by']} $reserved->user_id_id -> $reserved->message</p>" : ($l->isExpired() ? "<p><i>{$this->container->lang['reservation_not_possible']}</i></p>" : "\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => '{filter_var($this->request->getqueryparam('public_key', ''), filter_sanitize_string))}')}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t");
 
             $pk = $this->request->getQueryParam('public_key') ?? $this->request->getParsedBodyParam('public_key') ?? "";
             $routeItemShow = $this->container->router->pathFor("items_show_id", ["id" => $item->id]);
@@ -181,6 +186,7 @@ class ListView extends View
                                                             <div class="reservation_state">
                                                                 <span>$reservation_state</span>
                                                             </div>
+                                                            $item_res
                                                         </li>
             HTML;
         }
