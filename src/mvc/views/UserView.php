@@ -57,6 +57,7 @@ class UserView extends View
             "pc" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['user_password_changed']}</span></div>",
             "2fa" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['user_2fa_enabled_log']}</span></div>",
             "2farec" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['user_2fa_disabled']}</span></div>",
+            "deleted" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_deleted']}</span></div>",
             default => ""
         });
         $username = $authenticator ? filter_var($this->request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
