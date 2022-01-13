@@ -66,6 +66,11 @@ class ListView extends View
             "fileexist" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_exists']}</span></div>",
             "error" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['image_error']}</span></div>",
             "errtoken" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
+            "errPot" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['item_err_pot']}</span></div>",
+            "createdPot" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['item_created_pot']}</span></div>",
+            "deletedPot" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['pot_deleted']}</span></div>",
+            "alreadyPot" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['item_already_pot_participate']}</span></div>",
+            "potOk" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['pot_participate_ok']}</span></div>",
             default => ""
         };
         $descr_info = $this->list->description ?? $this->container->lang['none'];
