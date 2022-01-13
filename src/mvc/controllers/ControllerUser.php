@@ -13,7 +13,7 @@ use mywishlist\{Validator, MailSender};
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\UserView;
 use mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{User, RescueCode, PasswordReset};
+use mywishlist\mvc\models\{User, RescueCode, PasswordReset, Liste, Cagnotte, Participation, Reservation, Item};
 
 /**
  * Class ControllerUser
@@ -442,6 +442,54 @@ class ControllerUser
     }
 
     /**
+     * Control the delete account action
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     */
+    private function delete(): Response
+    {
+        if (empty($_SESSION['LOGGED_IN']))
+            return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "not_logged"]));
+        //Si la requete est de type GET, on affiche la page de confirmation, sinon, on verifie les valeurs passées
+        switch ($this->request->getMethod()) {
+            case 'GET':
+                return $this->response->write($this->renderer->render(Renderer::DELETE_ACCOUNT_CONFIRM));
+            case 'POST':
+                //On verifie une variable venant du formulaire
+                if ($this->request->getParsedBodyParam('sendBtn') !== "OK")
+                    throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
+                $password = filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING);
+                if (!password_verify($password, $this->user->password))
+                    return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'delete'], ["info" => "password"]));
+                foreach(Liste::whereUserId($this->user->user_id)->get() as $list){                    
+                    foreach($list->items as $item){
+                        Reservation::where('item_id', 'LIKE', $item->id)->delete();
+                        Participation::whereCagnotteItemid($item->id)->delete();
+                        Cagnotte::where('item_id', 'LIKE', $item->id)->delete();
+                        if(file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img))
+                            unlink($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img);
+                        $item->delete();
+                    }
+                    $list->delete();
+                };
+                foreach(Reservation::where('user_email', 'LIKE', $this->user->mail)->get() as $reservation){
+                    $liste = Item::find($reservation->item_id)->liste;
+                    if($liste->isExpired())
+                        $reservation->delete();
+                }
+                if(file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar))
+                    unlink($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
+                RescueCode::whereUser($this->user->user_id)->delete();
+                $this->user->logout();
+                $this->user->delete();
+                return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "deleted"]));   
+            default:
+                throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
+        }
+    }
+
+    /**
      * Control the forgot password action
      * @return Response
      * @throws ForbiddenException
@@ -521,6 +569,7 @@ class ControllerUser
         return match ($this->args['action']) {
             'login' => $this->login(),
             'profile' => $this->profile(),
+            'delete' => $this->delete(),
             'logout' => $this->logout(),
             'register' => $this->register(),
             'forgot_password' => $this->forgot_password(),
