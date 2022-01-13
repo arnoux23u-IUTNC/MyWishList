@@ -401,6 +401,7 @@ class UserView extends View
             "profile_route" => $this->container->router->pathFor('accounts', ["action" => 'profile']),
             "logout_route" => $this->container->router->pathFor('accounts', ["action" => 'logout']),
             "2fa_route" => $this->container->router->pathFor('2fa', ["action" => 'manage']),
+            "delete_account_route" => $this->container->router->pathFor('accounts', ["action" => 'delete']),
             "avatar_src" => (!empty($user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . "$user->avatar")) ? "/assets/img/avatars/$user->avatar" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($user->mail))) . "?size=120",
             "user_username" => $user->username,
             "user_firstname" => $user->firstname,
@@ -506,6 +507,63 @@ class UserView extends View
         EOD;
     }
 
+    /**
+     * Display the 2fa enabling page
+     * @return string html code
+     */
+    private function deleteAccount(): string
+    {
+        $popup = $this->getHeaderInfo();
+        $html = <<<HTML
+        <div class="main-content">
+            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                </div>
+            </nav>
+            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+                <div class="container-fluid align-items-center">
+                    <div class="row">
+                        <div class="fw" style="position:relative;">
+                            <h1 class="text-center text-white">{$this->container->lang["user_delete_account"]}</h1>
+                            $popup
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 flex mt--7">
+                <div class="fw">
+                    <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('accounts', ['action' => 'delete'])}">
+                        <div class="card bg-secondary shadow">
+                            <div class="card-body">
+                                <div class="pl-lg-4">
+                                    <div class="row fw">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label">{$this->container->lang['user_delete_account_confirm']}</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="private_key">{$this->container->lang['user_password']}</label>
+                                            <div class="pfield"><input type="password" name="password" id="password" class="form-control form-control-alternative" autofocus required /><i data-associated="password" class="pwdicon far fa-eye"></i></div>
+                                        </div>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-danger" value="OK" name="sendBtn">{$this->container->lang['confirm']}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        HTML;
+        return genererHeader("{$this->container->lang["user_delete_account"]} | MyWishList", ["profile.css", "toggle.css"]) . $html;
+    }
+
+    //TODO LANG ICI ET W3C
     /**
      * Display the 2fa manage page
      * @return string
@@ -626,6 +684,7 @@ class UserView extends View
             Renderer::RECOVER_2FA => $this->recover2FA(),
             Renderer::LOST_PASSWORD => $this->forgotPassword(),
             Renderer::RESET_PASSWORD => $this->resetPassword(),
+            Renderer::DELETE_ACCOUNT_CONFIRM => $this->deleteAccount(),
             default => parent::render($method, $access_level),
         };
     }
@@ -653,6 +712,7 @@ class UserView extends View
             "not_sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
             "already" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['reset_already_asked']}</span></div>",
             "invalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['token_invalid']}</span></div>",
+            'password' => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_password_incorrect']}</span></div>",
             "emailnovalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['email_not_valid']}</span></div>",
             default => ""
         };
