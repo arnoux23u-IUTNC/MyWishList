@@ -17,6 +17,8 @@ abstract class Renderer
     const CREATE = 2;
     const EDIT = 3;
     const EDIT_ADD_ITEM = 22;
+    const POT_CREATE = 23;
+    const POT_PARTICIPATE = 24;
     const REQUEST_AUTH = 4;
     const PREVENT_DELETE = 41;
     const DELETE = 42;
