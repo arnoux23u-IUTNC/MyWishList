@@ -69,4 +69,13 @@ class Liste extends Model
         return !empty($user) ? $user->name() : null;
     }
 
+    /**
+     * Check if a list is claimed
+     * @return bool at true if claimed, false otherwise
+     */
+    public function isClaimed(): bool
+    {
+        return $this->user_id != NULL;
+    }
+
 }

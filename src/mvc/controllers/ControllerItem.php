@@ -10,7 +10,7 @@ use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use mywishlist\Validator;
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\ItemView;
-use mywishlist\mvc\models\{Item, User, Reservation, Cagnotte, Participation, UserTemporaryResolver};
+use mywishlist\mvc\models\{Item, User, Reservation, Cagnotte, Participation};
 use mywishlist\exceptions\ForbiddenException;
 
 /**
