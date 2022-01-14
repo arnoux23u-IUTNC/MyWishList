@@ -1211,6 +1211,10 @@ button.bg-white:focus {
     margin-right: 1.5rem !important;
 }
 
+.mb-2 {
+    margin-bottom: .5rem !important;
+}
+
 .mb-4,
 .my-4 {
     margin-bottom: 1.5rem !important;
@@ -2145,6 +2149,10 @@ p.item-info {
     flex-direction: column;
 }
 
+.flex-row {
+    flex-direction: row;
+}
+
 .file {
     display: flex;
     flex-direction: row;
@@ -2171,4 +2179,8 @@ p.item-info {
 
 .hidden:hover {
     color: white;
+}
+
+.minimified{
+    max-height: 6vh;
 }
