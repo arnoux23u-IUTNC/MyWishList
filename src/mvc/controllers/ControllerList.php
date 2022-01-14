@@ -185,6 +185,9 @@ class ControllerList
                 $associated_user = User::where("mail", "LIKE", $email)->first();
                 if (!empty($associated_user))
                     $liste->user_id = $associated_user->user_id;
+                    $data = json_decode($_COOKIE['claimed_lists'], true);
+                    $data[] = $liste->no;
+                    setcookie('claimed_lists', json_encode($data), time()+(3600 * 480), "/", "");
                 $liste->save();
                 //Si l'utilisateur associé est null (email correspondant a aucun utilisateur inscrit), on crée un utilisateur temporaire qui sera verifié quand il s'inscrira
                 if (empty($liste->user_id)){
@@ -231,7 +234,12 @@ class ControllerList
                 $this->liste->update([
                     'user_id' => $this->user->user_id
                 ]);
-                UserTemporaryResolver::find($this->liste->no)->delete();
+                $data = json_decode($_COOKIE['claimed_lists'], true);
+                $data[] = $liste->no;
+                setcookie('claimed_lists', json_encode($data), time()+(3600 * 480), "/", "");
+                $tmp = UserTemporaryResolver::find($this->liste->no);
+                if(!empty($tmp))
+                    $tmp->delete();
                 return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $this->liste->no], ["public_key" => $this->liste->public_key, "state" => "update"]));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);

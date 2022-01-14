@@ -144,7 +144,7 @@ class ListView extends View
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 152:
-                    $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser();
+                    $reservation_state = in_array($l->no, json_decode($_COOKIE['claimed_lists'], true)) ? $this->container->lang['item_reserved'] : $this->container->lang['list_reserved_by'] . $reserved->getUser();
                     break;
                 case 1052:
                     $reservation_state = $this->container->lang['item_reserved'];

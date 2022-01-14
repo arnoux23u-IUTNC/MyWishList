@@ -3,7 +3,7 @@ ErrorDocument 405 /errors/405.html
 ErrorDocument 500 /errors/500.html
 
 Options -Indexes
-DirectoryIndex public/index.php
+DirectoryIndex index.php
 
 RewriteEngine On
 
@@ -16,4 +16,4 @@ RewriteRule ^src(/.*|)$ - [NC,F]
 
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^ public/index.php [QSA,L]
+RewriteRule ^ index.php [QSA,L]
