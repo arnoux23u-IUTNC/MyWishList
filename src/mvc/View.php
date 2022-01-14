@@ -63,6 +63,11 @@ abstract class View
                 $title = $this->container->lang['list_editing'];
                 $dataModel = $model->no;
                 break;
+            case (bool)preg_match('/^\/lists\/[0-9]+\/claim(\/?)/', $from) :
+                $from = $this->container->router->pathFor('lists_claim_id', ['id' => $model->no]);
+                $title = $this->container->lang['list_claim'];
+                $dataModel = $model->no;
+                break;
             case (bool)preg_match('/^\/items\/[0-9]+\/edit(\/?)/', $from) :
                 $from = $this->container->router->pathFor('items_edit_id', ['id' => $model->id]);
                 $title = $this->container->lang['item_editing'];
@@ -127,7 +132,7 @@ abstract class View
         </div>
         <script src="/assets/js/password-viewer.js"></script>
         HTML;
-        return genererHeader("{$this->container->lang['list_editing']} - {$this->container->lang['auth']}", ["profile.css"]) . $html;
+        return genererHeader("{$this->container->lang['auth']} - MyWishList", ["profile.css"]) . $html;
     }
 
     /**

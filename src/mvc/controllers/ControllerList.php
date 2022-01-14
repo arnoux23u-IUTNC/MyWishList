@@ -187,10 +187,52 @@ class ControllerList
                     $liste->user_id = $associated_user->user_id;
                 $liste->save();
                 //Si l'utilisateur associé est null (email correspondant a aucun utilisateur inscrit), on crée un utilisateur temporaire qui sera verifié quand il s'inscrira
-                if (empty($liste->user_id))
-                    (new UserTemporaryResolver($liste, $email))->save();
+                if (empty($liste->user_id)){
+                    $tmp = new UserTemporaryResolver();
+                    $tmp->list_id = $liste->no;
+                    $tmp->email = $email;
+                    $tmp->save();
+                }
                 $path = $this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key]);
                 return $this->response->write("<script type='text/javascript'>alert('{$this->container->lang['alert_modify_token']} $token');window.location.href='$path';</script>");
+            default:
+                throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
+        }
+    }
+
+    /**
+     * Control claim of a list
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException
+     */
+    public function claim(){
+        //Si la liste n'existe pas, on declenche une erreur
+        if (empty($this->liste))
+            throw new NotFoundException($this->request, $this->response);
+        //Si l'utilisateur n'existe pas ou n'est pas connecté, on déclenche une erreur
+        if(empty($_SESSION['LOGGED_IN']) || empty($this->user->username) || $this->liste->isClaimed())
+            throw new ForbiddenException(message: $this->container->lang['exception_ressource_not_allowed']);
+        switch ($this->request->getMethod()) {
+            case 'GET':
+                //Si l'utilisateur n'est pas admin, on demande l'authentification
+                if (!$this->user->isAdmin())
+                    return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH));
+            case 'POST':
+                /*Trois cas de figure :
+                - L'utilisateur est admin, on revendique la liste
+                - L'utilisateur est inconnu, et a saisi le token privé
+                - L'utilisateur est inconnu, et n'a pas saisi le token privé, on lui affiche le formulaire d'authentification*/
+                if (!$this->user->isAdmin() && empty($this->request->getParsedBodyParam('private_key')))
+                    return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH));
+                if (!$this->user->isAdmin() && !password_verify(filter_var($this->request->getParsedBodyParam('private_key') ?? "", FILTER_SANITIZE_STRING), $this->liste->private_key))
+                    return $this->response->withRedirect($this->container->router->pathFor('lists_claim_id', ['id' => $this->liste->no], ["info" => "errtoken"]));
+                $this->liste->update([
+                    'user_id' => $this->user->user_id
+                ]);
+                UserTemporaryResolver::find($this->liste->no)->delete();
+                return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $this->liste->no], ["public_key" => $this->liste->public_key, "state" => "update"]));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }

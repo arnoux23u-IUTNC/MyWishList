@@ -76,6 +76,7 @@ class ListView extends View
         $descr_info = $this->list->description ?? $this->container->lang['none'];
         $expiration_info = !empty($this->list->expiration) ? date_format(date_create($this->list->expiration), "d-m-Y") : $this->container->lang['nc'];
         $associated_user = User::find($this->list->user_id);
+        $claim = (!empty($_SESSION['LOGGED_IN']) && !$this->list->isClaimed()) ? "<a href=".$this->container->router->pathFor('lists_claim_id', ['id' => $l->no])." class='btn btn-sm btn-default'>".$this->container->lang['list_claim']."</a>" : "<a href='#' class='btn btn-sm btn-default disabled'>".$this->container->lang['list_claim']."</a>";
         $user_info = empty($associated_user) ? $this->container->lang['nc'] : $associated_user->lastname . ' ' . $associated_user->firstname;
         $items_list = "";
         foreach ($l->items as $pos => $item) {
@@ -261,6 +262,7 @@ class ListView extends View
                                             </div>
                                         </div>
                                         <a href="{$this->container->router->pathFor('lists_edit_items_id', ['id' => $l->no])}" class="btn btn-sm btn-primary">{$this->container->lang['list_add_item']}</a>
+                                        $claim
                                     </div>
                                 </div>
                             </div>
