@@ -7,6 +7,9 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' 
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'i18n' . DIRECTORY_SEPARATOR . 'langs.php';
 
 use mywishlist\bd\Eloquent as Eloquent;
+use mywishlist\mvc\Renderer;
+use mywishlist\mvc\models\{User, Liste};
+use mywishlist\mvc\views\UserView;
 use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem, ControllerAPI};
 use mywishlist\exceptions\ExceptionHandler;
 use Slim\{App, Container};
@@ -93,6 +96,51 @@ $app->any("/api/v1/lists/{path:.*}[/]", function ($request, $response, $args) {
 $app->any("/api/v1/items/{path:.*}[/]", function ($request, $response, $args) {
     return (new ControllerAPI($this, $request, $response, $args))->itemsV1();
 })->setName('api_v1_items');
+$app->get("/createurs[/]", function ($request, $response, $args) use ($lang) {
+    $routeCreate = $this->router->pathFor('lists_create');
+    $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
+    $html = genererHeader("{$lang['home_title']} MyWishList", ["profile.css", "style.css", "lang.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
+    $list = "";
+    $phtmlVars = array(
+        'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
+        'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
+        'my_lists_route' => $this->router->pathFor('lists_home'),
+        'createurs_route' => $this->router->pathFor('createurs'),
+        'create_list_route' => $routeCreate,
+        'flag_img' => "<img class='selected' alt='" . strtolower($_SESSION["lang"]) . "-flag' src='/assets/img/flags/flag-" . strtolower($_SESSION["lang"]) . ".png'>",
+        'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),
+        'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<EOD
+
+                    <li>
+                        <a href="$routeProfile">
+                            <i class='bx bxs-user'></i>
+                            <span class="links_name">{$lang['home_my_profile']}</span>
+                        </a>
+                        <span class="tooltip">{$lang['home_my_profile']}</span>
+                    </li>
+        EOD
+    );
+    foreach ($phtmlVars as $key => $value) {
+        $html = str_replace("%" . $key . "%", $value, $html);
+    }
+    preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+    foreach ($matches[0] as $match) {
+        $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+    }
+    foreach(User::all() as $user){
+        if(Liste::whereUserId($user->user_id)->count() > 0)
+            $list .= (new UserView($this, $user, $request))->render(Renderer::SHOW_FOR_LIST);
+    }
+    $html .= <<<EOD
+        <div class="main_container">
+            <h3>{$lang["phtml_creators"]}</h3>
+            <div class='lists'>$list
+            </div>
+        </div>
+    </body>
+    EOD;
+    return $response->write($html);
+})->setName('createurs');
 
 #Route principale
 $app->get('/', function ($request, $response) use ($lang) {
@@ -103,6 +151,7 @@ $app->get('/', function ($request, $response) use ($lang) {
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
         'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
         'my_lists_route' => $this->router->pathFor('lists_home'),
+        'createurs_route' => $this->router->pathFor('createurs'),
         'create_list_route' => $routeCreate,
         'flag_img' => "<img class='selected' alt='" . strtolower($_SESSION["lang"]) . "-flag' src='/assets/img/flags/flag-" . strtolower($_SESSION["lang"]) . ".png'>",
         'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),

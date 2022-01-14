@@ -95,6 +95,7 @@ $lang = array(
     "password_form_valid_number" => "Un <b>chiffre</b>",
     "password_form_valid_small" => "Une lettre <b>minuscule</b>",
     "password_form_valid_special" => "Un <b>caractère spécial</b>",
+    "phtml_creators" => "Liste des créateurs",
     "phtml_error_backhome" => "Revenir à l'<a href='/'>accueil</a>",
     "phtml_error_error" => "Erreur",
     "phtml_error_fields" => "Un ou plusieurs champs sont incorrects",
