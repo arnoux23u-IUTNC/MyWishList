@@ -58,6 +58,9 @@ $app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $ar
 $app->any("/lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->edit();
 })->setName('lists_edit_id');
+$app->any("/lists/{id:[0-9]+}/claim[/]", function ($request, $response, $args) {
+    return (new ControllerList($this, $request, $response, $args))->claim();
+})->setName('lists_claim_id');
 $app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->show();
 })->setName('lists_show_id');
