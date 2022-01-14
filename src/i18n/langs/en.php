@@ -63,6 +63,7 @@ $lang = array(
     "list_add_item" => "Add an item",
     "list_associated_items" => "Associated items",
     "list_associated_user" => "Associated user",
+    "list_claim" => "Claim list",
     "list_editing" => "Editing a list",
     "list_edition" => "Edit list",
     "list_item_added" => "Item added",
