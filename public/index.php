@@ -8,7 +8,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' 
 
 use mywishlist\bd\Eloquent as Eloquent;
 use mywishlist\mvc\Renderer;
-use mywishlist\mvc\models\User;
+use mywishlist\mvc\models\{User, Liste};
 use mywishlist\mvc\views\UserView;
 use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem, ControllerAPI};
 use mywishlist\exceptions\ExceptionHandler;
@@ -128,7 +128,8 @@ $app->get("/createurs[/]", function ($request, $response, $args) use ($lang) {
         $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
     }
     foreach(User::all() as $user){
-        $list .= (new UserView($this, $user, $request))->render(Renderer::SHOW_FOR_LIST);
+        if(Liste::whereUserId($user->user_id)->count() > 0)
+            $list .= (new UserView($this, $user, $request))->render(Renderer::SHOW_FOR_LIST);
     }
     $html .= <<<EOD
         <div class="main_container">
