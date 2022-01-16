@@ -2,15 +2,15 @@
 
 namespace mywishlist\mvc\models;
 
-use Exception;
 use Illuminate\Database\Eloquent\Model;
-use mywishlist\bd\HasCompositePrimaryKey;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * UserTemp Model
  * Inherits from the Model class of Laravel
  * @property int $list_id
  * @property string $email
+ * @method static whereEmail(string $email) Eloquent method
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\models
@@ -23,5 +23,14 @@ class UserTemporaryResolver extends Model
     public $incrementing = false;
     public $timestamps = false;
     protected $guarded = [];
+
+    /**
+     * Get the associated list of an tmp resolver
+     * @return BelongsTo liste belongsTo relation
+     */
+    public function liste(): BelongsTo
+    {
+        return $this->belongsTo('\mywishlist\mvc\models\Liste', 'list_id');
+    }
 
 }
