@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $public_key
  * @property string $private_key
  * @property mixed $published
+ * @property mixed $is_public
  * @property mixed $items Goes to items(), eloquent relation
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @method static whereUserId(int $user_id) Eloquent method
@@ -56,6 +57,15 @@ class Liste extends Model
     public function isPublished(): bool
     {
         return $this->published == 1;
+    }
+
+    /**
+     * Check if a list is public
+     * @return bool true if public, false otherwise
+     */
+    public function isPublic(): bool
+    {
+        return $this->is_public == 1;
     }
 
     /**
