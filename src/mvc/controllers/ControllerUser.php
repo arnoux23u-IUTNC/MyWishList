@@ -13,7 +13,7 @@ use mywishlist\{Validator, MailSender};
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\UserView;
 use mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{User, RescueCode, PasswordReset, Liste, Cagnotte, Participation, Reservation, Item};
+use mywishlist\mvc\models\{User, RescueCode, PasswordReset, Liste, Cagnotte, Participation, Reservation, Item, UserTemporaryResolver};
 
 /**
  * Class ControllerUser
@@ -259,6 +259,11 @@ class ControllerUser
                 //Sauvegarde dans la base
                 $user->save();
                 $user->authenticate();
+                //Supressions des utilisateurs temporaires et attribution des listes si existantes
+                foreach(UserTemporaryResolver::whereEmail($email)->get() as $tmp){
+                    $tmp->liste->update(['user_id' => $user->user_id]);
+                    $tmp->delete();
+                }
                 return $this->response->withRedirect($this->container->router->pathFor('home'));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
