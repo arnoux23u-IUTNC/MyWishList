@@ -183,19 +183,23 @@ class ControllerList
                 //Attribution de l'utilisateur associé
                 $email = filter_var($this->request->getParsedBodyParam('email'), FILTER_SANITIZE_EMAIL);
                 $associated_user = User::where("mail", "LIKE", $email)->first();
-                if (!empty($associated_user))
+                if (!empty($associated_user)){
                     $liste->user_id = $associated_user->user_id;
-                    $data = json_decode($_COOKIE['claimed_lists'], true);
-                    $data[] = $liste->no;
-                    setcookie('claimed_lists', json_encode($data), time()+(3600 * 480), "/", "");
+                    $liste->published = 0;    
+                }
                 $liste->save();
+                $data = json_decode($_COOKIE['claimed_lists'], true);
+                $data[] = $liste->no;
+                setcookie('claimed_lists', json_encode($data), time()+(3600 * 480), "/", "");
                 //Si l'utilisateur associé est null (email correspondant a aucun utilisateur inscrit), on crée un utilisateur temporaire qui sera verifié quand il s'inscrira
                 if (empty($liste->user_id)){
                     $tmp = new UserTemporaryResolver();
                     $tmp->list_id = $liste->no;
                     $tmp->email = $email;
+                    $liste->update(['published' => 1]);
                     $tmp->save();
                 }
+                
                 $path = $this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key]);
                 return $this->response->write("<script type='text/javascript'>alert('{$this->container->lang['alert_modify_token']} $token');window.location.href='$path';</script>");
             default:
