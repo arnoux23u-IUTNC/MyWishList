@@ -50,8 +50,10 @@ class User extends Model
     {
         session_destroy();
         //Double vérification pour éviter les problèmes de session
+        $l = $_SESSION['lang'];
         unset($_SESSION);
         session_start();
+        $_SESSION['lang'] = $l;
     }
 
     /**

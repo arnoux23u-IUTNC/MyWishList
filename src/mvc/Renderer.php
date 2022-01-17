@@ -22,8 +22,6 @@ abstract class Renderer
     const POT_PARTICIPATE = 24;
     const RESERVATION_FORM = 25;
     const REQUEST_AUTH = 26;
-    const PREVENT_DELETE = 41;
-    const DELETE = 42;
     const LOGIN = 71;
     const LOGIN_2FA = 72;
     const REGISTER = 73;
