@@ -673,7 +673,7 @@ class UserView extends View
      */
     private function showInList(){
         $avatar = (!empty($this->user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar)) ? "/assets/img/avatars/{$this->user->avatar}" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($this->user->mail))) . "?size=120";
-        return "\n\t\t\t<div class='mb-2'>\n\t\t\t\t<div class='list form-control form-control-alternative flex flex-row'>\n\t\t\t\t\t<span class='form-control-label'>{$this->user->name()}</span>\n\t\t\t\t\t<img alt='profilepicture' class='rounded-circle minimified' src='$avatar'/>\n\t\t\t\t</div>\n\t\t\t</div>";
+        return "\n\t\t\t<div class='mb-2'>\n\t\t\t\t<div class='list form-control mw form-control-alternative flex flex-row'>\n\t\t\t\t\t<span class='mw text-white form-control-label'>{$this->user->name()}</span>\n\t\t\t\t\t<img alt='profilepicture' class='rounded-circle minimified' src='$avatar'/>\n\t\t\t\t</div>\n\t\t\t</div>";
     }
 
 
@@ -692,7 +692,7 @@ class UserView extends View
             Renderer::ENABLE_2FA => $this->enable2FA(),
             Renderer::MANAGE_2FA => $this->manage2FA(),
             Renderer::SHOW_2FA_CODES => $this->show2FACodes(),
-            Renderer::SHOW_FOR_LIST => $this->showInList(),
+            Renderer::SHOW_FOR_MENU => $this->showInList(),
             Renderer::RECOVER_2FA => $this->recover2FA(),
             Renderer::LOST_PASSWORD => $this->forgotPassword(),
             Renderer::RESET_PASSWORD => $this->resetPassword(),

@@ -14,14 +14,14 @@ abstract class Renderer
 
     const SHOW = 0;
     const SHOW_FOR_ITEM = 1;
-    const SHOW_FOR_LIST = 2;
+    const SHOW_FOR_MENU = 2;
     const CREATE = 3;
     const EDIT = 4;
     const EDIT_ADD_ITEM = 22;
     const POT_CREATE = 23;
     const POT_PARTICIPATE = 24;
-    const RESERVATION_FORM = 23;
-    const REQUEST_AUTH = 4;
+    const RESERVATION_FORM = 25;
+    const REQUEST_AUTH = 26;
     const PREVENT_DELETE = 41;
     const DELETE = 42;
     const LOGIN = 71;
