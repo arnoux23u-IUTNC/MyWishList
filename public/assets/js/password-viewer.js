@@ -1,5 +1,13 @@
 'use strict';
 
+$(document).ready(function() {
+    $('.pwdicon').each(function() {
+        $(this).click(function(event) {
+            pwd($(this).attr('data-associated'), event);
+        });
+    });
+});
+
 let pwd = (id, element) => {
     let icon = element.target;
     const field = $(`#${id}`);

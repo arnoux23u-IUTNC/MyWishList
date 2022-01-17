@@ -5,7 +5,7 @@ namespace mywishlist\mvc\models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Reserved Model
+ * User Model
  * Inherits from the Model class of Laravel
  * @property int $user_id
  * @property string $username
@@ -19,12 +19,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $last_ip
  * @property mixed $is_admin
  * @property string $totp_key
- * @author Guillaume ARNOUX
- * @package mywishlist\mvc\models
  * @method static find(int $USER_ID) Eloquent method
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @method static whereMail(string $email) Eloquent method
  * @method static whereUsername(string $username) Eloquent method
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\models
  */
 class User extends Model
 {
@@ -50,8 +50,10 @@ class User extends Model
     {
         session_destroy();
         //Double vérification pour éviter les problèmes de session
+        $l = $_SESSION['lang'];
         unset($_SESSION);
         session_start();
+        $_SESSION['lang'] = $l;
     }
 
     /**
@@ -85,9 +87,18 @@ class User extends Model
     }
 
     /**
+     * Return the user's firstname and lastname
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->lastname . " " . $this->firstname;
+    }
+
+    /**
      * Check if the user can interact with a list
      * @param Liste $list List to check
-     * @return bool true if can interact, false otherwise
+     * @return bool true if user can interact, false otherwise
      */
     public function canInteractWithList(Liste $list): bool
     {

@@ -1,24 +1,25 @@
-<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+<?php
 
 namespace mywishlist\mvc\models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Reserved Model
+ * Reservation Model
  * Inherits from the Model class of Laravel
- * @author Guillaume ARNOUX
- * @package mywishlist\mvc\models
  * @property int $item_id
- * @property int $user_id
+ * @property string $user_email
  * @property string $message
  * @method static where(string $string, string $string1, string $string2) Eloquent method
- * @method static find(int $user_id) Eloquent method
+ * @method static find(int $item_id) Eloquent method
+ * @author Guillaume ARNOUX
+ * @package mywishlist\mvc\models
  */
-class Reserved extends Model
+class Reservation extends Model
 {
     protected $table = 'reserve';
     protected $primaryKey = 'item_id';
+    public $timestamps = false;
     public $incrementing = false;
     protected $guarded = [];
 
@@ -26,9 +27,9 @@ class Reserved extends Model
      * Get the user that reserved the item
      * @return string user lastname and firstname
      */
-    public function user(): string
+    public function getUser(): string
     {
-        $user = $this->belongsTo(User::class, 'user_id')->first();
-        return " $user->lastname $user->firstname";
+        $user = User::whereMail($this->user_email)->first();
+        return empty($user) ? " $this->user_email" : " $user->lastname $user->firstname";
     }
 }

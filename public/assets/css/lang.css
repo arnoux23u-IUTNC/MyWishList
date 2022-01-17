@@ -57,3 +57,11 @@
 .lang-menu ul img {
     padding-right: 10px;
 }
+
+.text-white {
+    color: #fff !important;
+}
+
+.mw{
+    width: 40vw !important;
+}

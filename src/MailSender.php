@@ -19,17 +19,19 @@ class MailSender
      * @param string $body body of the mail
      * @param array $recipients list of recipients
      * @param bool $debug at false. if true, show smtp transaction
-     * @return bool true if mail was sent
+     * @return bool true if mail was sent, false otherwise (include empty config)
      */
     public static function sendMail(string $subject, string $body, array $recipients, bool $debug = false): bool
     {
+        $conf = parse_ini_file(__DIR__ . DIRECTORY_SEPARATOR . "conf" . DIRECTORY_SEPARATOR . "conf.ini");
+        if (empty($conf['smtp_host']) || empty($conf['smtp_username']) || empty($conf['smtp_password']) || empty($recipients)) {
+            return false;
+        }
         $mail = new PHPMailer(true);
         $mail->CharSet = 'UTF-8';
         try {
-            //enable debug
             if ($debug)
                 $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-            $conf = parse_ini_file(__DIR__ . DIRECTORY_SEPARATOR . "conf" . DIRECTORY_SEPARATOR . "conf.ini");
             $mail->isSMTP();
             $mail->Host = $conf['smtp_host'];
             $mail->SMTPAuth = true;
@@ -38,7 +40,7 @@ class MailSender
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port = 465;
             $from = explode("%", $conf['smtp_from']);
-            $mail->setFrom(ltrim($from[1], '%'), $from[0]);
+            $mail->setFrom(ltrim($from[1], '%'), $from[0] ?? "MyWishList");
             foreach ($recipients as $recipient) {
                 $mail->addAddress($recipient);
             }

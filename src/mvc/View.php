@@ -27,6 +27,11 @@ abstract class View
      */
     protected int $access_level;
 
+    /**
+     * View constructor
+     * @param Container $c
+     * @param Request|null $request
+     */
     public function __construct(Container $c, Request $request = null)
     {
         $this->container = $c;
@@ -46,15 +51,37 @@ abstract class View
     protected function requestAuth(Model $model): string
     {
         $from = $this->request->getRequestTarget();
+        /** @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection */
         switch ($from) {
             case (bool)preg_match('/^\/lists\/[0-9]+\/edit\/items(\/?)/', $from) :
                 $from = $this->container->router->pathFor('lists_edit_items_id', ['id' => $model->no]);
+                $title = $this->container->lang['list_editing'];
+                $dataModel = $model->no;
                 break;
             case (bool)preg_match('/^\/lists\/[0-9]+\/edit(\/?)/', $from) :
                 $from = $this->container->router->pathFor('lists_edit_id', ['id' => $model->no]);
+                $title = $this->container->lang['list_editing'];
+                $dataModel = $model->no;
+                break;
+            case (bool)preg_match('/^\/lists\/[0-9]+\/claim(\/?)/', $from) :
+                $from = $this->container->router->pathFor('lists_claim_id', ['id' => $model->no]);
+                $title = $this->container->lang['list_claim'];
+                $dataModel = $model->no;
                 break;
             case (bool)preg_match('/^\/items\/[0-9]+\/edit(\/?)/', $from) :
                 $from = $this->container->router->pathFor('items_edit_id', ['id' => $model->id]);
+                $title = $this->container->lang['item_editing'];
+                $dataModel = $model->liste->no;
+                break;
+            case (bool)preg_match('/^\/items\/[0-9]+\/pot\/create(\/?)/', $from) :
+                $from = $this->container->router->pathFor('items_pot_id', ['id' => $model->id, "action" => "create"]);
+                $title = $this->container->lang['create_pot'];
+                $dataModel = $model->liste->no;
+                break;
+            case (bool)preg_match('/^\/items\/[0-9]+\/pot\/delete(\/?)/', $from) :
+                $from = $this->container->router->pathFor('items_pot_id', ['id' => $model->id, "action" => "delete"]);
+                $title = $this->container->lang['delete_pot'];
+                $dataModel = $model->liste->no;
                 break;
             default:
                 throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
@@ -63,13 +90,6 @@ abstract class View
             "errtoken" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['incorrect_token']}</span></div>",
             default => ""
         };
-        if (get_class($model) == Liste::class) {
-            $title = $this->container->lang['list_editing'];
-            $dataModel = $model->no;
-        } else {
-            $title = $this->container->lang['item_editing'];
-            $dataModel = $model->id;
-        }
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -97,7 +117,7 @@ abstract class View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="private_key">{$this->container->lang['private_token_for']} $dataModel</label>
-                                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required /><i onclick="pwd('private_key', event)" class="pwdicon far fa-eye"></i></div>
+                                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required /><i data-associated="private_key" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -112,7 +132,7 @@ abstract class View
         </div>
         <script src="/assets/js/password-viewer.js"></script>
         HTML;
-        return genererHeader("{$this->container->lang['list_editing']} - {$this->container->lang['auth']}", ["profile.css"]) . $html;
+        return genererHeader("{$this->container->lang['auth']} - MyWishList", ["profile.css"]) . $html;
     }
 
     /**
@@ -132,5 +152,11 @@ abstract class View
         };
     }
 
+    /**
+     * JSON Encoding method
+     * @param int $access_level depends on the user's privileges
+     * @return string json encoded string of the object
+     */
+    public abstract function encode(int $access_level): string;
 
 }

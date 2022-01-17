@@ -20,9 +20,11 @@ class Eloquent
     public static function start(string $file)
     {
         $capsule = new Capsule;
+        if(!file_exists($file))
+            throw new \Exception("Config file not found ");
         $config = parse_ini_file($file);
         $capsule->addConnection(array('driver' => $config['db_driver'],
-                'host' => 'db',
+                'host' => $config['db_host'],
                 'database' => 'wishlist',
                 'username' => 'usr_mywishlist',
                 'password' => $config['db_password'],

@@ -4,6 +4,7 @@
 
 namespace mywishlist\mvc\controllers;
 
+use Exception;
 use Slim\Container;
 use Slim\Http\{Response, Request};
 use Slim\Exception\{NotFoundException, MethodNotAllowedException};
@@ -12,7 +13,7 @@ use mywishlist\{Validator, MailSender};
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\UserView;
 use mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{User, RescueCode, PasswordReset};
+use mywishlist\mvc\models\{User, RescueCode, PasswordReset, Liste, Cagnotte, Participation, Reservation, Item, UserTemporaryResolver};
 
 /**
  * Class ControllerUser
@@ -67,7 +68,7 @@ class ControllerUser
         //Selon le type de requete, on affiche ou on modifie le profil
         switch ($this->request->getMethod()) {
             case 'GET':
-                return $this->response->write($this->renderer->render(Renderer::PROFILE));
+                return $this->response->write($this->renderer->render(Renderer::SHOW));
             case 'POST':
                 //Si l'utilisateur donne l'ordre de supprimer l'avatar, on le supprime
                 if (!empty($this->request->getParsedBodyParam("delete_btn")) && $this->request->getParsedBodyParam("delete_btn") === "delete")
@@ -78,7 +79,7 @@ class ControllerUser
                 if (!empty($file)) {
                     $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
                     $finfo = [$this->user->user_id, strtolower($extension)];
-                    $oldfile = $this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar;
+                    $oldfile = $this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar;
                     $info = Validator::validateFile($this->container, $file, $finfo, "user");
                     if ($info === "ok") {
                         if ($this->user->avatar !== $finfo[0] . "." . $finfo[1])
@@ -130,6 +131,31 @@ class ControllerUser
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
+    }
+
+    /**
+     * Control the user api key generation
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     * @throws Exception when generating the api key
+     */
+    private function createApiKey(): Response
+    {
+        //Si l'utilisateur n'est pas connecté, on l'envoie vers la page de connexion
+        if (empty($_SESSION['LOGGED_IN']))
+            return $this->login();
+        //Si l'utilisateur n'existe pas, on affiche une erreur
+        if (empty($this->user))
+            throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
+        //On intedit certaines requetes
+        if ($this->request->getMethod() !== 'GET')
+            throw new MethodNotAllowedException($this->request, $this->response, ['GET']);
+        //On génère une clé d'API
+        $key = bin2hex(random_bytes(16));
+        //On l'enregistre dans la base de données
+        $this->user->update(['api_key' => $key]);
+        return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "api"]));
     }
 
     /**
@@ -233,6 +259,11 @@ class ControllerUser
                 //Sauvegarde dans la base
                 $user->save();
                 $user->authenticate();
+                //Supressions des utilisateurs temporaires et attribution des listes si existantes
+                foreach(UserTemporaryResolver::whereEmail($email)->get() as $tmp){
+                    $tmp->liste->update(['user_id' => $user->user_id]);
+                    $tmp->delete();
+                }
                 return $this->response->withRedirect($this->container->router->pathFor('home'));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
@@ -268,7 +299,7 @@ class ControllerUser
         if (empty($this->user->avatar))
             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile'], ["info" => "noavatar"]));
         //On supprime l'image precedente et on insere NULL dans la DB
-        unlink($this->container['users_upload_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
+        unlink($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
         $this->user->update(["avatar" => NULL]);
         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'profile']));
     }
@@ -393,7 +424,7 @@ class ControllerUser
         if (empty($reset))
             throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
         //On vérifie l'expiration du token
-        if ($reset->isExpired())
+        if ($reset->expired())
             return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "invalid"]));
         //Si la requete est de type GET, on affiche la page de reinitialisation, sinon, on verifie les valeurs passées
         switch ($this->request->getMethod()) {
@@ -410,6 +441,54 @@ class ControllerUser
                 if (Validator::validatePassword($password, $this->request->getParsedBodyParam('input-new-password-c')))
                     $user->update(["password" => password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]), "updated" => date("Y-m-d H:i:s")]);
                 return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "pc"]));
+            default:
+                throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
+        }
+    }
+
+    /**
+     * Control the delete account action
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     */
+    private function delete(): Response
+    {
+        if (empty($_SESSION['LOGGED_IN']))
+            return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "not_logged"]));
+        //Si la requete est de type GET, on affiche la page de confirmation, sinon, on verifie les valeurs passées
+        switch ($this->request->getMethod()) {
+            case 'GET':
+                return $this->response->write($this->renderer->render(Renderer::DELETE_ACCOUNT_CONFIRM));
+            case 'POST':
+                //On verifie une variable venant du formulaire
+                if ($this->request->getParsedBodyParam('sendBtn') !== "OK")
+                    throw new ForbiddenException(message: $this->container->lang['exception_page_not_allowed']);
+                $password = filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING);
+                if (!password_verify($password, $this->user->password))
+                    return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'delete'], ["info" => "password"]));
+                foreach(Liste::whereUserId($this->user->user_id)->get() as $list){                    
+                    foreach($list->items as $item){
+                        Reservation::where('item_id', 'LIKE', $item->id)->delete();
+                        Participation::whereCagnotteItemid($item->id)->delete();
+                        Cagnotte::where('item_id', 'LIKE', $item->id)->delete();
+                        if(file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img))
+                            unlink($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img);
+                        $item->delete();
+                    }
+                    $list->delete();
+                };
+                foreach(Reservation::where('user_email', 'LIKE', $this->user->mail)->get() as $reservation){
+                    $liste = Item::find($reservation->item_id)->liste;
+                    if($liste->isExpired())
+                        $reservation->delete();
+                }
+                if(file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar))
+                    unlink($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
+                RescueCode::whereUser($this->user->user_id)->delete();
+                $this->user->logout();
+                $this->user->delete();
+                return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "deleted"]));   
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
@@ -445,7 +524,7 @@ class ControllerUser
                     if (empty($user))
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "nouser"]));
                     $reset = PasswordReset::where("user_id", "LIKE", $user->user_id)->first();
-                    if (!empty($reset) && !$reset->isExpired())
+                    if (!empty($reset) && !$reset->expired())
                         return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'forgot_password'], ["info" => "already"]));
                     //Generation d'un token
                     $token = md5($user->mail . time());
@@ -495,10 +574,12 @@ class ControllerUser
         return match ($this->args['action']) {
             'login' => $this->login(),
             'profile' => $this->profile(),
+            'delete' => $this->delete(),
             'logout' => $this->logout(),
             'register' => $this->register(),
             'forgot_password' => $this->forgot_password(),
             'reset_password' => $this->reset_password(),
+            'api_key' => $this->createApiKey(),
             default => throw new NotFoundException($this->request, $this->response),
         };
     }

@@ -2,49 +2,35 @@
 
 namespace mywishlist\mvc\models;
 
-use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * UserTemp Model
  * Inherits from the Model class of Laravel
- * @property int $data_id
- * @property int $type
+ * @property int $list_id
  * @property string $email
+ * @method static whereEmail(string $email) Eloquent method
+ * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\models
  */
 class UserTemporaryResolver extends Model
 {
+
     protected $table = 'temporary_waiting_users';
-    protected $primaryKey = 'data_id';
+    protected $primaryKey = 'list_id';
     public $incrementing = false;
     public $timestamps = false;
     protected $guarded = [];
 
     /**
-     * Constructor
-     * @param Model $object Liste or Item
-     * @param string $email Email of the user
-     * @throws Exception
+     * Get the associated list of an tmp resolver
+     * @return BelongsTo liste belongsTo relation
      */
-    public function __construct(Model $object, string $email)
+    public function liste(): BelongsTo
     {
-        switch (get_class($object)) {
-            case Liste::class:
-                $this->data_id = $object->no;
-                $this->type = 0;
-                parent::__construct();
-                break;
-            case Item::class:
-                $this->data_id = $object->id;
-                $this->type = 1;
-                parent::__construct();
-                break;
-            default:
-                throw new Exception("Unknown class");
-        }
-        $this->email = $email;
+        return $this->belongsTo('\mywishlist\mvc\models\Liste', 'list_id');
     }
 
 }

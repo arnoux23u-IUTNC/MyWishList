@@ -1211,6 +1211,10 @@ button.bg-white:focus {
     margin-right: 1.5rem !important;
 }
 
+.mb-2 {
+    margin-bottom: .5rem !important;
+}
+
 .mb-4,
 .my-4 {
     margin-bottom: 1.5rem !important;
@@ -1645,6 +1649,11 @@ a.text-white:focus {
     font-size: .999rem;
     font-weight: 600;
     color: #525f7f;
+}
+
+.form-control-label-2 {
+    color: white;
+    font-size: .7rem;
 }
 
 .form-control-alternative.choose {
@@ -2145,6 +2154,10 @@ p.item-info {
     flex-direction: column;
 }
 
+.flex-row {
+    flex-direction: row;
+}
+
 .file {
     display: flex;
     flex-direction: row;
@@ -2159,4 +2172,20 @@ p.item-info {
 
 .pfield {
     display: inline-flex;
+}
+
+.hidden {
+    font-size: .8rem;
+    margin: auto;
+    height: 100%;
+    background: grey;
+    color: grey;
+}
+
+.hidden:hover {
+    color: white;
+}
+
+.minimified {
+    max-height: 6vh;
 }

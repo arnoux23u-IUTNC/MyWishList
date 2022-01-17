@@ -13,7 +13,7 @@ use mywishlist\Validator;
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\ListView;
 use mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{Liste, User, UserTemporaryResolver};
+use mywishlist\mvc\models\{Liste, Message, User, UserTemporaryResolver};
 
 /**
  * Class ControllerList
@@ -90,13 +90,43 @@ class ControllerList
                 $this->liste->update([
                     'titre' => filter_var($this->request->getParsedBodyParam('titre'), FILTER_SANITIZE_STRING),
                     'description' => filter_var($this->request->getParsedBodyParam('description'), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
-                    'expiration' => filter_var($this->request->getParsedBodyParam('expiration'), FILTER_SANITIZE_STRING),
-                    'public_key' => filter_var($this->request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING)
+                    'expiration' => $this->request->getParsedBodyParam('expiration') !== "" ? filter_var($this->request->getParsedBodyParam('expiration'), FILTER_SANITIZE_STRING) : NULL,
+                    'public_key' => filter_var($this->request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING),
+                    'is_public' => filter_var($this->request->getParsedBodyParam('conf') ?? 0, FILTER_SANITIZE_NUMBER_INT),
                 ]);
                 return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $this->liste->no], ["public_key" => $this->liste->public_key, "state" => "update"]));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
+    }
+
+    /**
+     * Control adding message to a list
+     * @return Response
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException|ForbiddenException
+     */
+    public function addMessage(): Response
+    {
+        //Si la liste n'existe pas, on declenche une erreur
+        if (empty($this->liste))
+            throw new NotFoundException($this->request, $this->response);
+        if ($this->request->getMethod() !== 'POST')
+            throw new MethodNotAllowedException($this->request, $this->response, ['POST']);
+        //On récupère le mail et le message
+        if(!filter_var($this->request->getParsedBodyParam('email'), FILTER_VALIDATE_EMAIL))
+            throw new ForbiddenException(message: $this->container->lang['exception_ressource_not_allowed']);            
+        $mail = filter_var($this->request->getParsedBodyParam('email'), FILTER_SANITIZE_EMAIL);
+        $message = filter_var($this->request->getParsedBodyParam('message'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        if(ltrim($message) !== ""){
+            $msg = new Message();
+            $msg->list_id = $this->liste->no;
+            $msg->user_email = $mail;
+            $msg->message = $message;
+            $msg->date = date("Y-m-d H:i:s");
+            $msg->save();
+        }
+        return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $this->liste->no], ["public_key" => $this->liste->public_key, "state" => "update"]));
     }
 
     /**
@@ -183,14 +213,68 @@ class ControllerList
                 //Attribution de l'utilisateur associé
                 $email = filter_var($this->request->getParsedBodyParam('email'), FILTER_SANITIZE_EMAIL);
                 $associated_user = User::where("mail", "LIKE", $email)->first();
-                if (!empty($associated_user))
+                if (!empty($associated_user)){
                     $liste->user_id = $associated_user->user_id;
+                    $liste->published = 0;    
+                }
                 $liste->save();
+                $data = json_decode($_COOKIE['claimed_lists'], true);
+                $data[] = $liste->no;
+                setcookie('claimed_lists', json_encode($data), time()+(3600 * 480), "/", "");
                 //Si l'utilisateur associé est null (email correspondant a aucun utilisateur inscrit), on crée un utilisateur temporaire qui sera verifié quand il s'inscrira
-                if (empty($liste->user_id))
-                    (new UserTemporaryResolver($liste, $email))->save();
+                if (empty($liste->user_id)){
+                    $tmp = new UserTemporaryResolver();
+                    $tmp->list_id = $liste->no;
+                    $tmp->email = $email;
+                    $liste->update(['published' => 1]);
+                    $tmp->save();
+                }
+                
                 $path = $this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key]);
                 return $this->response->write("<script type='text/javascript'>alert('{$this->container->lang['alert_modify_token']} $token');window.location.href='$path';</script>");
+            default:
+                throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
+        }
+    }
+
+    /**
+     * Control claim of a list
+     * @return Response
+     * @throws ForbiddenException
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException
+     */
+    public function claim(){
+        //Si la liste n'existe pas, on declenche une erreur
+        if (empty($this->liste))
+            throw new NotFoundException($this->request, $this->response);
+        //Si l'utilisateur n'existe pas ou n'est pas connecté, on déclenche une erreur
+        if(empty($_SESSION['LOGGED_IN']) || empty($this->user->username) || $this->liste->isClaimed())
+            throw new ForbiddenException(message: $this->container->lang['exception_ressource_not_allowed']);
+        switch ($this->request->getMethod()) {
+            case 'GET':
+                //Si l'utilisateur n'est pas admin, on demande l'authentification
+                if (!$this->user->isAdmin())
+                    return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH));
+            case 'POST':
+                /*Trois cas de figure :
+                - L'utilisateur est admin, on revendique la liste
+                - L'utilisateur est inconnu, et a saisi le token privé
+                - L'utilisateur est inconnu, et n'a pas saisi le token privé, on lui affiche le formulaire d'authentification*/
+                if (!$this->user->isAdmin() && empty($this->request->getParsedBodyParam('private_key')))
+                    return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH));
+                if (!$this->user->isAdmin() && !password_verify(filter_var($this->request->getParsedBodyParam('private_key') ?? "", FILTER_SANITIZE_STRING), $this->liste->private_key))
+                    return $this->response->withRedirect($this->container->router->pathFor('lists_claim_id', ['id' => $this->liste->no], ["info" => "errtoken"]));
+                $this->liste->update([
+                    'user_id' => $this->user->user_id
+                ]);
+                $data = json_decode($_COOKIE['claimed_lists'], true);
+                $data[] = $liste->no;
+                setcookie('claimed_lists', json_encode($data), time()+(3600 * 480), "/", "");
+                $tmp = UserTemporaryResolver::find($this->liste->no);
+                if(!empty($tmp))
+                    $tmp->delete();
+                return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $this->liste->no], ["public_key" => $this->liste->public_key, "state" => "update"]));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
@@ -219,7 +303,7 @@ class ControllerList
         if (!in_array($this->request->getMethod(), ['GET', 'POST']))
             throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         //Si la liste n'est pas publiée ou que la clé publique ne correspond pas, on declenche une erreur
-        if (!$this->liste->isPublished() || (!empty($this->liste->public_key) && $this->liste->public_key !== filter_var($this->request->getQueryParam('public_key', ""), FILTER_SANITIZE_STRING)))
+        if (!$this->liste->isPublished() || (!$this->liste->isPublic() && !empty($this->liste->public_key) && $this->liste->public_key !== filter_var($this->request->getQueryParam('public_key', ""), FILTER_SANITIZE_STRING)))
             throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
         //On affiche la liste
         return $this->response->write($this->renderer->render(Renderer::SHOW));

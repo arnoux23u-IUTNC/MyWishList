@@ -48,14 +48,16 @@
                                         <p class="userinfo">{#creation_date#} %user_created_at%</p>
                                         <p class="userinfo">{#last_update#} %user_updated_at%</p>
                                         <p class="userinfo">{#last_login#} %user_lastlogged_at% [%user_lastlogged_ip%]</p>
+                                        <p class="userinfo">{#api_key#} : %user_api_key%</p>
                                     </div>
+                                    <a href="%api_key_route%" class="btn btn-sm btn-primary">{#regenerate#}</a>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <div class="row-2 row-3">
                         <div class="card card-profile shadow fw">
-                            <h3 class="text-center pt-2">{#phtml_lists#}</h3>
+                            <h3 class="text-center pt-2">{#phtml_my_lists#}</h3>
                             <div class="lists">
                                 %mylists%
                             </div>
@@ -84,13 +86,13 @@
                                         <div class="col-lg-6">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-username">{#user_username#}</label>
-                                                <input type="text" id="input-username" name="input-username" disabled class="form-control form-control-alternative" placeholder="{#user_username#}" value="%user_username%">
+                                                <input type="text" id="input-username" autocomplete="off" name="input-username" disabled class="form-control form-control-alternative" placeholder="{#user_username#}" value="%user_username%">
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="input-email">{#user_email#}</label>
-                                                <input type="email" id="input-email" name="input-email" class="form-control form-control-alternative" value="%user_email%">
+                                                <input type="email" id="input-email" autocomplete="email" name="input-email" class="form-control form-control-alternative" value="%user_email%">
                                             </div>
                                         </div>
                                     </div>
@@ -98,13 +100,13 @@
                                         <div class="col-lg-6">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-last-name">{#user_lastname#}</label>
-                                                <input type="text" id="input-last-name" name="input-last-name" class="form-control form-control-alternative" placeholder="{#user_lastname#}" value="%user_lastname%">
+                                                <input type="text" id="input-last-name" autocomplete="family-name" name="input-last-name" class="form-control form-control-alternative" placeholder="{#user_lastname#}" value="%user_lastname%">
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-first-name">{#user_firstname#}</label>
-                                                <input type="text" id="input-first-name" name="input-first-name" class="form-control form-control-alternative" placeholder="{#user_firstname#}" value="%user_firstname%">
+                                                <input type="text" id="input-first-name" name="input-first-name" autocomplete="given-name"  class="form-control form-control-alternative" placeholder="{#user_firstname#}" value="%user_firstname%">
                                             </div>
                                         </div>
                                     </div>
@@ -116,7 +118,7 @@
                                         <div class="col-lg-4">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-old-password">{#user_old_password#}</label>
-                                                <div class='pfield'><input type="password" id="input-old-password" name="input-old-password" class="form-control form-control-alternative" required placeholder="{#required#}"><i onclick="pwd('input-old-password', event)" class="pwdicon far fa-eye"></i></div>
+                                                <div class='pfield'><input type="password" id="input-old-password" name="input-old-password" autocomplete="current-password" class="form-control form-control-alternative" required placeholder="{#required#}"><i data-associated="input-old-password" class="pwdicon far fa-eye"></i></div>
                                             </div>
                                             <div>
                                                 <a href="%2fa_route%" class="btn btn-sm btn-default">{#user_2fa_code#}</a>
@@ -125,7 +127,7 @@
                                         <div class="col-lg-4">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-new-password">{#user_new_password#}</label>
-                                                <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative"><i onclick="pwd('input-new-password', event)" class="pwdicon far fa-eye"></i></div>
+                                                <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" autocomplete="new-password" class="form-control form-control-alternative"><i data-associated="input-new-password" class="pwdicon far fa-eye"></i></div>
                                             </div>
                                             <div id="message">
                                                 <h6 class="heading-small text-muted mb-4">{#password_form_valid#}</h6>
@@ -139,7 +141,10 @@
                                         <div class="col-lg-4">
                                             <div class="form-group focused">
                                                 <label class="form-control-label" for="input-new-password-c">{#user_password_confirm#}</label>
-                                                <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative"><i onclick="pwd('input-new-password-c', event)" class="pwdicon far fa-eye"></i></div>
+                                                <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" autocomplete="new-password" name="input-new-password-c" class="form-control form-control-alternative"><i data-associated="input-new-password-c" class="pwdicon far fa-eye"></i></div>
+                                            </div>
+                                            <div class='float-right'>
+                                                <a href="%delete_account_route%" class="btn btn-sm btn-danger">{#user_delete_account#}</a>
                                             </div>
                                         </div>
                                     </div>
