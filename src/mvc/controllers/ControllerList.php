@@ -274,7 +274,7 @@ class ControllerList
         if (!in_array($this->request->getMethod(), ['GET', 'POST']))
             throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         //Si la liste n'est pas publiée ou que la clé publique ne correspond pas, on declenche une erreur
-        if (!$this->liste->isPublished() || (!empty($this->liste->public_key) && $this->liste->public_key !== filter_var($this->request->getQueryParam('public_key', ""), FILTER_SANITIZE_STRING)))
+        if (!$this->liste->isPublished() || (!$this->list->isPublic() && !empty($this->liste->public_key) && $this->liste->public_key !== filter_var($this->request->getQueryParam('public_key', ""), FILTER_SANITIZE_STRING)))
             throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
         //On affiche la liste
         return $this->response->write($this->renderer->render(Renderer::SHOW));
