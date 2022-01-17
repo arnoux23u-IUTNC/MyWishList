@@ -71,6 +71,14 @@ CREATE TABLE `totp_rescue_codes`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+CREATE TABLE `messages` (
+  `list_id` int(11) NOT NULL,
+  `user_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `message` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`list_id`,`user_email`,`message`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `cagnotte` (
   `item_id` int(11) NOT NULL,
   `montant` decimal(7,2) NOT NULL,
@@ -109,6 +117,8 @@ ALTER TABLE `reserve`
     ADD CONSTRAINT `reserve_itemidfk` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
 ALTER TABLE `totp_rescue_codes`
     ADD CONSTRAINT `totp_useridfk` FOREIGN KEY (`user`) REFERENCES `accounts` (`user_id`);
+ALTER TABLE `messages`
+    ADD CONSTRAINT `fkmessage_listid` FOREIGN KEY (`list_id`) REFERENCES `liste` (`no`);
 
 INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `last_ip`, `is_admin`, `totp_key`)
 VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'admin@mail.com', NULL, 0, 1, NULL);

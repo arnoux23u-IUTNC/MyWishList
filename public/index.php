@@ -59,6 +59,9 @@ $app->any("/accounts/{action:login|profile|logout|register|forgot_password|reset
 $app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->addItem();
 })->setName('lists_edit_items_id');
+$app->any("/lists/{id:[0-9]+}/addmessage[/]", function ($request, $response, $args) {
+    return (new ControllerList($this, $request, $response, $args))->addMessage();
+})->setName('lists_add_message_id');
 $app->any("/lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->edit();
 })->setName('lists_edit_id');

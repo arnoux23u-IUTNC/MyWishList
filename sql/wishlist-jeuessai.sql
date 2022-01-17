@@ -85,6 +85,14 @@ CREATE TABLE `totp_rescue_codes`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+CREATE TABLE `messages` (
+  `list_id` int(11) NOT NULL,
+  `user_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `message` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`list_id`,`user_email`,`message`,`date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE `temporary_waiting_users`
 (
     `data_id` int(11)                              NOT NULL,
@@ -109,6 +117,8 @@ ALTER TABLE `reserve`
     ADD CONSTRAINT `reserve_itemidfk` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
 ALTER TABLE `totp_rescue_codes`
     ADD CONSTRAINT `totp_useridfk` FOREIGN KEY (`user`) REFERENCES `accounts` (`user_id`);
+ALTER TABLE `messages`
+    ADD CONSTRAINT `fkmessage_listid` FOREIGN KEY (`list_id`) REFERENCES `liste` (`no`);
 
 INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `created_at`, `updated`, `last_login`, `last_ip`, `is_admin`, `totp_key`) VALUES
 ('admin', 'admin', 'admin', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'admin@admin.fr', NULL, '2021-12-21 18:23:50', NULL, '2021-12-23 18:20:04', NULL, 1, NULL),
@@ -152,6 +162,10 @@ INSERT INTO `participe` (`cagnotte_itemid`, `user_email`, `montant`) VALUES
 INSERT INTO `reserve` (`item_id`, `user_email`, `message`) VALUES
 (7, 'user@user.fr', NULL),
 (8, 'user@user.fr', 'Joyeux Noel');
+
+INSERT INTO `messages` (`list_id`, `user_email`, `message`) VALUES
+(2, 'user@user.fr', 'Youhou !'),
+(2, 'user@user.fr', 'Joyeux Noel');
 
 GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
 
