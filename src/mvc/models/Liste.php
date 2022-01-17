@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $public_key
  * @property string $private_key
  * @property mixed $published
+ * @property mixed $is_public
  * @property mixed $items Goes to items(), eloquent relation
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @method static whereUserId(int $user_id) Eloquent method
@@ -29,7 +30,7 @@ class Liste extends Model
     public $timestamps = false;
     protected $hidden = ['user_id', 'private_key'];
     protected $appends = ['user_name'];
-    protected $fillable = ['titre', 'user_id', 'description', 'expiration', 'public_key', 'published'];
+    protected $fillable = ['titre', 'user_id', 'description', 'expiration', 'public_key', 'published', 'is_public'];
 
     /**
      * Get items associated to the list
@@ -59,11 +60,20 @@ class Liste extends Model
     }
 
     /**
+     * Check if a list is public
+     * @return bool true if public, false otherwise
+     */
+    public function isPublic(): bool
+    {
+        return $this->is_public == 1;
+    }
+
+    /**
      * Internal method for toJSON() method of Slim
      * @return string|null user's name if exists, null otherwise
      * @noinspection PhpUnused
      */
-    protected function getUserNameAttribute(): ?string
+    public function getUserNameAttribute(): ?string
     {
         $user = User::find($this->user_id);
         return !empty($user) ? $user->name() : null;

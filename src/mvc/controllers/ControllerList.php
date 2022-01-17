@@ -90,8 +90,9 @@ class ControllerList
                 $this->liste->update([
                     'titre' => filter_var($this->request->getParsedBodyParam('titre'), FILTER_SANITIZE_STRING),
                     'description' => filter_var($this->request->getParsedBodyParam('description'), FILTER_SANITIZE_FULL_SPECIAL_CHARS),
-                    'expiration' => filter_var($this->request->getParsedBodyParam('expiration'), FILTER_SANITIZE_STRING),
-                    'public_key' => filter_var($this->request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING)
+                    'expiration' => $this->request->getParsedBodyParam('expiration') !== "" ? filter_var($this->request->getParsedBodyParam('expiration'), FILTER_SANITIZE_STRING) : NULL,
+                    'public_key' => filter_var($this->request->getParsedBodyParam('public_key'), FILTER_SANITIZE_STRING),
+                    'is_public' => filter_var($this->request->getParsedBodyParam('conf') ?? 0, FILTER_SANITIZE_NUMBER_INT),
                 ]);
                 return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $this->liste->no], ["public_key" => $this->liste->public_key, "state" => "update"]));
             default:
@@ -273,7 +274,7 @@ class ControllerList
         if (!in_array($this->request->getMethod(), ['GET', 'POST']))
             throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         //Si la liste n'est pas publiée ou que la clé publique ne correspond pas, on declenche une erreur
-        if (!$this->liste->isPublished() || (!empty($this->liste->public_key) && $this->liste->public_key !== filter_var($this->request->getQueryParam('public_key', ""), FILTER_SANITIZE_STRING)))
+        if (!$this->liste->isPublished() || (!$this->list->isPublic() && !empty($this->liste->public_key) && $this->liste->public_key !== filter_var($this->request->getQueryParam('public_key', ""), FILTER_SANITIZE_STRING)))
             throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
         //On affiche la liste
         return $this->response->write($this->renderer->render(Renderer::SHOW));

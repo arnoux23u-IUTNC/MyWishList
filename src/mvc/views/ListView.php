@@ -196,6 +196,7 @@ class ListView extends View
                                                         </li>
             HTML;
         }
+        $list_confidentiality = $this->list->isPublic() ? "" : "🔒";
         $html = <<<HTML
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -223,7 +224,7 @@ class ListView extends View
                                 <div class="card-header bg-white border-0">
                                     <div class="row align-items-center">
                                         <div class="col-8">
-                                            <h1 class="mb-0">{$this->container->lang['list']} {$this->container->lang['number']} {$this->list->no}</h1>
+                                            <h1 class="mb-0">{$this->container->lang['list']} {$this->container->lang['number']} {$this->list->no} $list_confidentiality</h1>
                                         </div>
                                         <div class="col-4 text-right">
                                             <a href="{$this->container->router->pathFor('lists_edit_id', ['id' => $this->list->no])}" class="btn btn-sm btn-default">{$this->container->lang['list_edition']}</a>
@@ -481,6 +482,7 @@ class ListView extends View
     {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $l = $this->list;
+        $list_confidentiality = $l->isPublic() ? "<label class='form-control-label' for='public'>{$this->container->lang['public']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' checked name='conf' id='public' value='1' name='public'>\n\t\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='private'>{$this->container->lang['private']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' name='conf' id='private' value='0' name='private'>" : "<label class='form-control-label' for='public'>{$this->container->lang['public']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' name='conf' id='public' value='1' name='public'>\n\t\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='private'>{$this->container->lang['private']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' checked name='conf' id='private' value='0' name='private'>";
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -531,6 +533,14 @@ class ListView extends View
                                         </div>
                                     </div>
                                     <div class="row fw">
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="expiration">{$this->container->lang['list_confidentiality']}</label>
+                                            <div>
+                                                $list_confidentiality
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
                                         <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['list_edition']}</button>
                                     </div>
                                 </div>
@@ -554,6 +564,14 @@ class ListView extends View
     }
 
     /**
+     * Display the list for public lists
+     * @return string html code
+     */
+    private function showForMenu(){
+        return "\n\t\t\t<div class='mb-2'>\n\t\t\t\t<a href='{$this->container->router->pathFor('lists_show_id', ['id' => $this->list->no])}'>\n\t\t\t\t\t<div class='mw list form-control form-control-alternative flex flex-row'>\n\t\t\t\t\t\t<span class='mw text-white form-control-label'>{$this->list->titre}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</a>\n\t\t\t</div>";
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function render(int $method, int $access_level = Renderer::OTHER_MODE): string
@@ -561,6 +579,7 @@ class ListView extends View
         $this->access_level = $access_level;
         return match ($method) {
             Renderer::SHOW_FOR_ITEM => $this->showForItem(),
+            Renderer::SHOW_FOR_MENU => $this->showForMenu(),
             Renderer::CREATE => $this->createList(),
             Renderer::EDIT_ADD_ITEM => $this->addItem(),
             Renderer::REQUEST_AUTH => $this->requestAuth($this->list),

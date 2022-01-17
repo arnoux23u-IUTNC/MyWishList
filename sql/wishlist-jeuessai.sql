@@ -47,7 +47,8 @@ CREATE TABLE `liste`
     `expiration`  date                                          DEFAULT NULL,
     `public_key`  varchar(255) COLLATE utf8_unicode_ci          DEFAULT NULL,
     `private_key` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-    `published`   tinyint(1)                           NOT NULL DEFAULT 0
+    `published`   tinyint(1)                           NOT NULL DEFAULT 0,
+    `is_public`   tinyint(1)                           NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
