@@ -63,7 +63,7 @@ class UserView extends View
         $username = $authenticator ? filter_var($this->request->getParsedBodyParam('username'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
         $auth2FAReset = $authenticator ? "<a href=\"{$this->container->router->pathFor('2fa', ['action' => 'recover'], ['username' => $username])}\" class='btn btn-sm btn-default'>{$this->container->lang['login_lost_2FA']}</a>" : "";
         $password = $authenticator ? filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
-        $auth2FA = $authenticator ? "<div class='row fw'>\n\t\t\t\t\t\t\t\t<div class='form-group focused fw'>\n\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='2fa'>{$this->container->lang['user_2fa_code']}</label>\n\t\t\t\t\t\t\t\t\t<input type='text' class='form-control form-control-alternative' required autofocus name='query-code' required maxlength='6' minlength='6' pattern='^\d{6}$'>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>" : "";
+        $auth2FA = $authenticator ? "<div class='row fw'>\n\t\t\t\t\t\t\t\t<div class='form-group focused fw'>\n\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='2fa'>{$this->container->lang['user_2fa_code']}</label>\n\t\t\t\t\t\t\t\t\t<input type='text' class='form-control form-control-alternative' autofocus id='2fa' name='query-code' required maxlength='6' minlength='6' pattern='^\d{6}$'>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>" : "";
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -91,7 +91,7 @@ class UserView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
-                                            <input type="text" id="username" name="username" class="form-control form-control-alternative" required autofocus>
+                                            <input type="text" id="username" name="username" value="$username" class="form-control form-control-alternative" required>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -255,24 +255,59 @@ class UserView extends View
     {
         $username = filter_var($this->request->getQueryParam('username'), FILTER_SANITIZE_STRING) ?? "";
         $routeRecover = $this->container->router->pathFor('2fa', ["action" => 'recover']);
-        $popup = "\n\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-                "nok" => "<div class='popup warning'>{$this->container->lang['user_2fa_incorrect_code']}</div>",
-                default => ""
-            };
-        return genererHeader("Auth - MyWishList", ["list.css"]) . <<<EOD
-          <h2>{$this->container->lang['user_2fa_recover']}</h2>
-          <div>
-              <form class='form_container' method="post" action="$routeRecover">$popup
-                  <label for="username">{$this->container->lang['user_username']}</label>
-                  <input type="text" autofocus name="username" value="$username" required>
-                  <label for="rescue">{$this->container->lang['user_2fa_rescue_code']}</label>
-                  <input type="text" name="rescue" required maxlength="8" minlength="8" pattern="^\d{8}$">
-                  <button type="submit" value="OK" name="sendBtn">{$this->container->lang['user_2fa_delete']}</button>
-              </form>
-          <div>
-      </body>
-      </html>
-      EOD;
+        $popup = "\n\t\t\t\t\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+            "nok" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_2fa_incorrect_code']}</span></div>",
+            default => ""
+        };
+        return genererHeader("{$this->container->lang['user_2fa_recover']} - MyWishList", ["profile.css"]) . <<<HTML
+        <div class="main-content">
+            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                </div>
+            </nav>
+            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+                <div class="container-fluid align-items-center">
+                    <div class="row">
+                        <div class="fw" style="position:relative;">
+                            <h1 class="text-center text-white">{$this->container->lang['user_2fa_recover']}</h1>$popup
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 flex mt--7">
+                <div class="fw">
+                    <form method="post" action="$routeRecover">
+                        <div class="card bg-secondary shadow">
+                            <div class="card-body">
+                                <div class="pl-lg-4">
+                                    <div class="row fw">
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
+                                            <input type="text" id="username" name="username" value="$username" class="form-control form-control-alternative" required>
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <div class="form-group focused fw">
+                                            <label class="form-control-label" for="rescue">{$this->container->lang['user_2fa_rescue_code']}</label>
+                                            <input type="text" class="form-control form-control-alternative" name="rescue" id="rescue" required maxlength="8" minlength="8" pattern="^\d{8}$">
+                                        </div>
+                                    </div>
+                                    <div class="row fw">
+                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['login_title']}</button>
+                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}" class="btn btn-sm btn-danger">{$this->container->lang['login_lost_password']} ?</a>
+                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'register'])}" class="btn btn-sm btn-default">{$this->container->lang['login_to_register']}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script src="/assets/js/password-viewer.js"></script>
+        HTML;
     }
 
     /**
@@ -342,7 +377,7 @@ class UserView extends View
                                     </div>
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
+                                            <label class="form-control-label" for="input-new-password">{$this->container->lang['user_password']}</label>
                                             <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/><i data-associated="input-new-password" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
@@ -358,7 +393,7 @@ class UserView extends View
                                     </div>
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="password-confirm">{$this->container->lang['user_password_confirm']}</label>
+                                            <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
                                             <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/><i data-associated="input-new-password-c" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                     </div>
@@ -448,64 +483,63 @@ class UserView extends View
      */
     private function enable2FA(): string
     {
-        $route_main = $this->container->router->pathFor('home');
         $route_2fa = $this->container->router->pathFor('2fa', ["action" => 'enable']);
         $otp = TOTP::create($this->secret);
         $otp->setLabel('MyWishList');
         $img_src = $otp->getQrCodeUri('https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M', '[DATA]');
-        return genererHeader("Activation de 2FA - MyWishList", ["profile.css"]) . <<<EOD
+        return genererHeader("{$this->container->lang['user_2fa_manage']} - MyWishList", ["profile.css"]) . <<<HTML
         <div class="main-content">
-        <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-          <div class="container-fluid">
-            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
-          </div>
-        </nav>
-        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-          <span class="mask bg-gradient-default opacity-8"></span>
-        </div>
-        <div class="container-fluid mt--7">
-          <div class="row">
-            <div style="width:100%;">
-                <div class="card bg-secondary shadow">
-                  <div class="card-header bg-white border-0">
-                    <h3 class="mb-0">Mon authentification 2FA</h3>
-                  </div>
-                  <div class="card-body">
-                    <div class="pl-lg-4">
-                      <div class="row">
-                        <div class="col-lg-4">
-                          <div>
-                            <button disabled class="btn btn-sm btn-danger btn-danger-fr">Supprimer 2FA</button>
-                            <a href="#popup" class="btn btn-sm btn-primary">Activer 2FA</a>
-                          </div>
+            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                </div>
+            </nav>
+            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+                <div class="container-fluid align-items-center">
+                    <div class="row">
+                        <div class="fw" style="position:relative;">
+                            <h1 class="text-center text-white">{$this->container->lang['user_2fa_manage']}</h1>
                         </div>
-                      </div>
                     </div>
-                  </div>
                 </div>
             </div>
-          </div>
-        </div>
+            <div class="col-lg-6 flex mt--7">
+                <div class="fw">
+                    <div class="card bg-secondary shadow">
+                        <div class="card-body">
+                            <div class="pl-lg-4">
+                                <div class="row fw">
+                                    <div class="row fw">
+                                        <button disabled class="btn btn-sm btn-danger btn-danger-fr">{$this->container->lang['user_2fa_disable']}</button>
+                                        <a href="#popup" class="btn btn-sm btn-primary">{$this->container->lang['user_2fa_enable']}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="popup" class="overlay">
             <div class="popup1">
-                <h2 style="padding-bottom:2vh;">Activation 2FA</h2>
+                <h2 style="padding-bottom:2vh;">{$this->container->lang['user_2fa_enabling']}</h2>
                 <a class="close" href="#">&times;</a>
                 <form method="POST" action="$route_2fa" class="content">
-                    <h3>Merci d'entrer le code fourni par Google Authenticator dans la zone de texte ci-dessous.</h3>
+                    <h3>{$this->container->lang['user_2fa_enabling_message']}</h3>
                     <div class="d-flex">
                         <img alt="qr" src="$img_src"/>
                         <div style='padding-left:2vw;width:100%;display:flex;flex-direction:column;'>
-                            <label class="form-control-label" for="private_key">Votre clé : </label>
+                            <label class="form-control-label" for="private_key">{$this->container->lang['user_2fa_key']}</label>
                             <input type="text" readonly id="private_key" name="private_key" value="$this->secret">
                         </div>
                     </div>
                     <input type="text" autofocus name="query-code" required maxlength="6" minlength="6" pattern="^\d{6}$">
-                    <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-primary">Activer</button>
+                    <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-primary">{$this->container->lang['phtml_enable']}</button>
                 </form>
             </div>
         </div>
-        EOD;
+        HTML;
     }
 
     /**
@@ -546,7 +580,7 @@ class UserView extends View
                                             </div>
                                         </div>
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="private_key">{$this->container->lang['user_password']}</label>
+                                            <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
                                             <div class="pfield"><input type="password" name="password" id="password" class="form-control form-control-alternative" autofocus required /><i data-associated="password" class="pwdicon far fa-eye"></i></div>
                                         </div>
                                         <div class="row fw">
@@ -572,47 +606,46 @@ class UserView extends View
     private function manage2FA(): string
     {
         $route_main = $this->container->router->pathFor('home');
-        $route_2fa = $this->container->router->pathFor('2fa', ["action" => "disable"]);
-        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<EOD
-      <div class="main-content">
-      <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-        <div class="container-fluid">
-          <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
-        </div>
-      </nav>
-      <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-        <span class="mask bg-gradient-default opacity-8"></span>
-      </div>
-      <div class="container-fluid mt--7">
-        <form method="post" action="$route_2fa">
-          <div class="row">
-            <div style="width:100%;">
-                <div class="card bg-secondary shadow">
-                  <div class="card-header bg-white border-0">
-                    <h3 class="mb-0">Mon authentification 2FA</h3>
-                  </div>
-                  <div class="card-body">
-                    <div class="pl-lg-4">
-                      <div class="row">
-                        <div class="col-lg-4">
-                          <div class="popup">
-                            <span>2FA est activé.</span>
-                          </div>
-                          <div>
-                            <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-danger text-white">Supprimer 2FA</a>
-                            <button disabled class="btn btn-sm btn-default">Activer 2FA</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        return genererHeader("{$this->container->lang['user_2fa_manage']} - MyWishList", ["profile.css"]) . <<<HTML
+        <div class="main-content">
+            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+            <div class="container-fluid">
+                <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
             </div>
-          </div>
-        </form>
-      </div>
-      </div>
-      EOD;
+            </nav>
+            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+            </div>
+            <div class="container-fluid mt--7">
+                <form method="post" action="{$this->container->router->pathFor('2fa', ['action' => 'disable'])}">
+                    <div class="row">
+                        <div style="width:100%;">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-header bg-white border-0">
+                                <h3 class="mb-0">{$this->container->lang['user_2fa_manage']}</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row">
+                                            <div class="col-lg-4">
+                                                <div class="popup">
+                                                    <span>{$this->container->lang['user_2fa_enabled']}</span>
+                                                </div>
+                                                <div>
+                                                    <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-danger text-white">{$this->container->lang['user_2fa_disable']}</button>
+                                                    <button disabled class="btn btn-sm btn-default">{$this->container->lang['user_2fa_enable']}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        HTML;
     }
 
     /**
@@ -627,7 +660,7 @@ class UserView extends View
         foreach (RescueCode::whereUser($this->user->user_id)->get() as $code) {
             $codes .= "<p>$code->code</p>";
         }
-        return genererHeader("Gestion 2FA - MyWishList", ["profile.css"]) . <<<EOD
+        return genererHeader("{$this->container->lang['phtml_rescue_code']} - MyWishList", ["profile.css"]) . <<<HTML
         <div class="main-content">
         <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
           <div class="container-fluid">
@@ -642,7 +675,7 @@ class UserView extends View
             <div style="width:100%;">
                 <div class="card bg-secondary shadow">
                   <div class="card-header bg-white border-0">
-                    <h3 class="mb-0">Mes codes de récupération</h3>
+                    <h3 class="mb-0">{$this->container->lang['user_2fa_rescue_codes']}</h3>
                   </div>
                   <div class="card-body">
                     <div class="pl-lg-4">
@@ -652,7 +685,7 @@ class UserView extends View
                             $codes
                           </div>
                           <div>
-                            <a href="$route_login" class="btn btn-sm btn-default">C'est noté !</a>
+                            <a href="$route_login" class="btn btn-sm btn-default">{$this->container->lang['phtml_noted']}</a>
                           </div>
                         </div>
                       </div>
@@ -664,7 +697,7 @@ class UserView extends View
           </div>
         </div>
         </div>
-        EOD;
+        HTML;
     }
 
     /**
@@ -675,7 +708,6 @@ class UserView extends View
         $avatar = (!empty($this->user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar)) ? "/assets/img/avatars/{$this->user->avatar}" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($this->user->mail))) . "?size=120";
         return "\n\t\t\t<div class='mb-2'>\n\t\t\t\t<div class='list form-control mw form-control-alternative flex flex-row'>\n\t\t\t\t\t<span class='mw text-white form-control-label'>{$this->user->name()}</span>\n\t\t\t\t\t<img alt='profilepicture' class='rounded-circle minimified' src='$avatar'/>\n\t\t\t\t</div>\n\t\t\t</div>";
     }
-
 
     /**
      * Render the page

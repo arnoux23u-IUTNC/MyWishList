@@ -45,7 +45,7 @@ class ItemView extends View
      */
     protected function show(): string
     {
-        $reserved = Reserved::find($this->item->id);
+        $reserved = Reservation::find($this->item->id);
         $pot = Cagnotte::find($this->item->id);
         if (!empty($reserved)) {
             $reservation_state = match ($this->access_level) {
@@ -196,7 +196,7 @@ class ItemView extends View
         else
             $reservation_state = "{$this->container->lang['item_unreserved']}";*/
         //$item_desc = "\t<div>\n\t\t<h2>{$this->item->nom}</h2>\n\t\t".(!empty($this->item->descr) ? "<p>{$this->container->lang['description']} : {$this->item->descr}</p>\n\t\t" : "").(!empty($this->item->url) ? "<p>URL : {$this->item->url}</p>\n\t\t" : "").(!empty($this->item->tarif) ? "<p>{$this->container->lang['price']} : {$this->item->tarif}</p>\n\t\t" : "").(!empty($this->item->img) ? (file_exists(__DIR__."\..\..\..\assets\img\items\\{$this->item->img}") ? "<img alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>\n\t\t" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "<img alt='{$this->item->nom}' src='{$this->item->img}'>\n\t\t" : "")) : "")."<p>{$this->container->lang['item_associated_list']} : {!empty($l->titre) ? $l->titre | $l->description ($l->expiration)) : NULL}</p>\n\t\t"."<p>{$this->container->lang['reservation_state']} : $reservation_state</p>\n\t</div>\n</body>";
-        return genererHeader("Item {$this->item->id} - MyWishList", ["profile.css"]) . $html;
+        return genererHeader("{$this->container->lang['item']} {$this->item->id} - MyWishList", ["profile.css"]) . $html;
     }
 
     /**
@@ -231,7 +231,7 @@ class ItemView extends View
                                 <div class="pl-lg-4">
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="titre">{$this->container->lang['amount']}</label>
+                                            <label class="form-control-label" for="amount">{$this->container->lang['amount']}</label>
                                             <input type="number" id="amount" step="0.01" name="amount" max="100000" min="1" class="form-control form-control-alternative" required autofocus>
                                         </div>
                                     </div>
@@ -291,7 +291,7 @@ class ItemView extends View
                                 <div class="pl-lg-4">
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="titre">{$this->container->lang['amount']}</label>
+                                            <label class="form-control-label" for="amount">{$this->container->lang['amount']}</label>
                                             <input type="number" id="amount" step="0.01" name="amount" max="{$pot->reste()}" min="1" class="form-control form-control-alternative" required autofocus>
                                         </div>
                                     </div>
@@ -314,53 +314,6 @@ class ItemView extends View
         </div>
         HTML;
         return genererHeader("{$this->container->lang['item_participate_pot']}", ["profile.css"]) . $html;
-    }
-
-    /**
-     * Display prevent delete item page
-     * @return string html code
-     */
-    private function preventDelete(): string
-    {
-        $l = $this->item->liste()->first();
-        $from = $this->container->router->pathFor('items_delete_id', ['id' => $this->item->id], ["public_key" => $this->public_key]);
-        return genererHeader("{$this->container->lang['item_deleting']}", ["list.css"]) . <<<EOD
-            <h2>{$this->container->lang['item_deleting']}</h2>
-            <div>
-                <form class='form_container' method="post" action="$from">
-                    <label for="private_key">{$this->container->lang['private_token_for']} $l->no</label>
-                    <div class="pfield"><input type="password" name="private_key" id="private_key" required /><i data-associated="private_key" class="pwdicon far fa-eye"></i></div>
-                    <button type="submit" name="sendBtn">{$this->container->lang['delete']}</button>
-                </form>
-            <div>
-            <script src="/assets/js/password-viewer.js"></script>
-        </body>
-        </html>
-        EOD;
-    }
-
-    /**
-     * Display delete item page
-     * @return string html code
-     */
-    private function confirmDelete(): string
-    {
-        $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
-        $delete = $this->container->router->pathFor('items_delete_id', ['id' => $this->item->id]);
-        $back = $this->container->router->pathFor('lists_show_id', ['id' => $this->item->liste()->first()->no], ["public_key" => $this->public_key]);
-        return genererHeader("{$this->container->lang['item_delete']} $this->item->id", ["list.css"]) . <<<EOD
-            <h2>{$this->container->lang['item_delete']} $this->item->id</h2>
-            <div>
-                <p class="warning">{$this->container->lang['item_delete_confirm']} $this->item->id ?</p>
-                <form class='form_container' method="post" action="$delete">
-                    <input type="hidden" name="auth" id="auth" value="$private_key"/>
-                    <button type="submit" name="sendBtn">{$this->container->lang['delete']}</button> 
-                </form>
-                <a href="$back">{$this->container->lang['html_btn_back']}</a>
-            <div>
-        </body>
-        </html>
-        EOD;
     }
 
     /**
@@ -396,14 +349,14 @@ class ItemView extends View
                                 <div class="pl-lg-4">
                                 <div class="row fw">
                                     <div class="form-group focused fw">
-                                            <label class="form-control-label" for="name">{$this->container->lang['user_email']}</label>
+                                            <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
                                             <input type="email" id="email" name="email" class="form-control form-control-alternative" value="$email" required autofocus>
                                         </div>
                                     </div>
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="description">{$this->container->lang['message']}</label>
-                                            <input type="text" name="message" class="form-control form-control-alternative"/>
+                                            <label class="form-control-label" for="message">{$this->container->lang['message']}</label>
+                                            <input type="text" id="message" name="message" class="form-control form-control-alternative"/>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -417,7 +370,7 @@ class ItemView extends View
             </div>
         </div>
         HTML;
-        return genererHeader("Item {$this->item->id} | {$this->container->lang["reservation"]}", ["profile.css", "toggle.css"]) . $html;
+        return genererHeader("{$this->container->lang['item']} {$this->item->id} | {$this->container->lang["reservation"]}", ["profile.css", "toggle.css"]) . $html;
     }
 
     /**
@@ -459,7 +412,7 @@ class ItemView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative">{$this->item->descr}</textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative">{$this->item->descr}</textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -508,7 +461,7 @@ class ItemView extends View
         </div>
         <script src="/assets/js/form-delete.js"></script>
         HTML;
-        return genererHeader("Item {$this->item->id} | {$this->container->lang["editing"]}", ["profile.css", "toggle.css"]) . $html;
+        return genererHeader("{$this->container->lang['item']} {$this->item->id} | {$this->container->lang["editing"]}", ["profile.css", "toggle.css"]) . $html;
     }
 
     /**
@@ -518,8 +471,6 @@ class ItemView extends View
     {
         $this->access_level = $access_level;
         return match ($method) {
-            Renderer::PREVENT_DELETE => $this->preventDelete(),
-            Renderer::DELETE => $this->confirmDelete(),
             Renderer::RESERVATION_FORM => $this->reserve(),
             Renderer::REQUEST_AUTH => $this->requestAuth($this->item),
             Renderer::POT_CREATE => $this->createPot(),

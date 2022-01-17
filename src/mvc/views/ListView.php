@@ -347,7 +347,7 @@ class ListView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative"></textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative"></textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -422,7 +422,7 @@ class ListView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative"></textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative"></textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">
@@ -482,7 +482,7 @@ class ListView extends View
     {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $l = $this->list;
-        $list_confidentiality = $l->isPublic() ? "<label class='form-control-label' for='public'>{$this->container->lang['public']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' checked name='conf' id='public' value='1' name='public'>\n\t\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='private'>{$this->container->lang['private']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' name='conf' id='private' value='0' name='private'>" : "<label class='form-control-label' for='public'>{$this->container->lang['public']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' name='conf' id='public' value='1' name='public'>\n\t\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='private'>{$this->container->lang['private']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' checked name='conf' id='private' value='0' name='private'>";
+        $list_confidentiality = $l->isPublic() ? "<label class='form-control-label' for='public'>{$this->container->lang['public']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' checked name='conf' id='public' value='1' name='public'>\n\t\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='private'>{$this->container->lang['private']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' name='conf' id='private' value='0' name='private'>" : "<label class='form-control-label' for='public'>{$this->container->lang['public']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' name='conf' id='public' value='1'>\n\t\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='private'>{$this->container->lang['private']}</label>\n\t\t\t\t\t\t\t\t\t\t<input type='radio' checked name='conf' id='private' value='0'>";
         $html = <<<HTML
         <div class="main-content">
             <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -515,7 +515,7 @@ class ListView extends View
                                     <div class="row fw">
                                         <div class="form-group focused fw">
                                             <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea type="text" id="description" name="description" class="form-control form-control-alternative">$l->description</textarea>
+                                            <textarea id="description" name="description" class="form-control form-control-alternative">$l->description</textarea>
                                         </div>
                                     </div>
                                     <div class="row fw">
