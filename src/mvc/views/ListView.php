@@ -8,7 +8,7 @@ use Slim\Container;
 use Slim\Http\Request;
 use JetBrains\PhpStorm\Pure;
 use mywishlist\mvc\{Renderer, View};
-use mywishlist\mvc\models\{Liste, Reservation, User};
+use mywishlist\mvc\models\{Liste, Message, Reservation, User};
 
 /**
  * List View
@@ -79,6 +79,10 @@ class ListView extends View
         $claim = (!empty($_SESSION['LOGGED_IN']) && !$this->list->isClaimed()) ? "<a href=".$this->container->router->pathFor('lists_claim_id', ['id' => $l->no])." class='btn btn-sm btn-default'>".$this->container->lang['list_claim']."</a>" : "<a href='#' class='btn btn-sm btn-default disabled'>".$this->container->lang['list_claim']."</a>";
         $user_info = empty($associated_user) ? $this->container->lang['nc'] : $associated_user->lastname . ' ' . $associated_user->firstname;
         $items_list = "";
+        $messages = "";
+        foreach(Message::where('list_id', 'LIKE', $this->list->no)->orderBy('date')->get() as $message){
+            $messages .= "<span class='form-control-label'>".$message->getUser()." -> ".$message->message."</span>";
+        }
         foreach ($l->items as $pos => $item) {
             $pos++;
             $routeModItem = $this->container->router->pathFor('items_edit_id', ['id' => $item->id]);
@@ -197,6 +201,7 @@ class ListView extends View
             HTML;
         }
         $list_confidentiality = $this->list->isPublic() ? "" : "🔒";
+        $email = User::find($_SESSION['USER_ID'] ?? "")->mail ?? "";
         $html = <<<HTML
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -217,6 +222,27 @@ class ListView extends View
                                     $dataHeader
                                     $warnEdit
                                 </div>
+                            </div>
+                            <div class="card bg-secondary shadow mt-4">
+                                <div class="card-body flex">
+                                    <div class="row">
+                                        <p class="form-control-label item-info">{$this->container->lang['list_associated_messages']}</p>
+                                    </div>
+                                </div>
+                                <div class="card-body flex">
+                                    $messages
+                                </div>
+                                <form action="{$this->container->router->pathFor('lists_add_message_id', ['id' => $this->list->no])}" method="POST" class="card-body flex">
+                                    <div class="flex flex-row">
+                                        <label class="form-control-label mr-2" for="titre">{$this->container->lang['user_email']}</label>
+                                        <input type="email" id="email" name="email" class="form-control form-control-alternative" value="$email" required>
+                                    </div> 
+                                    <div class="flex flex-row mt-4">
+                                        <label class="form-control-label mr-2" for="titre">{$this->container->lang['message']}</label>
+                                        <input type="text" name="message" class="form-control form-control-alternative" autofocus/>
+                                    </div> 
+                                    <button class="btn btn-sm btn-info mt-4">{$this->container->lang['list_add_message']}</button>
+                                </form>
                             </div>
                         </div>
                         <div class="col-xl-8 order-xl-1">

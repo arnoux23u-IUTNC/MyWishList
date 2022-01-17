@@ -3,22 +3,26 @@
 namespace mywishlist\mvc\models;
 
 use Illuminate\Database\Eloquent\Model;
+use mywishlist\bd\HasCompositePrimaryKey;
 
 /**
- * Reservation Model
+ * Message Model
  * Inherits from the Model class of Laravel
- * @property int $item_id
+ * @property int $list_id
  * @property string $user_email
  * @property string $message
+ * @property mixed $date
  * @method static where(string $string, string $string1, string $string2) Eloquent method
- * @method static find(int $item_id) Eloquent method
+ * @method static find(int $list_id) Eloquent method
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\models
  */
-class Reservation extends Model
+class Message extends Model
 {
-    protected $table = 'reserve';
-    protected $primaryKey = 'item_id';
+    use HasCompositePrimaryKey; 
+
+    protected $table = 'messages';
+    protected $primaryKey = ['list_id', 'user_email', 'message', 'date'];
     public $timestamps = false;
     public $incrementing = false;
     protected $guarded = [];

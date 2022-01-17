@@ -13,7 +13,7 @@ use mywishlist\Validator;
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\ListView;
 use mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{Liste, User, UserTemporaryResolver};
+use mywishlist\mvc\models\{Liste, Message, User, UserTemporaryResolver};
 
 /**
  * Class ControllerList
@@ -98,6 +98,35 @@ class ControllerList
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
+    }
+
+    /**
+     * Control adding message to a list
+     * @return Response
+     * @throws MethodNotAllowedException
+     * @throws NotFoundException|ForbiddenException
+     */
+    public function addMessage(): Response
+    {
+        //Si la liste n'existe pas, on declenche une erreur
+        if (empty($this->liste))
+            throw new NotFoundException($this->request, $this->response);
+        if ($this->request->getMethod() !== 'POST')
+            throw new MethodNotAllowedException($this->request, $this->response, ['POST']);
+        //On récupère le mail et le message
+        if(!filter_var($this->request->getParsedBodyParam('email'), FILTER_VALIDATE_EMAIL))
+            throw new ForbiddenException(message: $this->container->lang['exception_ressource_not_allowed']);            
+        $mail = filter_var($this->request->getParsedBodyParam('email'), FILTER_SANITIZE_EMAIL);
+        $message = filter_var($this->request->getParsedBodyParam('message'), FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        if(ltrim($message) !== ""){
+            $msg = new Message();
+            $msg->list_id = $this->liste->no;
+            $msg->user_email = $mail;
+            $msg->message = $message;
+            $msg->date = date("Y-m-d H:i:s");
+            $msg->save();
+        }
+        return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $this->liste->no], ["public_key" => $this->liste->public_key, "state" => "update"]));
     }
 
     /**

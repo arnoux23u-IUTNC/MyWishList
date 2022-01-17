@@ -2,7 +2,6 @@
 
 namespace mywishlist\mvc\models;
 
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use mywishlist\bd\HasCompositePrimaryKey;
 
