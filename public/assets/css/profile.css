@@ -1651,6 +1651,11 @@ a.text-white:focus {
     color: #525f7f;
 }
 
+.form-control-label-2 {
+    color: white;
+    font-size: .7rem;
+}
+
 .form-control-alternative.choose {
     margin: 0 2vw;
 }
@@ -2181,6 +2186,6 @@ p.item-info {
     color: white;
 }
 
-.minimified{
+.minimified {
     max-height: 6vh;
 }

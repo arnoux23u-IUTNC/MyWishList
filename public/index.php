@@ -12,6 +12,7 @@ use mywishlist\mvc\models\{User, Liste};
 use mywishlist\mvc\views\UserView;
 use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem, ControllerAPI};
 use mywishlist\exceptions\ExceptionHandler;
+use mywishlist\mvc\views\ListView;
 use Slim\{App, Container};
 
 #Container
@@ -70,8 +71,75 @@ $app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
 $app->any("/lists/new[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->create();
 })->setName('lists_create');
-$app->any("/lists[/]", function ($request, $response, $args) {
-    //TODO return (new ControllerUser($this,$request, $response, $args))->create();
+$app->any("/lists[/]", function ($request, $response, $args) use ($lang) {
+    $routeCreate = $this->router->pathFor('lists_create');
+    $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
+    $html = genererHeader("{$lang['phtml_public_lists']} - MyWishList", ["profile.css", "style.css", "lang.css", "search.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
+    $lists = "";
+    $phtmlVars = array(
+        'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
+        'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
+        'my_lists_route' => $this->router->pathFor('lists_home'),
+        'createurs_route' => $this->router->pathFor('createurs'),
+        'create_list_route' => $routeCreate,
+        'flag_img' => "<img class='selected' alt='" . strtolower($_SESSION["lang"]) . "-flag' src='/assets/img/flags/flag-" . strtolower($_SESSION["lang"]) . ".png'>",
+        'href' => empty($_SESSION["LOGGED_IN"]) ? $this->router->pathFor('accounts', ["action" => "login"]) : $this->router->pathFor('accounts', ["action" => "logout"]),
+        'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<EOD
+
+                    <li>
+                        <a href="$routeProfile">
+                            <i class='bx bxs-user'></i>
+                            <span class="links_name">{$lang['home_my_profile']}</span>
+                        </a>
+                        <span class="tooltip">{$lang['home_my_profile']}</span>
+                    </li>
+        EOD
+    );
+    foreach ($phtmlVars as $key => $value) {
+        $html = str_replace("%" . $key . "%", $value, $html);
+    }
+    preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+    foreach ($matches[0] as $match) {
+        $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
+    }
+    if($request->getQueryParam('search', '') != '' || $request->getQueryParam('exp', '') != '') {
+        foreach(Liste::where('is_public', '1')->orderBy('expiration')->get() as $list){
+            if(!$list->isExpired() && $list->isPublished() && (($list->expiration ?? date('9999-99-99')) > filter_var($request->getQueryParam('exp')))  && str_contains(strtolower($list->getUserNameAttribute()) ?? "", strtolower(filter_var($request->getQueryParam('search', ''), FILTER_SANITIZE_STRING))))
+                $lists .= (new ListView($this, $list, $request))->render(Renderer::SHOW_FOR_MENU);
+        }
+    }else{
+        foreach(Liste::where('is_public', '1')->orderBy('expiration')->get() as $list){
+            if(!$list->isExpired() && $list->isPublished())
+                $lists .= (new ListView($this, $list, $request))->render(Renderer::SHOW_FOR_MENU);
+        }
+    }
+    $search = filter_var($request->getQueryParam('search'), FILTER_SANITIZE_STRING);
+    $exp = filter_var($request->getQueryParam('exp'), FILTER_SANITIZE_STRING);
+    $html .= <<<EOD
+        <div class="main_container">
+            <h3 class="text-white">{$lang["phtml_public_lists"]}</h3>
+            <div class="fw flex">
+                <div id="enable" class="row flex flex-row col-4">
+                    <div class="search-box">
+                        <input type="text" value="$search" placeholder="{$lang["phtml_search_by_author"]}">
+                        <div class="search-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="cancel-icon">
+                            <i class="fas fa-times"></i>
+                        </div>
+                    </div>
+                    <label class="form-control-label-2" for="expiration">{$lang['date']}</label>
+                    <input type="date" id="expiration" value="$exp" class="form-control form-control-alternative search-date ml-2"/>
+                </div>
+            </div>
+            <div class='lists'>$lists
+            </div>
+        </div>
+        <script src="/assets/js/search.js"></script>
+    </body>
+    EOD;
+    return $response->write($html);
 })->setName('lists_home');
 //Items
 $app->any("/items/{id:[0-9]+}/pot/{action:delete|participate|create}[/]", function ($request, $response, $args) {
@@ -99,7 +167,7 @@ $app->any("/api/v1/items/{path:.*}[/]", function ($request, $response, $args) {
 $app->get("/createurs[/]", function ($request, $response, $args) use ($lang) {
     $routeCreate = $this->router->pathFor('lists_create');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("{$lang['home_title']} MyWishList", ["profile.css", "style.css", "lang.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
+    $html = genererHeader("{$lang['phtml_creators']} - MyWishList", ["profile.css", "style.css", "lang.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
     $list = "";
     $phtmlVars = array(
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
@@ -129,11 +197,11 @@ $app->get("/createurs[/]", function ($request, $response, $args) use ($lang) {
     }
     foreach(User::all() as $user){
         if(Liste::whereUserId($user->user_id)->count() > 0)
-            $list .= (new UserView($this, $user, $request))->render(Renderer::SHOW_FOR_LIST);
+            $list .= (new UserView($this, $user, $request))->render(Renderer::SHOW_FOR_MENU);
     }
     $html .= <<<EOD
         <div class="main_container">
-            <h3>{$lang["phtml_creators"]}</h3>
+            <h3 class="text-white">{$lang["phtml_creators"]}</h3>
             <div class='lists'>$list
             </div>
         </div>
@@ -145,8 +213,9 @@ $app->get("/createurs[/]", function ($request, $response, $args) use ($lang) {
 #Route principale
 $app->get('/', function ($request, $response) use ($lang) {
     $routeCreate = $this->router->pathFor('lists_create');
+    $routeLists = $this->router->pathFor('lists_home');
     $routeProfile = $this->router->pathFor('accounts', ['action' => 'profile']);
-    $html = genererHeader("{$lang['home_title']} MyWishList", ["style.css", "lang.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
+    $html = genererHeader("{$lang['home_title']} - MyWishList", ["style.css", "lang.css"]) . file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
     $phtmlVars = array(
         'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
         'user_name' => $_SESSION["USER_NAME"] ?? "{$lang['login_title']}",
@@ -177,7 +246,7 @@ $app->get('/', function ($request, $response) use ($lang) {
         <div class="main_container">
             <h3>{$lang["home_welcome"]}</h3>
             <span><a id="createBtn" content="{$lang['phtml_lists_create']}" href="$routeCreate"></a></span>
-            <span><a class="disabled" content="{$lang['html_btn_list']}" id="lookBtn" href="#"></a></span>
+            <span><a content="{$lang['html_btn_list']}" id="lookBtn" href="$routeLists"></a></span>
         </div>
     </body>
     EOD;
