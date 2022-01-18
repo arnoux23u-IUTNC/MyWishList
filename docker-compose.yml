@@ -1,0 +1,36 @@
+version: "3.5"
+services:
+  web:
+    container_name: mywl_web
+    image: nginx:latest
+    ports:
+      - "8090:80"
+    volumes:
+      - ./public:/var/www/mywishlist/public
+      - ./errors:/var/www/mywishlist/errors
+      - ./src:/var/www/mywishlist/src
+      - ./docker/default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php-fpm
+  php-fpm:
+    container_name: mywl_php-fpm
+    build:
+      dockerfile: ./docker/php/Dockerfile
+      context: .
+  db:
+    image: mariadb:10.7
+    restart: always
+    volumes:
+      - ./sql:/sql/
+    build:
+      context: .
+      args:
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      dockerfile: ./docker/db/Dockerfile
+    environment:
+      MYSQL_DATABASE: 'wishlist'
+      MYSQL_USER: 'usr_mywishlist'
+      MYSQL_PASSWORD: "${MYSQL_USER_PASSWORD:-password}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-password}"
+    ports:
+      - '3392:3306'
