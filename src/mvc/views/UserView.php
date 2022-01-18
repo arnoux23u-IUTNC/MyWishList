@@ -920,7 +920,7 @@ class UserView extends View
     /**
      * [NEXISTS] Edit user function
      * @return void
-     * @throws ForbiddenException
+     * @throws ForbiddenException because not exists (cannot modify an user separately)
      */
     protected function edit()
     {
