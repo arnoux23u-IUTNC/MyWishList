@@ -5,10 +5,14 @@ ErrorDocument 500 /errors/500.html
 Options -Indexes
 DirectoryIndex index.php
 
-RewriteEngine On
-
 php_value upload_max_filesize 15M
 php_value post_max_size 15M
+
+RewriteEngine On
+RewriteCond %{HTTP:Authorization} .+
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 
 RewriteRule ^docs(/.*|)$ - [NC,F]
 RewriteRule ^sql(/.*|)$ - [NC,F]

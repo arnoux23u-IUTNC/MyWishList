@@ -205,6 +205,30 @@ class ControllerUser
     }
 
     /**
+     * Control the home page render
+     * @return Response
+     */
+    public function home(): Response{
+        return $this->response->write((new UserView($this->container, request: $this->request))->render(Renderer::HOME_HOME));
+    }
+
+    /**
+     * Control the creators page render
+     * @return Response
+     */
+    public function creators(): Response{
+        return $this->response->write((new UserView($this->container, request: $this->request))->render(Renderer::HOME_CREATORS));
+    }
+
+    /**
+     * Control the public lists page render
+     * @return Response
+     */
+    public function publicLists(): Response{
+        return $this->response->write((new UserView($this->container, request: $this->request))->render(Renderer::HOME_LISTS));
+    }
+
+    /**
      * Control the register action
      * @return Response
      * @throws ForbiddenException

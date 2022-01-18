@@ -91,46 +91,48 @@ abstract class View
             default => ""
         };
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">$title</h1>
-                            $header
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">$title</h1>
+                                $header
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" action="$from">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="private_key">{$this->container->lang['private_token_for']} $dataModel</label>
-                                            <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required /><i data-associated="private_key" class="pwdicon far fa-eye"></i></div>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" action="$from">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="private_key">{$this->container->lang['private_token_for']} $dataModel</label>
+                                                <div class="pfield"><input type="password" name="private_key" id="private_key" class="form-control form-control-alternative" autofocus required /><i data-associated="private_key" class="pwdicon far fa-eye"></i></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang["validate"]}</button>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang["validate"]}</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <script src="/assets/js/password-viewer.js"></script>
+            <script src="/assets/js/password-viewer.js"></script>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['auth']} - MyWishList", ["profile.css"]) . $html;
     }

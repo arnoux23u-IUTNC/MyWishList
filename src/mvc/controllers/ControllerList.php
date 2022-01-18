@@ -269,7 +269,7 @@ class ControllerList
                     'user_id' => $this->user->user_id
                 ]);
                 $data = json_decode($_COOKIE['claimed_lists'], true);
-                $data[] = $liste->no;
+                $data[] = $this->liste->no;
                 setcookie('claimed_lists', json_encode($data), time()+(3600 * 480), "/", "");
                 $tmp = UserTemporaryResolver::find($this->liste->no);
                 if(!empty($tmp))

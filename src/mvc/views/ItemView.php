@@ -186,16 +186,6 @@ class ItemView extends View
         </body>
         </html>
         HTML;
-
-
-        /*if(!empty($reserved))
-            if(($l->isExpired() || $this->request->getCookieParam('typeUser') == "participant") && !empty($reserved->user_id))
-                $reservation_state = "{$this->container->lang['list_reserved_by']} $reserved->user_id";
-            else
-                $reservation_state = "{$this->container->lang['item_reserved']}";
-        else
-            $reservation_state = "{$this->container->lang['item_unreserved']}";*/
-        //$item_desc = "\t<div>\n\t\t<h2>{$this->item->nom}</h2>\n\t\t".(!empty($this->item->descr) ? "<p>{$this->container->lang['description']} : {$this->item->descr}</p>\n\t\t" : "").(!empty($this->item->url) ? "<p>URL : {$this->item->url}</p>\n\t\t" : "").(!empty($this->item->tarif) ? "<p>{$this->container->lang['price']} : {$this->item->tarif}</p>\n\t\t" : "").(!empty($this->item->img) ? (file_exists(__DIR__."\..\..\..\assets\img\items\\{$this->item->img}") ? "<img alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>\n\t\t" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "<img alt='{$this->item->nom}' src='{$this->item->img}'>\n\t\t" : "")) : "")."<p>{$this->container->lang['item_associated_list']} : {!empty($l->titre) ? $l->titre | $l->description ($l->expiration)) : NULL}</p>\n\t\t"."<p>{$this->container->lang['reservation_state']} : $reservation_state</p>\n\t</div>\n</body>";
         return genererHeader("{$this->container->lang['item']} {$this->item->id} - MyWishList", ["profile.css"]) . $html;
     }
 
@@ -207,52 +197,54 @@ class ItemView extends View
     {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key") ?? "", FILTER_SANITIZE_STRING);
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['create_pot']}</h1>
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['create_pot']}</h1>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" action="{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'create'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="amount">{$this->container->lang['amount']}</label>
-                                            <input type="number" id="amount" step="0.01" name="amount" max="100000" min="1" class="form-control form-control-alternative" required autofocus>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" action="{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'create'])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="amount">{$this->container->lang['amount']}</label>
+                                                <input type="number" id="amount" step="0.01" name="amount" max="100000" min="1" class="form-control form-control-alternative" required autofocus>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="expiration">{$this->container->lang['end_date']}</label>
-                                            <input type="date" id="expiration" name="expiration" class="form-control form-control-alternative"/>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="expiration">{$this->container->lang['end_date']}</label>
+                                                <input type="date" id="expiration" name="expiration" class="form-control form-control-alternative"/>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['create']}</button>
-                                        <input type="hidden" name="private_key" value="$private_key"/>
-                                        <input type="hidden" name="auth" value="1"/>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['create']}</button>
+                                            <input type="hidden" name="private_key" value="$private_key"/>
+                                            <input type="hidden" name="auth" value="1"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['create_pot']}", ["profile.css"]) . $html;
     }
@@ -263,55 +255,56 @@ class ItemView extends View
      */
     private function participatePot(): string
     {
-        $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $pot = Cagnotte::find($this->item->id);
         $email = User::find($_SESSION['USER_ID'] ?? -1)->mail ?? "";
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['item_participate_pot']}</h1>
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['item_participate_pot']}</h1>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" action="{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'participate'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="amount">{$this->container->lang['amount']}</label>
-                                            <input type="number" id="amount" step="0.01" name="amount" max="{$pot->reste()}" min="1" class="form-control form-control-alternative" required autofocus>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" action="{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'participate'])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="amount">{$this->container->lang['amount']}</label>
+                                                <input type="number" id="amount" step="0.01" name="amount" max="{$pot->reste()}" min="1" class="form-control form-control-alternative" required autofocus>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
-                                            <input type="email" id="email" name="email" class="form-control form-control-alternative" required value="$email">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
+                                                <input type="email" id="email" name="email" class="form-control form-control-alternative" required value="$email">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['participate']}</button>
-                                        <input type="hidden" name="public_key" value="{$this->request->getQueryParam('public_key','')}"/>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['participate']}</button>
+                                            <input type="hidden" name="public_key" value="{$this->request->getQueryParam('public_key','')}"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['item_participate_pot']}", ["profile.css"]) . $html;
     }
@@ -325,50 +318,52 @@ class ItemView extends View
         $email = User::find($_SESSION['USER_ID'] ?? "")->mail ?? $_COOKIE['user_email'] ?? "";
         $public_key = filter_var($this->request->getQueryParam("public_key", ''), FILTER_SANITIZE_STRING);
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang["item_reservation"]} {$this->item->id}</h1>
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang["item_reservation"]} {$this->item->id}</h1>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('items_reserve_id', ['id' => $this->item->id], ['public_key' => $public_key])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                <div class="row fw">
-                                    <div class="form-group focused fw">
-                                            <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
-                                            <input type="email" id="email" name="email" class="form-control form-control-alternative" value="$email" required autofocus>
-                                        </div>
-                                    </div>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('items_reserve_id', ['id' => $this->item->id], ['public_key' => $public_key])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="message">{$this->container->lang['message']}</label>
-                                            <input type="text" id="message" name="message" class="form-control form-control-alternative"/>
+                                                <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
+                                                <input type="email" id="email" name="email" class="form-control form-control-alternative" value="$email" required autofocus>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['reserve']}</button>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="message">{$this->container->lang['message']}</label>
+                                                <input type="text" id="message" name="message" class="form-control form-control-alternative"/>
+                                            </div>
+                                        </div>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['reserve']}</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['item']} {$this->item->id} | {$this->container->lang["reservation"]}", ["profile.css", "toggle.css"]) . $html;
     }
@@ -381,85 +376,87 @@ class ItemView extends View
     {
         $private_key = filter_var($this->request->getParsedBodyParam("private_key"), FILTER_SANITIZE_STRING);
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang["item_edit"]} {$this->item->id}</h1>
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang["item_edit"]} {$this->item->id}</h1>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('items_edit_id', ['id' => $this->item->id])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                <div class="row fw">
-                                    <div class="form-group focused fw">
-                                            <label class="form-control-label" for="name">{$this->container->lang['name']}</label>
-                                            <input type="text" id="name" name="name" class="form-control form-control-alternative" value="{$this->item->nom}" required autofocus>
-                                        </div>
-                                    </div>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('items_edit_id', ['id' => $this->item->id])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
                                     <div class="row fw">
                                         <div class="form-group focused fw">
-                                            <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
-                                            <textarea id="description" name="description" class="form-control form-control-alternative">{$this->item->descr}</textarea>
-                                        </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                        <label class="form-control-label" for="url">URL</label>
-                                            <input type="url" id="url" name="url" value="{$this->item->url}" class="form-control form-control-alternative"/>
-                                        </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="price">{$this->container->lang['price']}</label>
-                                            <input type="number" id="price" min="0" step="0.01" name="price" value="{$this->item->tarif}" class="form-control form-control-alternative"/>
-                                        </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw noradio">
-                                            <span class="form-control-label">{$this->container->lang['image']}</span>
-                                            <div class='file'>
-                                                <div class="toggle">
-                                                    <input type="radio" value="link" checked id="link" name="type">
-                                                    <label for="link">URL</label>
-                                                    <input type="radio" value="upload" id="upload" name="type">
-                                                    <label for="upload">{$this->container->lang['upload']}</label>
-                                                </div>
-                                                <input class="invisible" accept="image/*" type="file" name="file_img" id="file_img"/>
-                                                <input type="text" value="{$this->item->img}" class="form-control form-control-alternative choose" name="url_img" id="url_img"/>
-                                                <button type="button" class="sendBtn" id="delete"><img class="dimg" alt="delete" id="delete_img" src="/assets/img/del.png" /></button>    
+                                                <label class="form-control-label" for="name">{$this->container->lang['name']}</label>
+                                                <input type="text" id="name" name="name" class="form-control form-control-alternative" value="{$this->item->nom}" required autofocus>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <input type="hidden" id="auth" name="auth" value="1" class="form-control form-control-alternative"/>
-                                            <input type="hidden" id="private_key" name="private_key" value="$private_key" class="form-control form-control-alternative"/>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="description">{$this->container->lang['description']}</label>
+                                                <textarea id="description" name="description" class="form-control form-control-alternative">{$this->item->descr}</textarea>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['editing']}</button>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                            <label class="form-control-label" for="url">URL</label>
+                                                <input type="url" id="url" name="url" value="{$this->item->url}" class="form-control form-control-alternative"/>
+                                            </div>
+                                        </div>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="price">{$this->container->lang['price']}</label>
+                                                <input type="number" id="price" min="0" step="0.01" name="price" value="{$this->item->tarif}" class="form-control form-control-alternative"/>
+                                            </div>
+                                        </div>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw noradio">
+                                                <span class="form-control-label">{$this->container->lang['image']}</span>
+                                                <div class='file'>
+                                                    <div class="toggle">
+                                                        <input type="radio" value="link" checked id="link" name="type">
+                                                        <label for="link">URL</label>
+                                                        <input type="radio" value="upload" id="upload" name="type">
+                                                        <label for="upload">{$this->container->lang['upload']}</label>
+                                                    </div>
+                                                    <input class="invisible" accept="image/*" type="file" name="file_img" id="file_img"/>
+                                                    <input type="text" value="{$this->item->img}" class="form-control form-control-alternative choose" name="url_img" id="url_img"/>
+                                                    <button type="button" class="sendBtn" id="delete"><img class="dimg" alt="delete" id="delete_img" src="/assets/img/del.png" /></button>    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <input type="hidden" id="auth" name="auth" value="1" class="form-control form-control-alternative"/>
+                                                <input type="hidden" id="private_key" name="private_key" value="$private_key" class="form-control form-control-alternative"/>
+                                            </div>
+                                        </div>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['editing']}</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <script src="/assets/js/form-delete.js"></script>
+            <script src="/assets/js/form-delete.js"></script>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['item']} {$this->item->id} | {$this->container->lang["editing"]}", ["profile.css", "toggle.css"]) . $html;
     }

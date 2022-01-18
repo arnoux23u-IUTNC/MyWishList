@@ -65,56 +65,58 @@ class UserView extends View
         $password = $authenticator ? filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING) ?? NULL : NULL;
         $auth2FA = $authenticator ? "<div class='row fw'>\n\t\t\t\t\t\t\t\t<div class='form-group focused fw'>\n\t\t\t\t\t\t\t\t\t<label class='form-control-label' for='2fa'>{$this->container->lang['user_2fa_code']}</label>\n\t\t\t\t\t\t\t\t\t<input type='text' class='form-control form-control-alternative' autofocus id='2fa' name='query-code' required maxlength='6' minlength='6' pattern='^\d{6}$'>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>" : "";
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['login_title']}</h1>
-                            $popup
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['login_title']}</h1>
+                                $popup
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" action="{$this->container->router->pathFor('accounts', ['action' => 'login'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
-                                            <input type="text" id="username" name="username" value="$username" class="form-control form-control-alternative" required>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" action="{$this->container->router->pathFor('accounts', ['action' => 'login'])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
+                                                <input type="text" id="username" name="username" value="$username" class="form-control form-control-alternative" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
-                                            <div class="pfield"><input type="password" id="password" name="password" value="$password" class="form-control form-control-alternative" required/><i data-associated="password" class="pwdicon far fa-eye"></i></div>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
+                                                <div class="pfield"><input type="password" id="password" name="password" value="$password" class="form-control form-control-alternative" required/><i data-associated="password" class="pwdicon far fa-eye"></i></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    $auth2FA
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['login_title']}</button>
-                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}" class="btn btn-sm btn-danger">{$this->container->lang['login_lost_password']} ?</a>
-                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'register'])}" class="btn btn-sm btn-default">{$this->container->lang['login_to_register']}</a>
-                                        $auth2FAReset
+                                        $auth2FA
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['login_title']}</button>
+                                            <a href="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}" class="btn btn-sm btn-danger">{$this->container->lang['login_lost_password']} ?</a>
+                                            <a href="{$this->container->router->pathFor('accounts', ['action' => 'register'])}" class="btn btn-sm btn-default">{$this->container->lang['login_to_register']}</a>
+                                            $auth2FAReset
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <script src="/assets/js/password-viewer.js"></script>
+            <script src="/assets/js/password-viewer.js"></script>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['login_title']} - MyWishList", ["profile.css"]) . $html;
     }
@@ -127,46 +129,48 @@ class UserView extends View
     {
         $popup = $this->getHeaderInfo();
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['login_lost_password']}</h1>
-                            $popup
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['login_lost_password']}</h1>
+                                $popup
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" action="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
-                                            <input type="email" id="email" name="email" class="form-control form-control-alternative mb-4" required autofocus>
-                                            <span class="form-text mt-4" style="color:var(--red);">{$this->container->lang['email_warn_microsoft']}</span>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" action="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
+                                                <input type="email" id="email" name="email" class="form-control form-control-alternative mb-4" required autofocus>
+                                                <span class="form-text mt-4" style="color:var(--red);">{$this->container->lang['email_warn_microsoft']}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['validate']}</button>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['validate']}</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </body>
+        </html> 
         HTML;
         return genererHeader("{$this->container->lang['login_lost_password']} - MyWishList", ["profile.css"]) . $html;
     }
@@ -181,68 +185,70 @@ class UserView extends View
         $token = filter_var($this->request->getQueryParam('token'), FILTER_SANITIZE_STRING) ?? "";
         $popup = $this->getHeaderInfo();
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['forgot_password_title']}</h1>
-                            $popup
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['forgot_password_title']}</h1>
+                                $popup
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" onsubmit="return matchPwd()" action="{$this->container->router->pathFor('accounts', ['action' => 'reset_password'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="input-new-password">{$this->container->lang['user_new_password']}</label>
-                                            <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative"><i data-associated="input-new-password" class="pwdicon far fa-eye"></i></div>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" onsubmit="return matchPwd()" action="{$this->container->router->pathFor('accounts', ['action' => 'reset_password'])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="input-new-password">{$this->container->lang['user_new_password']}</label>
+                                                <div class="pfield"><input type="password" id="input-new-password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password" class="form-control form-control-alternative"><i data-associated="input-new-password" class="pwdicon far fa-eye"></i></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div id="message">
-                                            <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
-                                            <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</p>
-                                            <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</p>
-                                            <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
-                                            <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
-                                            <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
+                                        <div class="row fw">
+                                            <div id="message">
+                                                <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
+                                                <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</p>
+                                                <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</p>
+                                                <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
+                                                <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
+                                                <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
-                                            <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative"><i data-associated="input-new-password-c" class="pwdicon far fa-eye"></i></div>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
+                                                <div class="pfield"><input type="password" id="input-new-password-c" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" name="input-new-password-c" class="form-control form-control-alternative"><i data-associated="input-new-password-c" class="pwdicon far fa-eye"></i></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['validate']}</button>
-                                    </div>
-                                    <div class="row fw">
-                                        <input type="hidden" id="mail" name="mail" value="$mail" class="form-control form-control-alternative"/>
-                                        <input type="hidden" id="token" name="token" value="$token" class="form-control form-control-alternative"/>
-                                        <input type="hidden" id="auth" name="auth" value="1" class="form-control form-control-alternative"/>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['validate']}</button>
+                                        </div>
+                                        <div class="row fw">
+                                            <input type="hidden" id="mail" name="mail" value="$mail" class="form-control form-control-alternative"/>
+                                            <input type="hidden" id="token" name="token" value="$token" class="form-control form-control-alternative"/>
+                                            <input type="hidden" id="auth" name="auth" value="1" class="form-control form-control-alternative"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <script src="/assets/js/password-validator.js"></script>
-        <script src="/assets/js/password-viewer.js"></script>
+            <script src="/assets/js/password-validator.js"></script>
+            <script src="/assets/js/password-viewer.js"></script>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['forgot_password_title']} - MyWishList", ["profile.css"]) . $html;
     }
@@ -260,53 +266,55 @@ class UserView extends View
             default => ""
         };
         return genererHeader("{$this->container->lang['user_2fa_recover']} - MyWishList", ["profile.css"]) . <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['user_2fa_recover']}</h1>$popup
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['user_2fa_recover']}</h1>$popup
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" action="$routeRecover">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
-                                            <input type="text" id="username" name="username" value="$username" class="form-control form-control-alternative" required>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" action="$routeRecover">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
+                                                <input type="text" id="username" name="username" value="$username" class="form-control form-control-alternative" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="rescue">{$this->container->lang['user_2fa_rescue_code']}</label>
-                                            <input type="text" class="form-control form-control-alternative" name="rescue" id="rescue" required maxlength="8" minlength="8" pattern="^\d{8}$">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="rescue">{$this->container->lang['user_2fa_rescue_code']}</label>
+                                                <input type="text" class="form-control form-control-alternative" name="rescue" id="rescue" required maxlength="8" minlength="8" pattern="^\d{8}$">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['login_title']}</button>
-                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}" class="btn btn-sm btn-danger">{$this->container->lang['login_lost_password']} ?</a>
-                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'register'])}" class="btn btn-sm btn-default">{$this->container->lang['login_to_register']}</a>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['login_title']}</button>
+                                            <a href="{$this->container->router->pathFor('accounts', ['action' => 'forgot_password'])}" class="btn btn-sm btn-danger">{$this->container->lang['login_lost_password']} ?</a>
+                                            <a href="{$this->container->router->pathFor('accounts', ['action' => 'register'])}" class="btn btn-sm btn-default">{$this->container->lang['login_to_register']}</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <script src="/assets/js/password-viewer.js"></script>
+            <script src="/assets/js/password-viewer.js"></script>
+        </body>
+        </html>
         HTML;
     }
 
@@ -322,95 +330,97 @@ class UserView extends View
             default => ""
         };
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['title_register']}</h1>
-                            $popup
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['title_register']}</h1>
+                                $popup
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" onsubmit="return (assertFile() && matchPwd())" enctype="multipart/form-data" action="{$this->container->router->pathFor('accounts', ['action' => 'register'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
-                                            <input type="text" id="username" name="username" class="form-control form-control-alternative" required autofocus>
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" onsubmit="return (assertFile() && matchPwd())" enctype="multipart/form-data" action="{$this->container->router->pathFor('accounts', ['action' => 'register'])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="username">{$this->container->lang['user_username']}</label>
+                                                <input type="text" id="username" name="username" class="form-control form-control-alternative" required autofocus>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="lastname">{$this->container->lang['user_lastname']}</label>
-                                            <input type="text" id="lastname" name="lastname" class="form-control form-control-alternative" required>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="lastname">{$this->container->lang['user_lastname']}</label>
+                                                <input type="text" id="lastname" name="lastname" class="form-control form-control-alternative" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="firstname">{$this->container->lang['user_firstname']}</label>
-                                            <input type="text" id="firstname" name="firstname" class="form-control form-control-alternative" required>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="firstname">{$this->container->lang['user_firstname']}</label>
+                                                <input type="text" id="firstname" name="firstname" class="form-control form-control-alternative" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
-                                            <input type="email" id="email" name="email" class="form-control form-control-alternative" required>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="email">{$this->container->lang['user_email']}</label>
+                                                <input type="email" id="email" name="email" class="form-control form-control-alternative" required>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="file_img">{$this->container->lang['user_avatar']}</label>
-                                            <input accept="image/*" type="file" id="file_img" name="file_img" class="form-control form-control-alternative">
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="file_img">{$this->container->lang['user_avatar']}</label>
+                                                <input accept="image/*" type="file" id="file_img" name="file_img" class="form-control form-control-alternative">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="input-new-password">{$this->container->lang['user_password']}</label>
-                                            <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/><i data-associated="input-new-password" class="pwdicon far fa-eye"></i></div>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="input-new-password">{$this->container->lang['user_password']}</label>
+                                                <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password" name="password" class="form-control form-control-alternative" required/><i data-associated="input-new-password" class="pwdicon far fa-eye"></i></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div id="message">
-                                            <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
-                                            <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</p>
-                                            <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</p>
-                                            <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
-                                            <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
-                                            <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
+                                        <div class="row fw">
+                                            <div id="message">
+                                                <h6 class="heading-small text-muted mb-4">{$this->container->lang['password_form_valid']}</h6>
+                                                <p id="small" class="invalid">{$this->container->lang['password_form_valid_small']}</p>
+                                                <p id="capital" class="invalid">{$this->container->lang['password_form_valid_capital']}</p>
+                                                <p id="number" class="invalid">{$this->container->lang['password_form_valid_number']}</p>
+                                                <p id="special" class="invalid">{$this->container->lang['password_form_valid_special']}</p>
+                                                <p id="length" class="invalid">{$this->container->lang['password_form_valid_length']}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
-                                            <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/><i data-associated="input-new-password-c" class="pwdicon far fa-eye"></i></div>
+                                        <div class="row fw">
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="input-new-password-c">{$this->container->lang['user_password_confirm']}</label>
+                                                <div class="pfield"><input type="password" minlength="14" maxlength="40" pattern="(?=.*\d)(?=.*[a-z])(?=.*[~!@#$%^&*()\-_=+[\]{};:,<>\/?|])(?=.*[A-Z]).{14,}" id="input-new-password-c" name="password-confirm" class="form-control form-control-alternative" required/><i data-associated="input-new-password-c" class="pwdicon far fa-eye"></i></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="row fw">
-                                        <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['title_register']}</button>
-                                        <a href="{$this->container->router->pathFor('accounts', ['action' => 'login'])}" class="btn btn-sm btn-default">{$this->container->lang['register_to_login']}</a>
+                                        <div class="row fw">
+                                            <button type="submit" class="btn btn-sm btn-primary" value="OK" name="sendBtn">{$this->container->lang['title_register']}</button>
+                                            <a href="{$this->container->router->pathFor('accounts', ['action' => 'login'])}" class="btn btn-sm btn-default">{$this->container->lang['register_to_login']}</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <script src="/assets/js/password-validator.js"></script>
-        <script src="/assets/js/password-viewer.js"></script>
-        <script src="/assets/js/avatar-register.js"></script>
+            <script src="/assets/js/password-validator.js"></script>
+            <script src="/assets/js/password-viewer.js"></script>
+            <script src="/assets/js/avatar-register.js"></script>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang['title_register']} - MyWishList", ["profile.css"]) . $html;
     }
@@ -488,31 +498,32 @@ class UserView extends View
         $otp->setLabel('MyWishList');
         $img_src = $otp->getQrCodeUri('https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M', '[DATA]');
         return genererHeader("{$this->container->lang['user_2fa_manage']} - MyWishList", ["profile.css"]) . <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang['user_2fa_manage']}</h1>
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang['user_2fa_manage']}</h1>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <div class="card bg-secondary shadow">
-                        <div class="card-body">
-                            <div class="pl-lg-4">
-                                <div class="row fw">
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <div class="card bg-secondary shadow">
+                            <div class="card-body">
+                                <div class="pl-lg-4">
                                     <div class="row fw">
-                                        <button disabled class="btn btn-sm btn-danger btn-danger-fr">{$this->container->lang['user_2fa_disable']}</button>
-                                        <a href="#popup" class="btn btn-sm btn-primary">{$this->container->lang['user_2fa_enable']}</a>
+                                        <div class="row fw">
+                                            <button disabled class="btn btn-sm btn-danger btn-danger-fr">{$this->container->lang['user_2fa_disable']}</button>
+                                            <a href="#popup" class="btn btn-sm btn-primary">{$this->container->lang['user_2fa_enable']}</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -520,25 +531,26 @@ class UserView extends View
                     </div>
                 </div>
             </div>
-        </div>
-        <div id="popup" class="overlay">
-            <div class="popup1">
-                <h2 style="padding-bottom:2vh;">{$this->container->lang['user_2fa_enabling']}</h2>
-                <a class="close" href="#">&times;</a>
-                <form method="POST" action="$route_2fa" class="content">
-                    <h3>{$this->container->lang['user_2fa_enabling_message']}</h3>
-                    <div class="d-flex">
-                        <img alt="qr" src="$img_src"/>
-                        <div style='padding-left:2vw;width:100%;display:flex;flex-direction:column;'>
-                            <label class="form-control-label" for="private_key">{$this->container->lang['user_2fa_key']}</label>
-                            <input type="text" readonly id="private_key" name="private_key" value="$this->secret">
+            <div id="popup" class="overlay">
+                <div class="popup1">
+                    <h2 style="padding-bottom:2vh;">{$this->container->lang['user_2fa_enabling']}</h2>
+                    <a class="close" href="#">&times;</a>
+                    <form method="POST" action="$route_2fa" class="content">
+                        <h3>{$this->container->lang['user_2fa_enabling_message']}</h3>
+                        <div class="d-flex">
+                            <img alt="qr" src="$img_src"/>
+                            <div style='padding-left:2vw;width:100%;display:flex;flex-direction:column;'>
+                                <label class="form-control-label" for="private_key">{$this->container->lang['user_2fa_key']}</label>
+                                <input type="text" readonly id="private_key" name="private_key" value="$this->secret">
+                            </div>
                         </div>
-                    </div>
-                    <input type="text" autofocus name="query-code" required maxlength="6" minlength="6" pattern="^\d{6}$">
-                    <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-primary">{$this->container->lang['phtml_enable']}</button>
-                </form>
+                        <input type="text" autofocus name="query-code" required maxlength="6" minlength="6" pattern="^\d{6}$">
+                        <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-primary">{$this->container->lang['phtml_enable']}</button>
+                    </form>
+                </div>
             </div>
-        </div>
+        </body>
+        </html> 
         HTML;
     }
 
@@ -550,50 +562,52 @@ class UserView extends View
     {
         $popup = $this->getHeaderInfo();
         $html = <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-                <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
-                </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-                <div class="container-fluid align-items-center">
-                    <div class="row">
-                        <div class="fw" style="position:relative;">
-                            <h1 class="text-center text-white">{$this->container->lang["user_delete_account"]}</h1>
-                            $popup
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                    <div class="container-fluid">
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                    </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                    <div class="container-fluid align-items-center">
+                        <div class="row">
+                            <div class="fw" style="position:relative;">
+                                <h1 class="text-center text-white">{$this->container->lang["user_delete_account"]}</h1>
+                                $popup
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-6 flex mt--7">
-                <div class="fw">
-                    <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('accounts', ['action' => 'delete'])}">
-                        <div class="card bg-secondary shadow">
-                            <div class="card-body">
-                                <div class="pl-lg-4">
-                                    <div class="row fw">
+                <div class="col-lg-6 flex mt--7">
+                    <div class="fw">
+                        <form method="post" enctype="multipart/form-data" action="{$this->container->router->pathFor('accounts', ['action' => 'delete'])}">
+                            <div class="card bg-secondary shadow">
+                                <div class="card-body">
+                                    <div class="pl-lg-4">
                                         <div class="row fw">
-                                            <div class="form-group focused fw">
-                                                <label class="form-control-label">{$this->container->lang['user_delete_account_confirm']}</label>
+                                            <div class="row fw">
+                                                <div class="form-group focused fw">
+                                                    <label class="form-control-label">{$this->container->lang['user_delete_account_confirm']}</label>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="form-group focused fw">
-                                            <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
-                                            <div class="pfield"><input type="password" name="password" id="password" class="form-control form-control-alternative" autofocus required /><i data-associated="password" class="pwdicon far fa-eye"></i></div>
-                                        </div>
-                                        <div class="row fw">
-                                            <button type="submit" class="btn btn-sm btn-danger" value="OK" name="sendBtn">{$this->container->lang['confirm']}</button>
+                                            <div class="form-group focused fw">
+                                                <label class="form-control-label" for="password">{$this->container->lang['user_password']}</label>
+                                                <div class="pfield"><input type="password" name="password" id="password" class="form-control form-control-alternative" autofocus required /><i data-associated="password" class="pwdicon far fa-eye"></i></div>
+                                            </div>
+                                            <div class="row fw">
+                                                <button type="submit" class="btn btn-sm btn-danger" value="OK" name="sendBtn">{$this->container->lang['confirm']}</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </body>
+        </html>
         HTML;
         return genererHeader("{$this->container->lang["user_delete_account"]} | MyWishList", ["profile.css", "toggle.css"]) . $html;
     }
@@ -607,33 +621,34 @@ class UserView extends View
     {
         $route_main = $this->container->router->pathFor('home');
         return genererHeader("{$this->container->lang['user_2fa_manage']} - MyWishList", ["profile.css"]) . <<<HTML
-        <div class="main-content">
-            <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-            <div class="container-fluid">
-                <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
-            </div>
-            </nav>
-            <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-                <span class="mask bg-gradient-default opacity-8"></span>
-            </div>
-            <div class="container-fluid mt--7">
-                <form method="post" action="{$this->container->router->pathFor('2fa', ['action' => 'disable'])}">
-                    <div class="row">
-                        <div style="width:100%;">
-                            <div class="card bg-secondary shadow">
-                                <div class="card-header bg-white border-0">
-                                <h3 class="mb-0">{$this->container->lang['user_2fa_manage']}</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="pl-lg-4">
-                                        <div class="row">
-                                            <div class="col-lg-4">
-                                                <div class="popup">
-                                                    <span>{$this->container->lang['user_2fa_enabled']}</span>
-                                                </div>
-                                                <div>
-                                                    <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-danger text-white">{$this->container->lang['user_2fa_disable']}</button>
-                                                    <button disabled class="btn btn-sm btn-default">{$this->container->lang['user_2fa_enable']}</button>
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
+                </div>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                    <span class="mask bg-gradient-default opacity-8"></span>
+                </div>
+                <div class="container-fluid mt--7">
+                    <form method="post" action="{$this->container->router->pathFor('2fa', ['action' => 'disable'])}">
+                        <div class="row">
+                            <div style="width:100%;">
+                                <div class="card bg-secondary shadow">
+                                    <div class="card-header bg-white border-0">
+                                    <h3 class="mb-0">{$this->container->lang['user_2fa_manage']}</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="pl-lg-4">
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="popup">
+                                                        <span>{$this->container->lang['user_2fa_enabled']}</span>
+                                                    </div>
+                                                    <div>
+                                                        <button type="submit" name="sendBtn" value="ok" class="btn btn-sm btn-danger text-white">{$this->container->lang['user_2fa_disable']}</button>
+                                                        <button disabled class="btn btn-sm btn-default">{$this->container->lang['user_2fa_enable']}</button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -641,10 +656,11 @@ class UserView extends View
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
+        </body>
+        </html>
         HTML;
     }
 
@@ -661,43 +677,171 @@ class UserView extends View
             $codes .= "<p>$code->code</p>";
         }
         return genererHeader("{$this->container->lang['phtml_rescue_code']} - MyWishList", ["profile.css"]) . <<<HTML
-        <div class="main-content">
-        <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
-          <div class="container-fluid">
-            <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
-          </div>
-        </nav>
-        <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
-          <span class="mask bg-gradient-default opacity-8"></span>
-        </div>
-        <div class="container-fluid mt--7">
-          <div class="row">
-            <div style="width:100%;">
-                <div class="card bg-secondary shadow">
-                  <div class="card-header bg-white border-0">
-                    <h3 class="mb-0">{$this->container->lang['user_2fa_rescue_codes']}</h3>
-                  </div>
-                  <div class="card-body">
-                    <div class="pl-lg-4">
-                      <div class="row">
-                        <div class="col-lg-4">
-                          <div class="code">
-                            $codes
-                          </div>
-                          <div>
-                            <a href="$route_login" class="btn btn-sm btn-default">{$this->container->lang['phtml_noted']}</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div class="main-content">
+                <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+                <div class="container-fluid">
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
                 </div>
-              </form>
+                </nav>
+                <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
+                <span class="mask bg-gradient-default opacity-8"></span>
+                </div>
+                <div class="container-fluid mt--7">
+                <div class="row">
+                    <div style="width:100%;">
+                        <div class="card bg-secondary shadow">
+                        <div class="card-header bg-white border-0">
+                            <h3 class="mb-0">{$this->container->lang['user_2fa_rescue_codes']}</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                <div class="code">
+                                    $codes
+                                </div>
+                                <div>
+                                    <a href="$route_login" class="btn btn-sm btn-default">{$this->container->lang['phtml_noted']}</a>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                </div>
             </div>
-          </div>
-        </div>
-        </div>
+        </body>
+        </html>
         HTML;
+    }
+
+    /**
+     * Display the home page
+     * @return string html code
+     */
+    private function showHome(): string{
+        $routeCreate = $this->container->router->pathFor('lists_create');
+        $html = genererHeader("{$this->container->lang['home_title']} - MyWishList", ["style.css", "lang.css"]) . $this->sidebar();
+        $html .= <<<HTML
+            <div class="main_container">
+                <h3>{$this->container->lang["home_welcome"]}</h3>
+                <span><a id="createBtn" content="{$this->container->lang['phtml_lists_create']}" href="$routeCreate"></a></span>
+                <span><a content="{$this->container->lang['html_btn_list']}" id="lookBtn" href="{$this->container->router->pathFor('lists_home')}"></a></span>
+            </div>
+        </body>
+        </html>
+        HTML;
+        return $html;
+    }
+
+    /**
+     * Display the creators page
+     * @return string html code
+     */
+    private function showCreators(): string{
+        $list = "";
+        $html = genererHeader("{$this->container->lang['phtml_creators']} - MyWishList", ["profile.css", "style.css", "lang.css"]) . $this->sidebar();
+        foreach(User::all() as $user){
+            if(Liste::whereUserId($user->user_id)->count() > 0)
+                $list .= (new UserView($this->container, $user, $this->request))->render(Renderer::SHOW_FOR_MENU);
+        }
+        $html .= <<<HTML
+            <div class="main_container">
+                <h3 class="text-white">{$this->container->lang["phtml_creators"]}</h3>
+                <div class='lists'>$list
+                </div>
+            </div>
+        </body>
+        </html>
+        HTML;
+        return $html;
+    }
+
+    /**
+     * Display the public lists page
+     * @return string html code
+     */
+    private function showPublicLists(): string{
+        $html = genererHeader("{$this->container->lang['phtml_public_lists']} - MyWishList", ["profile.css", "style.css", "lang.css", "search.css"]) . $this->sidebar();
+        $lists = "";        
+        if($this->request->getQueryParam('search', '') != '' || $this->request->getQueryParam('exp', '') != '') {
+            foreach(Liste::where('is_public', '1')->orderBy('expiration')->get() as $list){
+                if(!$list->isExpired() && $list->isPublished() && (($list->expiration ?? date('9999-99-99')) > filter_var($this->request->getQueryParam('exp')))  && str_contains(strtolower($list->getUserNameAttribute()) ?? "", strtolower(filter_var($this->request->getQueryParam('search', ''), FILTER_SANITIZE_STRING))))
+                    $lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
+            }
+        }else{
+            foreach(Liste::where('is_public', '1')->orderBy('expiration')->get() as $list){
+                if(!$list->isExpired() && $list->isPublished())
+                    $lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
+            }
+        }
+        $search = filter_var($this->request->getQueryParam('search'), FILTER_SANITIZE_STRING);
+        $exp = filter_var($this->request->getQueryParam('exp'), FILTER_SANITIZE_STRING);
+        $html .=<<<HTML
+            <div class="main_container">
+                <h3 class="text-white">{$this->container->lang["phtml_public_lists"]}</h3>
+                <div class="fw flex">
+                    <div id="enable" class="row flex flex-row col-4">
+                        <div class="search-box">
+                            <input type="text" value="$search" placeholder="{$this->container->lang["phtml_search_by_author"]}">
+                            <div class="search-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="cancel-icon">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        <label class="form-control-label-2" for="expiration">{$this->container->lang['date']}</label>
+                        <input type="date" id="expiration" value="$exp" class="form-control form-control-alternative search-date ml-2"/>
+                    </div>
+                </div>
+                <div class='lists'>$lists
+                </div>
+            </div>
+            <script src="/assets/js/search.js"></script>
+        </body>
+        </html>
+        HTML;
+        return $html;
+    }
+
+    /**
+     * Display the sidebar
+     * @return string html code
+     */
+    private function sidebar() : string{
+        $html = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
+        $phtmlVars = array(
+            'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
+            'user_name' => $_SESSION["USER_NAME"] ?? "{$this->container->lang['login_title']}",
+            'main_route' => $this->container->router->pathFor('home'),
+            'my_lists_route' => $this->container->router->pathFor('lists_home'),
+            'createurs_route' => $this->container->router->pathFor('createurs'),
+            'create_list_route' => $this->container->router->pathFor('lists_create'),
+            'flag_img' => "<img class='selected' alt='" . strtolower($_SESSION["lang"]) . "-flag' src='/assets/img/flags/flag-" . strtolower($_SESSION["lang"]) . ".png'>",
+            'href' => empty($_SESSION["LOGGED_IN"]) ? $this->container->router->pathFor('accounts', ["action" => "login"]) : $this->container->router->pathFor('accounts', ["action" => "logout"]),
+            'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<HTML
+
+                        <li>
+                            <a href="{$this->container->router->pathFor('accounts', ['action' => 'profile'])}">
+                                <i class='bx bxs-user'></i>
+                                <span class="links_name">{$this->container->lang['home_my_profile']}</span>
+                            </a>
+                            <span class="tooltip">{$this->container->lang['home_my_profile']}</span>
+                        </li>
+            HTML
+        );
+        foreach ($phtmlVars as $key => $value) {
+            $html = str_replace("%" . $key . "%", $value, $html);
+        }
+        preg_match_all("/{#(\w|_)+#}/", $html, $matches);
+        foreach ($matches[0] as $match) {
+            $html = str_replace($match, $this->container->lang[str_replace(["{", "#", "}"], "", $match)], $html);
+        }
+        return $html;
     }
 
     /**
@@ -718,6 +862,9 @@ class UserView extends View
     public function render(int $method, int $access_level = Renderer::OTHER_MODE): string
     {
         return match ($method) {
+            Renderer::HOME_HOME => $this->showHome(),
+            Renderer::HOME_LISTS => $this->showPublicLists(),
+            Renderer::HOME_CREATORS => $this->showCreators(),
             Renderer::LOGIN => $this->login(),
             Renderer::LOGIN_2FA => $this->login(true),
             Renderer::REGISTER => $this->register(),
@@ -773,7 +920,7 @@ class UserView extends View
     /**
      * [NEXISTS] Edit user function
      * @return void
-     * @throws ForbiddenException
+     * @throws ForbiddenException because not exists (cannot modify an user separately)
      */
     protected function edit()
     {
