@@ -76,12 +76,12 @@ class ListView extends View
         $descr_info = $this->list->description ?? $this->container->lang['none'];
         $expiration_info = !empty($this->list->expiration) ? date_format(date_create($this->list->expiration), "d-m-Y") : $this->container->lang['nc'];
         $associated_user = User::find($this->list->user_id);
-        $claim = (!empty($_SESSION['LOGGED_IN']) && !$this->list->isClaimed()) ? "<a href=".$this->container->router->pathFor('lists_claim_id', ['id' => $l->no])." class='btn btn-sm btn-default'>".$this->container->lang['list_claim']."</a>" : "<a href='#' class='btn btn-sm btn-default disabled'>".$this->container->lang['list_claim']."</a>";
+        $claim = (!empty($_SESSION['LOGGED_IN']) && !$this->list->isClaimed()) ? "<a href=" . $this->container->router->pathFor('lists_claim_id', ['id' => $l->no]) . " class='btn btn-sm btn-default'>" . $this->container->lang['list_claim'] . "</a>" : "<a href='#' class='btn btn-sm btn-default disabled'>" . $this->container->lang['list_claim'] . "</a>";
         $user_info = empty($associated_user) ? $this->container->lang['nc'] : $associated_user->lastname . ' ' . $associated_user->firstname;
         $items_list = "";
         $messages = "";
-        foreach(Message::where('list_id', 'LIKE', $this->list->no)->orderBy('date')->get() as $message){
-            $messages .= "<span class='form-control-label'>".$message->getUser()." -> ".$message->message."</span>";
+        foreach (Message::where('list_id', 'LIKE', $this->list->no)->orderBy('date')->get() as $message) {
+            $messages .= "<span class='form-control-label'>" . $message->getUser() . " -> " . $message->message . "</span>";
         }
         foreach ($l->items as $pos => $item) {
             $pos++;
@@ -106,14 +106,12 @@ class ListView extends View
             $item_del = "";
             $item_res = "";
             switch ($state_item) {
+                case 1001:
                 case 101:
                     $reservation_state = $this->container->lang['item_unreserved'];
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
-                case 1001:
-                    $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    break;
+                case 1002:
                 case 10001:
                     $reservation_state = $this->container->lang['item_unreserved'];
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
@@ -130,20 +128,10 @@ class ListView extends View
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
+                case 10002:
                 case 102:
                     $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_res = "<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => $public_key])}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    break;
-                case 1002:
-                    $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    break;
-                case 10002:
-                    $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_res = "<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => $public_key])}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_res = "<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => $public_key])}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img alt='validate' src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
@@ -159,7 +147,7 @@ class ListView extends View
                     $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
             }
-            $item_desc = "<span class='pos'>$pos</span>$item->nom" . (!empty($item->img) ? (file_exists($this->container['items_img_dir'].DIRECTORY_SEPARATOR . "$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/.]+).(jpe?g|png))?$/", $item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")) : "");
+            $item_desc = "<span class='pos'>$pos</span>$item->nom" . (!empty($item->img) ? (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . "$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/.]+).(jpe?g|png))?$/", $item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")) : "");
             $pk = $this->request->getQueryParam('public_key') ?? $this->request->getParsedBodyParam('public_key') ?? "";
             $routeItemShow = $this->container->router->pathFor("items_show_id", ["id" => $item->id]);
             $items_list .= <<<HTML
@@ -211,12 +199,12 @@ class ListView extends View
                                 </div>
                                 <form action="{$this->container->router->pathFor('lists_add_message_id', ['id' => $this->list->no])}" method="POST" class="card-body flex">
                                     <div class="flex flex-row">
-                                        <label class="form-control-label mr-2" for="titre">{$this->container->lang['user_email']}</label>
+                                        <label class="form-control-label mr-2" for="email">{$this->container->lang['user_email']}</label>
                                         <input type="email" id="email" name="email" class="form-control form-control-alternative" value="$email" required>
                                     </div> 
                                     <div class="flex flex-row mt-4">
-                                        <label class="form-control-label mr-2" for="titre">{$this->container->lang['message']}</label>
-                                        <input type="text" name="message" class="form-control form-control-alternative" autofocus/>
+                                        <label class="form-control-label mr-2" for="message">{$this->container->lang['message']}</label>
+                                        <input type="text" name="message" id="message" class="form-control form-control-alternative" autofocus/>
                                     </div> 
                                     <button class="btn btn-sm btn-info mt-4">{$this->container->lang['list_add_message']}</button>
                                 </form>
@@ -576,7 +564,8 @@ class ListView extends View
      * Display the list for public lists
      * @return string html code
      */
-    private function showForMenu(){
+    private function showForMenu(): string
+    {
         return "\n\t\t\t<div class='mb-2'>\n\t\t\t\t<a href='{$this->container->router->pathFor('lists_show_id', ['id' => $this->list->no])}'>\n\t\t\t\t\t<div class='mw list form-control form-control-alternative flex flex-row'>\n\t\t\t\t\t\t<span class='mw text-white form-control-label'>{$this->list->titre}</span>\n\t\t\t\t\t</div>\n\t\t\t\t</a>\n\t\t\t</div>";
     }
 

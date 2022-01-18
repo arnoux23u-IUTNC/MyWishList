@@ -1,6 +1,4 @@
-<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-/** @noinspection PhpUndefinedVariableInspection */
-/** @noinspection PhpUndefinedFieldInspection */
+<?php /** @noinspection PhpUndefinedFieldInspection */
 
 namespace mywishlist\mvc\views;
 
@@ -68,19 +66,14 @@ class ItemView extends View
         $descr_info = $this->item->descr ?? $this->container->lang['none'];
         $url_info = $this->item->url ?? $this->container->lang['none'];
         $tarif_info = $this->item->tarif ?? $this->container->lang['nc'];
-        if(!empty($pot->montant)){
+        if (!empty($pot->montant)) {
             $collected = $pot->totalAmount();
-            switch ($this->access_level){
-                case Renderer::ADMIN_MODE:
-                case Renderer::OWNER_MODE:
-                    $pot_participate = "<div class='form-group focused'>\n\t\t\t\t\t\t\t\t\t\t".$pot->participants()."</div>";
-                    break;
-                case Renderer::OTHER_MODE:
-                    $pot_participate = ($collected < $pot->montant && !$pot->isExpired()) ? "<a href='{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'participate'], ["public_key" => $pk])}' class='btn btn-sm btn-default'>{$this->container->lang['participate_pot']}</a>" : "<a href='#' class='btn btn-sm btn-default disabled'>{$this->container->lang['participate_pot']}</a>";
-                    break;
-            }
+            $pot_participate = match ($this->access_level) {
+                Renderer::ADMIN_MODE, Renderer::OWNER_MODE => "<div class='form-group focused'>\n\t\t\t\t\t\t\t\t\t\t" . $pot->participants() . "</div>",
+                Renderer::OTHER_MODE => ($collected < $pot->montant && !$pot->isExpired()) ? "<a href='{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'participate'], ["public_key" => $pk])}' class='btn btn-sm btn-default'>{$this->container->lang['participate_pot']}</a>" : "<a href='#' class='btn btn-sm btn-default disabled'>{$this->container->lang['participate_pot']}</a>",
+            };
             $pot_participate .= "\n\t\t\t\t\t\t\t\t\t\t<a href='{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'delete'])}' class='btn btn-sm btn-danger'>{$this->container->lang['delete_pot']}</a>";
-            $pot_amount = number_format($collected, 2)." / $pot->montant €";
+            $pot_amount = number_format($collected, 2) . " / $pot->montant €";
             $end_date_pot = $pot->limite ?? $this->container->lang['none'];
             $pot_desc = <<<HTML
             <div class="card-body">
@@ -294,7 +287,7 @@ class ItemView extends View
                                         </div>
                                         <div class="row fw">
                                             <button type="submit" class="btn btn-sm btn-primary" name="sendBtn">{$this->container->lang['participate']}</button>
-                                            <input type="hidden" name="public_key" value="{$this->request->getQueryParam('public_key','')}"/>
+                                            <input type="hidden" name="public_key" value="{$this->request->getQueryParam('public_key', '')}"/>
                                         </div>
                                     </div>
                                 </div>

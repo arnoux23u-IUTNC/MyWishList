@@ -1,6 +1,4 @@
-<?php /** @noinspection PhpUndefinedVariableInspection */
-
-/** @noinspection PhpUndefinedFieldInspection */
+<?php /** @noinspection PhpUndefinedFieldInspection */
 
 namespace mywishlist\mvc\views;
 
@@ -262,9 +260,9 @@ class UserView extends View
         $username = filter_var($this->request->getQueryParam('username'), FILTER_SANITIZE_STRING) ?? "";
         $routeRecover = $this->container->router->pathFor('2fa', ["action" => 'recover']);
         $popup = "\n\t\t\t\t\t" . match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
-            "nok" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_2fa_incorrect_code']}</span></div>",
-            default => ""
-        };
+                "nok" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_2fa_incorrect_code']}</span></div>",
+                default => ""
+            };
         return genererHeader("{$this->container->lang['user_2fa_recover']} - MyWishList", ["profile.css"]) . <<<HTML
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
@@ -613,6 +611,7 @@ class UserView extends View
     }
 
     //TODO LANG ICI ET W3C
+
     /**
      * Display the 2fa manage page
      * @return string
@@ -722,7 +721,8 @@ class UserView extends View
      * Display the home page
      * @return string html code
      */
-    private function showHome(): string{
+    private function showHome(): string
+    {
         $routeCreate = $this->container->router->pathFor('lists_create');
         $html = genererHeader("{$this->container->lang['home_title']} - MyWishList", ["style.css", "lang.css"]) . $this->sidebar();
         $html .= <<<HTML
@@ -740,12 +740,14 @@ class UserView extends View
     /**
      * Display the creators page
      * @return string html code
+     * @throws ForbiddenException error while render
      */
-    private function showCreators(): string{
+    private function showCreators(): string
+    {
         $list = "";
         $html = genererHeader("{$this->container->lang['phtml_creators']} - MyWishList", ["profile.css", "style.css", "lang.css"]) . $this->sidebar();
-        foreach(User::all() as $user){
-            if(Liste::whereUserId($user->user_id)->count() > 0)
+        foreach (User::all() as $user) {
+            if (Liste::whereUserId($user->user_id)->count() > 0)
                 $list .= (new UserView($this->container, $user, $this->request))->render(Renderer::SHOW_FOR_MENU);
         }
         $html .= <<<HTML
@@ -763,24 +765,26 @@ class UserView extends View
     /**
      * Display the public lists page
      * @return string html code
+     * @throws ForbiddenException error while render
      */
-    private function showPublicLists(): string{
+    private function showPublicLists(): string
+    {
         $html = genererHeader("{$this->container->lang['phtml_public_lists']} - MyWishList", ["profile.css", "style.css", "lang.css", "search.css"]) . $this->sidebar();
-        $lists = "";        
-        if($this->request->getQueryParam('search', '') != '' || $this->request->getQueryParam('exp', '') != '') {
-            foreach(Liste::where('is_public', '1')->orderBy('expiration')->get() as $list){
-                if(!$list->isExpired() && $list->isPublished() && (($list->expiration ?? date('9999-99-99')) > filter_var($this->request->getQueryParam('exp')))  && str_contains(strtolower($list->getUserNameAttribute()) ?? "", strtolower(filter_var($this->request->getQueryParam('search', ''), FILTER_SANITIZE_STRING))))
+        $lists = "";
+        if ($this->request->getQueryParam('search', '') != '' || $this->request->getQueryParam('exp', '') != '') {
+            foreach (Liste::where('is_public', 'LIKE', '1')->orderBy('expiration')->get() as $list) {
+                if (!$list->isExpired() && $list->isPublished() && (($list->expiration ?? date('9999-99-99')) > filter_var($this->request->getQueryParam('exp'))) && str_contains(strtolower($list->getUserNameAttribute()) ?? "", strtolower(filter_var($this->request->getQueryParam('search', ''), FILTER_SANITIZE_STRING))))
                     $lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
             }
-        }else{
-            foreach(Liste::where('is_public', '1')->orderBy('expiration')->get() as $list){
-                if(!$list->isExpired() && $list->isPublished())
+        } else {
+            foreach (Liste::where('is_public', 'LIKE', '1')->orderBy('expiration')->get() as $list) {
+                if (!$list->isExpired() && $list->isPublished())
                     $lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
             }
         }
         $search = filter_var($this->request->getQueryParam('search'), FILTER_SANITIZE_STRING);
         $exp = filter_var($this->request->getQueryParam('exp'), FILTER_SANITIZE_STRING);
-        $html .=<<<HTML
+        $html .= <<<HTML
             <div class="main_container">
                 <h3 class="text-white">{$this->container->lang["phtml_public_lists"]}</h3>
                 <div class="fw flex">
@@ -812,7 +816,8 @@ class UserView extends View
      * Display the sidebar
      * @return string html code
      */
-    private function sidebar() : string{
+    private function sidebar(): string
+    {
         $html = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR . 'sidebar.phtml');
         $phtmlVars = array(
             'iconclass' => empty($_SESSION["LOGGED_IN"]) ? "bx bx-lock-open-alt" : "bx bx-log-out",
@@ -848,7 +853,8 @@ class UserView extends View
      * Display the profile of user for include in a list
      * @return string html code
      */
-    private function showInList(){
+    private function showInList(): string
+    {
         $avatar = (!empty($this->user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar)) ? "/assets/img/avatars/{$this->user->avatar}" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($this->user->mail))) . "?size=120";
         return "\n\t\t\t<div class='mb-2'>\n\t\t\t\t<div class='list form-control mw form-control-alternative flex flex-row'>\n\t\t\t\t\t<span class='mw text-white form-control-label'>{$this->user->name()}</span>\n\t\t\t\t\t<img alt='profilepicture' class='rounded-circle minimified' src='$avatar'/>\n\t\t\t\t</div>\n\t\t\t</div>";
     }
@@ -920,7 +926,7 @@ class UserView extends View
     /**
      * [NEXISTS] Edit user function
      * @return void
-     * @throws ForbiddenException because not exists (cannot modify an user separately)
+     * @throws ForbiddenException because not exists (cannot modify a user separately)
      */
     protected function edit()
     {

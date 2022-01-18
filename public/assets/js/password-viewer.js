@@ -1,8 +1,8 @@
 'use strict';
 
-$(document).ready(function() {
-    $('.pwdicon').each(function() {
-        $(this).click(function(event) {
+$(document).ready(function () {
+    $('.pwdicon').each(function () {
+        $(this).click(function (event) {
             pwd($(this).attr('data-associated'), event);
         });
     });

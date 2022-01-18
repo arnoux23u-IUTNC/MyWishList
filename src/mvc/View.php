@@ -7,7 +7,6 @@ namespace mywishlist\mvc;
 use Slim\Container;
 use Slim\Http\Request;
 use Illuminate\Database\Eloquent\Model;
-use mywishlist\mvc\models\Liste;
 use mywishlist\exceptions\ForbiddenException;
 
 /**
@@ -51,7 +50,6 @@ abstract class View
     protected function requestAuth(Model $model): string
     {
         $from = $this->request->getRequestTarget();
-        /** @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection */
         switch ($from) {
             case (bool)preg_match('/^\/lists\/[0-9]+\/edit\/items(\/?)/', $from) :
                 $from = $this->container->router->pathFor('lists_edit_items_id', ['id' => $model->no]);

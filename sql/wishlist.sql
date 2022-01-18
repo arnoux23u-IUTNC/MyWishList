@@ -21,7 +21,7 @@ CREATE TABLE `accounts`
     `last_ip`    bigint(20)   NOT NULL,
     `is_admin`   tinyint(1)   NOT NULL DEFAULT 0,
     `totp_key`   varchar(255)          DEFAULT NULL UNIQUE,
-    `api_key`   varchar(255)           DEFAULT NULL UNIQUE
+    `api_key`    varchar(255)          DEFAULT NULL UNIQUE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -55,9 +55,9 @@ CREATE TABLE `liste`
 
 CREATE TABLE `reserve`
 (
-    `item_id` int(11) NOT NULL,
+    `item_id`    int(11)      NOT NULL,
     `user_email` varchar(255) NOT NULL,
-    `message` varchar(255)    DEFAULT NULL, 
+    `message`    varchar(255) DEFAULT NULL,
     PRIMARY KEY (`item_id`, `user_email`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
@@ -71,27 +71,36 @@ CREATE TABLE `totp_rescue_codes`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-CREATE TABLE `messages` (
-  `list_id` int(11) NOT NULL,
-  `user_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `message` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `date` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`list_id`,`user_email`,`message`,`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `messages`
+(
+    `list_id`    int(11)                              NOT NULL,
+    `user_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+    `message`    varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+    `date`       timestamp                            NOT NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`list_id`, `user_email`, `message`, `date`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-CREATE TABLE `cagnotte` (
-  `item_id` int(11) NOT NULL,
-  `montant` decimal(7,2) NOT NULL,
-  `limite` date DEFAULT NULL,
-  PRIMARY KEY (`item_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `cagnotte`
+(
+    `item_id` int(11)       NOT NULL,
+    `montant` decimal(7, 2) NOT NULL,
+    `limite`  date DEFAULT NULL,
+    PRIMARY KEY (`item_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-CREATE TABLE `participe` (
-  `cagnotte_itemid` int(11) NOT NULL,
-  `user_email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `montant` decimal(7,2) NOT NULL,
-  PRIMARY KEY (`cagnotte_itemid`,`user_email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+CREATE TABLE `participe`
+(
+    `cagnotte_itemid` int(11)                              NOT NULL,
+    `user_email`      varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+    `montant`         decimal(7, 2)                        NOT NULL,
+    PRIMARY KEY (`cagnotte_itemid`, `user_email`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
 CREATE TABLE `temporary_waiting_users`
 (
@@ -104,10 +113,10 @@ CREATE TABLE `temporary_waiting_users`
   COLLATE = utf8_unicode_ci;
 
 ALTER TABLE `participe`
-  ADD CONSTRAINT `fkparticipe_cagnotte` FOREIGN KEY (`cagnotte_itemid`) REFERENCES `cagnotte` (`item_id`);
+    ADD CONSTRAINT `fkparticipe_cagnotte` FOREIGN KEY (`cagnotte_itemid`) REFERENCES `cagnotte` (`item_id`);
 COMMIT;
 ALTER TABLE `cagnotte`
-  ADD CONSTRAINT `fkcagnotte_item` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
+    ADD CONSTRAINT `fkcagnotte_item` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
 COMMIT;
 ALTER TABLE `item`
     ADD CONSTRAINT `item_listeidfk` FOREIGN KEY (`liste_id`) REFERENCES `liste` (`no`);
@@ -119,9 +128,6 @@ ALTER TABLE `totp_rescue_codes`
     ADD CONSTRAINT `totp_useridfk` FOREIGN KEY (`user`) REFERENCES `accounts` (`user_id`);
 ALTER TABLE `messages`
     ADD CONSTRAINT `fkmessage_listid` FOREIGN KEY (`list_id`) REFERENCES `liste` (`no`);
-
-INSERT INTO `accounts` (`username`, `lastname`, `firstname`, `password`, `mail`, `avatar`, `last_ip`, `is_admin`, `totp_key`)
-VALUES ('admin', 'ADMINISTRATOR', 'ADMINISTRATOR', '$2y$12$od1gC5TZWJGodSmmJwmC3Olwpf/ssKi1rhRnBfSKnjmARqZQSEtwW', 'admin@mail.com', NULL, 0, 1, NULL);
 
 GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
 

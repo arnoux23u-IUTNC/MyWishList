@@ -6,7 +6,7 @@ $lang = [];
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'i18n' . DIRECTORY_SEPARATOR . 'langs.php';
 
-use mywishlist\bd\Eloquent as Eloquent;
+use mywishlist\db\Eloquent as Eloquent;
 use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem, ControllerAPI};
 use mywishlist\exceptions\ExceptionHandler;
 use Slim\{App, Container};
@@ -48,7 +48,7 @@ $app = new App($container);
 $app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->auth2FA();
 })->setName('2fa');
-$app->any("/accounts/{action:login|profile|logout|register|forgot_password|reset_password|api_key|delete}[/]", function ($request, $response, $args) {
+$app->any("|/accounts/{action:login|profile|logout|register|forgot_passwordreset_password|api_key|delete}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
 //Listes
@@ -71,7 +71,7 @@ $app->any("/lists/new[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->create();
 })->setName('lists_create');
 $app->any("/lists[/]", function ($request, $response, $args) use ($lang) {
-    return (new ControllerUser($this, $request, $response, $args))->publicLists();	
+    return (new ControllerUser($this, $request, $response, $args))->publicLists();
 })->setName('lists_home');
 //Items
 $app->any("/items/{id:[0-9]+}/pot/{action:delete|participate|create}[/]", function ($request, $response, $args) {

@@ -3,7 +3,7 @@
 namespace mywishlist\mvc\models;
 
 use Illuminate\Database\Eloquent\Model;
-use mywishlist\bd\HasCompositePrimaryKey;
+use mywishlist\db\HasCompositePrimaryKey;
 
 /**
  * RescueCode Model

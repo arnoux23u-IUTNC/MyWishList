@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property float $tarif
  * @property mixed $liste Goes to liste() method, eloquent relation
  * @method static where(string $string, string $string1, string $string2) Eloquent method
+ * @method static find(int $item_id) Eloquent method
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\models
  */

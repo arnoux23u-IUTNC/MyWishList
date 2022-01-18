@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedVariableInspection */
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
 /** @noinspection PhpUndefinedFieldInspection */
 
@@ -207,24 +207,30 @@ class ControllerUser
     /**
      * Control the home page render
      * @return Response
+     * @throws ForbiddenException error while render
      */
-    public function home(): Response{
+    public function home(): Response
+    {
         return $this->response->write((new UserView($this->container, request: $this->request))->render(Renderer::HOME_HOME));
     }
 
     /**
      * Control the creators page render
      * @return Response
+     * @throws ForbiddenException error while render
      */
-    public function creators(): Response{
+    public function creators(): Response
+    {
         return $this->response->write((new UserView($this->container, request: $this->request))->render(Renderer::HOME_CREATORS));
     }
 
     /**
      * Control the public lists page render
      * @return Response
+     * @throws ForbiddenException error while render
      */
-    public function publicLists(): Response{
+    public function publicLists(): Response
+    {
         return $this->response->write((new UserView($this->container, request: $this->request))->render(Renderer::HOME_LISTS));
     }
 
@@ -284,7 +290,7 @@ class ControllerUser
                 $user->save();
                 $user->authenticate();
                 //Supressions des utilisateurs temporaires et attribution des listes si existantes
-                foreach(UserTemporaryResolver::whereEmail($email)->get() as $tmp){
+                foreach (UserTemporaryResolver::whereEmail($email)->get() as $tmp) {
                     $tmp->liste->update(['user_id' => $user->user_id]);
                     $tmp->delete();
                 }
@@ -471,7 +477,7 @@ class ControllerUser
     }
 
     /**
-     * Control the delete account action
+     * Control delete account action
      * @return Response
      * @throws ForbiddenException
      * @throws MethodNotAllowedException
@@ -491,28 +497,28 @@ class ControllerUser
                 $password = filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING);
                 if (!password_verify($password, $this->user->password))
                     return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'delete'], ["info" => "password"]));
-                foreach(Liste::whereUserId($this->user->user_id)->get() as $list){                    
-                    foreach($list->items as $item){
+                foreach (Liste::whereUserId($this->user->user_id)->get() as $list) {
+                    foreach ($list->items as $item) {
                         Reservation::where('item_id', 'LIKE', $item->id)->delete();
                         Participation::whereCagnotteItemid($item->id)->delete();
                         Cagnotte::where('item_id', 'LIKE', $item->id)->delete();
-                        if(file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img))
+                        if (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img))
                             unlink($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img);
                         $item->delete();
                     }
                     $list->delete();
-                };
-                foreach(Reservation::where('user_email', 'LIKE', $this->user->mail)->get() as $reservation){
+                }
+                foreach (Reservation::where('user_email', 'LIKE', $this->user->mail)->get() as $reservation) {
                     $liste = Item::find($reservation->item_id)->liste;
-                    if($liste->isExpired())
+                    if ($liste->isExpired())
                         $reservation->delete();
                 }
-                if(file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar))
+                if (file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar))
                     unlink($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar);
                 RescueCode::whereUser($this->user->user_id)->delete();
                 $this->user->logout();
                 $this->user->delete();
-                return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "deleted"]));   
+                return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'login'], ["info" => "deleted"]));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }

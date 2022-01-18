@@ -1,8 +1,7 @@
-<?php /** @noinspection PhpUndefinedFieldInspection */
+<?php
 
 namespace mywishlist\mvc\models;
 
-use mywishlist\mvc\models\Participation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -11,9 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Inherits from the Model class of Laravel
  * @property int $item_id
  * @property float $montant
- * @property date $expiration
+ * @property mixed $expiration
  * @property mixed $item Goes to item() method, eloquent relation
  * @method static where(string $string, string $string1, string $string2) Eloquent method
+ * @method static find(int $cagnotte_id) Eloquent method
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\models
  */
@@ -25,7 +25,7 @@ class Cagnotte extends Model
     protected $guarded = [];
 
     /**
-     * Get the associated item of an pot
+     * Get the associated item of a pot
      * @return BelongsTo item belongsTo relation
      */
     public function item(): BelongsTo
@@ -45,8 +45,10 @@ class Cagnotte extends Model
     /**
      * Get all participants of a pot
      * @return string html code of the participants
+     * @noinspection PhpUnused
      */
-    public function participants(): string{
+    public function participants(): string
+    {
         $html = "";
         foreach (Participation::whereCagnotteItemid($this->item_id)->get() as $participant) {
             $html .= "\t<span class='form-control-label'>$participant->user_email -> $participant->montant €</span>\n\t\t\t\t\t\t\t\t\t\t";
@@ -58,9 +60,10 @@ class Cagnotte extends Model
      * Get total amount of a pot
      * @return float total amount
      */
-    public function totalAmount(): float{
+    public function totalAmount(): float
+    {
         $total = 0;
-        foreach (Participation::where('cagnotte_itemid', $this->item_id)->get() as $participant) {
+        foreach (Participation::where('cagnotte_itemid', 'LIKE', $this->item_id)->get() as $participant) {
             $total += $participant->montant;
         }
         return $total;
@@ -70,7 +73,8 @@ class Cagnotte extends Model
      * Calculate the remaining amount of a pot
      * @return float remaining amount
      */
-    public function reste(): float{
+    public function reste(): float
+    {
         return $this->montant - $this->totalAmount();
     }
 
@@ -78,8 +82,9 @@ class Cagnotte extends Model
      * Delete a pot
      * Delete all participations of the pot
      */
-    public function remove(): void {
-        Participation::where('cagnotte_itemid', $this->item_id)->delete();
+    public function remove(): void
+    {
+        Participation::where('cagnotte_itemid', 'LIKE', $this->item_id)->delete();
         $this->delete();
     }
 

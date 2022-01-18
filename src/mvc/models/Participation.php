@@ -3,7 +3,7 @@
 namespace mywishlist\mvc\models;
 
 use Illuminate\Database\Eloquent\Model;
-use mywishlist\bd\HasCompositePrimaryKey;
+use mywishlist\db\HasCompositePrimaryKey;
 
 /**
  * Participation Model
@@ -13,6 +13,7 @@ use mywishlist\bd\HasCompositePrimaryKey;
  * @property float $montant
  * @method static whereCagnotteItemidAndUserEmail($item_id, string $user_email) Eloquent method
  * @method static whereCagnotteItemid(int $cagnotte_itemid) Eloquent method
+ * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @author Guillaume ARNOUX
  * @package mywishlist\mvc\models
  */

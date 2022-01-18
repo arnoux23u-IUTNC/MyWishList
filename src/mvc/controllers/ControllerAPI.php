@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedFieldInspection */
+<?php
 
 namespace mywishlist\mvc\controllers;
 

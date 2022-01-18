@@ -1,6 +1,6 @@
 <?php
 
-namespace mywishlist\bd;
+namespace mywishlist\db;
 
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  * Source : https://github.com/mopo922/LaravelTreats/blob/master/src/Model/Traits/HasCompositePrimaryKey.php
  * @author Mark Potter
  * @author Guillaume ARNOUX
- * @package mywishlist\bd
+ * @package mywishlist\db
  */
 trait HasCompositePrimaryKey
 {

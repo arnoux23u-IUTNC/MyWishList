@@ -10,8 +10,8 @@ use Slim\Exception\{NotFoundException, MethodNotAllowedException};
 use mywishlist\Validator;
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\ItemView;
-use mywishlist\mvc\models\{Item, User, Reservation, Cagnotte, Participation};
 use mywishlist\exceptions\ForbiddenException;
+use mywishlist\mvc\models\{Item, User, Reservation, Cagnotte, Participation};
 
 /**
  * Class ControllerItem
@@ -113,7 +113,7 @@ class ControllerItem
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
     }
-  
+
     /**
      * Control creation of pot for an item
      * @return Response
@@ -157,7 +157,7 @@ class ControllerItem
                 if (!$this->user->isAdmin() && !$this->user->canInteractWithList($liste) && (empty($this->request->getParsedBodyParam('auth')) || filter_var($this->request->getParsedBodyParam('auth'), FILTER_SANITIZE_STRING) !== '1'))
                     return $this->response->write($this->renderer->render(Renderer::POT_CREATE));
                 $amount = filter_var($this->request->getParsedBodyParam('amount'), FILTER_SANITIZE_NUMBER_FLOAT);
-                if(empty($amount))
+                if (empty($amount))
                     return $this->response->withRedirect($this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'create'], ["info" => "errAmount"]));
                 //Création de la cagnotte
                 $pot = new Cagnotte();
@@ -196,6 +196,8 @@ class ControllerItem
                 //Si l'utilisateur n'est pas admin et ne peut pas interagir avec la liste, on lui demande la clé privée
                 if (!$this->user->isAdmin() && !$this->user->canInteractWithList($liste))
                     return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH));
+                $pot->remove();
+                return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "info" => "deletedPot"]));
             case 'POST':
                 /*Trois cas de figure :
                 - L'utilisateur est admin ou peut modifier la liste, on passe a l'edition
@@ -233,7 +235,7 @@ class ControllerItem
         $pot = Cagnotte::find($this->item->id);
         if (empty($pot->montant))
             return $this->response->withRedirect($this->container->router->pathFor('items_show_id', ["id" => $this->item->id], ["state" => "noPot"]));
-        if($pot->isExpired() || $pot->totalAmount() >= $pot->montant)
+        if ($pot->isExpired() || $pot->totalAmount() >= $pot->montant)
             return $this->response->withRedirect($this->container->router->pathFor('items_show_id', ["id" => $this->item->id], ["state" => "errPot"]));
         switch ($this->request->getMethod()) {
             case 'GET':
@@ -247,15 +249,15 @@ class ControllerItem
                     throw new ForbiddenException(message: $this->container->lang['exception_ressource_not_allowed']);
                 $amount = filter_var($this->request->getParsedBodyParam('amount'), FILTER_SANITIZE_NUMBER_FLOAT);
                 $email = filter_var($this->request->getParsedBodyParam('email'), FILTER_SANITIZE_EMAIL);
-                if(empty($amount) || $amount < 1 || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || $amount > $pot->reste())
+                if (empty($amount) || $amount < 1 || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || $amount > $pot->reste())
                     return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ['id' => $liste->no], ["public_key" => $liste->public_key, "info" => "errPot"]));
-                if(!empty(Participation::whereCagnotteItemidAndUserEmail($pot->item_id, $email)->first()))
+                if (!empty(Participation::whereCagnotteItemidAndUserEmail($pot->item_id, $email)->first()))
                     return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ['id' => $liste->no], ["public_key" => $liste->public_key, "info" => "alreadyPot"]));
                 $p = new Participation();
                 $p->cagnotte_itemid = $this->item->id;
                 $p->montant = $amount;
                 $p->user_email = $email;
-                $p->save();                
+                $p->save();
                 return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ["id" => $liste->no], ["public_key" => $liste->public_key, "info" => "potOk"]));
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
@@ -278,7 +280,7 @@ class ControllerItem
         //On verifie donc si l'item est attribué à une liste. Si non : on déclenche une erreur
         if (!$this->user->isAdmin() && empty($liste))
             throw new ForbiddenException($this->container->lang['exception_forbidden'], $this->container->lang['exception_ressource_not_allowed']);
-        if($this->request->getMethod() != 'POST')
+        if ($this->request->getMethod() != 'POST')
             throw new MethodNotAllowedException($this->request, $this->response, ['POST']);
         /*Deux cas de figure :
         - L'utilisateur est admin ou peut modifier la liste, on passe a l'edition
@@ -289,10 +291,10 @@ class ControllerItem
         if (empty($this->request->getParsedBodyParam('sendBtn')) || filter_var($this->request->getParsedBodyParam('sendBtn'), FILTER_SANITIZE_STRING) !== 'OK')
             return $this->response->write($this->renderer->render(Renderer::RESERVATION_FORM));
         $email = filter_var($this->request->getParsedBodyParam('email'), FILTER_SANITIZE_EMAIL);
-        if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL))
             return $this->response->withRedirect($this->container->router->pathFor('lists_show_id', ['id' => $liste->no], ["state" => "error"]));
         //Si l'utilisateur n'est pas loggé, on enregistre son email dans un cookie pendant 1h
-        if(empty($_SESSION["LOGGED_IN"]))
+        if (empty($_SESSION["LOGGED_IN"]))
             setcookie("user_email", $email, time() + 3600, "/", "");
         $res = new Reservation();
         $res->item_id = $this->item->id;
@@ -372,6 +374,9 @@ class ControllerItem
     /**
      * Process request for the pot of an item
      * @return Response
+     * @throws MethodNotAllowedException if the request method is not allowed
+     * @throws NotFoundException if the item does not exist
+     * @throws ForbiddenException if the user cannot interact with the item
      */
     public function actionPot(): Response
     {

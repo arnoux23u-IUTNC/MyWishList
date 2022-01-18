@@ -3,7 +3,7 @@
 namespace mywishlist\mvc\models;
 
 use Illuminate\Database\Eloquent\Model;
-use mywishlist\bd\HasCompositePrimaryKey;
+use mywishlist\db\HasCompositePrimaryKey;
 
 /**
  * Message Model
@@ -19,7 +19,7 @@ use mywishlist\bd\HasCompositePrimaryKey;
  */
 class Message extends Model
 {
-    use HasCompositePrimaryKey; 
+    use HasCompositePrimaryKey;
 
     protected $table = 'messages';
     protected $primaryKey = ['list_id', 'user_email', 'message', 'date'];
