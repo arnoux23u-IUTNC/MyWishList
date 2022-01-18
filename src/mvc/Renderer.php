@@ -17,6 +17,9 @@ abstract class Renderer
     const SHOW_FOR_MENU = 2;
     const CREATE = 3;
     const EDIT = 4;
+    const HOME_HOME = 5;
+    const HOME_LISTS = 6;
+    const HOME_CREATORS = 7;
     const EDIT_ADD_ITEM = 22;
     const POT_CREATE = 23;
     const POT_PARTICIPATE = 24;
