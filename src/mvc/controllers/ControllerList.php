@@ -13,7 +13,7 @@ use mywishlist\Validator;
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\ListView;
 use mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{Liste, Message, User, UserTemporaryResolver};
+use mywishlist\mvc\models\{Liste, Message, User, UserTemporaryResolver, Reservation, Participation, Cagnotte};
 
 /**
  * Class ControllerList
@@ -181,6 +181,46 @@ class ControllerList
             default:
                 throw new MethodNotAllowedException($this->request, $this->response, ['GET', 'POST']);
         }
+    }
+
+    /**
+     * Control deletion of a list
+     * @return Response
+     * @throws MethodNotAllowedException
+     * @throws Exception
+     */
+    public function delete(): Response
+    {
+        //Si la liste n'existe pas, on declenche une erreur
+        if (empty($this->liste))
+            throw new NotFoundException($this->request, $this->response);
+        switch ($this->request->getMethod()) {
+            case 'GET':
+                //Si l'utilisateur n'a pas les permissions nécessaires, on affiche une erreur
+                if (!$this->user->isAdmin() && !$this->user->canInteractWithList($this->liste))
+                    return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH));
+                break;
+            case 'POST':
+                if (!$this->user->isAdmin() && !$this->user->canInteractWithList($this->liste) && empty($this->request->getParsedBodyParam('private_key')))
+                    return $this->response->write($this->renderer->render(Renderer::REQUEST_AUTH));
+                if (!$this->user->isAdmin() && !$this->user->canInteractWithList($this->liste) && !password_verify(filter_var($this->request->getParsedBodyParam('private_key') ?? "", FILTER_SANITIZE_STRING), $this->liste->private_key))
+                    return $this->response->withRedirect($this->container->router->pathFor('lists_delete_id', ['id' => $this->liste->no], ["info" => "errtoken"]));
+                break;
+        }
+        foreach ($this->liste->items as $item) {
+            //Supression des reservations, des participations, des cagnottes et de l'image des items
+            Reservation::where('item_id', 'LIKE', $item->id)->delete();
+            Participation::whereCagnotteItemid($item->id)->delete();
+            Cagnotte::where('item_id', 'LIKE', $item->id)->delete();
+            if (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img))
+                unlink($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img);
+            $item->delete();
+        }
+        //Supression des messages
+        Message::where('list_id', 'LIKE', $this->liste->no)->delete();
+        //Supression liste
+        $this->liste->delete();
+        return $this->response->withRedirect($this->container->router->pathFor('home', [], ["info" => "deleted"]));
     }
 
     /**

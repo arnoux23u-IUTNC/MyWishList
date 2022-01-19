@@ -13,7 +13,7 @@ use mywishlist\{Validator, MailSender};
 use mywishlist\mvc\Renderer;
 use mywishlist\mvc\views\UserView;
 use mywishlist\exceptions\ForbiddenException;
-use mywishlist\mvc\models\{User, RescueCode, PasswordReset, Liste, Cagnotte, Participation, Reservation, Item, UserTemporaryResolver};
+use mywishlist\mvc\models\{User, RescueCode, PasswordReset, Liste, Cagnotte, Participation, Reservation, Item, UserTemporaryResolver, Message};
 
 /**
  * Class ControllerUser
@@ -497,6 +497,7 @@ class ControllerUser
                 $password = filter_var($this->request->getParsedBodyParam('password'), FILTER_SANITIZE_STRING);
                 if (!password_verify($password, $this->user->password))
                     return $this->response->withRedirect($this->container->router->pathFor('accounts', ["action" => 'delete'], ["info" => "password"]));
+                //Supression des reservations, des participations, des cagnottes et de l'image 
                 foreach (Liste::whereUserId($this->user->user_id)->get() as $list) {
                     foreach ($list->items as $item) {
                         Reservation::where('item_id', 'LIKE', $item->id)->delete();
@@ -506,6 +507,8 @@ class ControllerUser
                             unlink($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . $item->img);
                         $item->delete();
                     }
+                    //Supression des messages
+                    Message::where('list_id', 'LIKE', $this->liste->no)->delete();
                     $list->delete();
                 }
                 foreach (Reservation::where('user_email', 'LIKE', $this->user->mail)->get() as $reservation) {

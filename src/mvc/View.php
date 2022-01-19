@@ -66,6 +66,11 @@ abstract class View
                 $title = $this->container->lang['list_claim'];
                 $dataModel = $model->no;
                 break;
+            case (bool)preg_match('/^\/lists\/[0-9]+\/delete(\/?)/', $from) :
+                $from = $this->container->router->pathFor('lists_delete_id', ['id' => $model->no]);
+                $title = $this->container->lang['list_delete'];
+                $dataModel = $model->no;
+                break;
             case (bool)preg_match('/^\/items\/[0-9]+\/edit(\/?)/', $from) :
                 $from = $this->container->router->pathFor('items_edit_id', ['id' => $model->id]);
                 $title = $this->container->lang['item_editing'];

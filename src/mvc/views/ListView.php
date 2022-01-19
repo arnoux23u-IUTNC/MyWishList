@@ -45,8 +45,6 @@ class ListView extends View
     {
         $l = $this->list;
         $public_key = $this->request->getQueryParam('public_key');
-        //$routeAddItem = $this->container->router->pathFor('lists_edit_items_id',['id' => $l->no]);
-
         //Headers HTML
         $dataHeader = match (filter_var($this->request->getQueryParam('state'), FILTER_SANITIZE_STRING) ?? "") {
             "update" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['list_updated']}</span></div>",
@@ -255,6 +253,7 @@ class ListView extends View
                                         </div>
                                         <a href="{$this->container->router->pathFor('lists_edit_items_id', ['id' => $l->no])}" class="btn btn-sm btn-primary">{$this->container->lang['list_add_item']}</a>
                                         $claim
+                                        <a href="{$this->container->router->pathFor('lists_delete_id', ['id' => $l->no])}" class="btn btn-sm btn-danger">{$this->container->lang['list_delete']}</a>
                                     </div>
                                 </div>
                             </div>
