@@ -725,9 +725,12 @@ class UserView extends View
     {
         $routeCreate = $this->container->router->pathFor('lists_create');
         $html = genererHeader("{$this->container->lang['home_title']} - MyWishList", ["style.css", "lang.css"]) . $this->sidebar();
+        $popup = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
+            "deleted" => "\n\t\t<div class='popup warning fit'><span style='color:black; font-size:.7rem;'>{$this->container->lang['phtml_list_deleted']}</span></div>",
+        };
         $html .= <<<HTML
-            <div class="main_container">
-                <h3>{$this->container->lang["home_welcome"]}</h3>
+        <div class="main_container">
+                <h3>{$this->container->lang["home_welcome"]}</h3>$popup
                 <span><a id="createBtn" content="{$this->container->lang['phtml_lists_create']}" href="$routeCreate"></a></span>
                 <span><a content="{$this->container->lang['html_btn_list']}" id="lookBtn" href="{$this->container->router->pathFor('lists_home')}"></a></span>
             </div>

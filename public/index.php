@@ -48,7 +48,7 @@ $app = new App($container);
 $app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->auth2FA();
 })->setName('2fa');
-$app->any("|/accounts/{action:login|profile|logout|register|forgot_passwordreset_password|api_key|delete}[/]", function ($request, $response, $args) {
+$app->any("/accounts/{action:login|profile|logout|register|forgot_passwordreset_password|api_key|delete}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
 //Listes
@@ -64,6 +64,9 @@ $app->any("/lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
 $app->any("/lists/{id:[0-9]+}/claim[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->claim();
 })->setName('lists_claim_id');
+$app->any("/lists/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
+    return (new ControllerList($this, $request, $response, $args))->delete();
+})->setName('lists_delete_id');
 $app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->show();
 })->setName('lists_show_id');
