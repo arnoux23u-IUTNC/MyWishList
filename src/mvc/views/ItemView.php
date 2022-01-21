@@ -342,7 +342,7 @@ class ItemView extends View
                                         <div class="row fw">
                                             <div class="form-group focused fw">
                                                 <label class="form-control-label" for="message">{$this->container->lang['message']}</label>
-                                                <input type="text" id="message" name="message" class="form-control form-control-alternative"/>
+                                                <input type="text" name="message" class="form-control form-control-alternative"/>
                                             </div>
                                         </div>
                                         <div class="row fw">
