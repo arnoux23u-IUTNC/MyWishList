@@ -48,7 +48,7 @@ $app = new App($container);
 $app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->auth2FA();
 })->setName('2fa');
-$app->any("/accounts/{action:login|profile|logout|register|forgot_passwordreset_password|api_key|delete}[/]", function ($request, $response, $args) {
+$app->any("/accounts/{action:login|profile|logout|register|forgot_password|reset_password|api_key|delete}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
 //Listes
