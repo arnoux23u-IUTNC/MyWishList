@@ -62,6 +62,7 @@ $lang = array(
     "item_unreserved" => "Item non réservé",
     "last_login" => "Dernière connexion :",
     "last_update" => "Dernière mise à jour :",
+    "link" => "Lien",
     "list" => "Liste",
     "list_add_item" => "Ajouter un item",
     "list_add_message" => "Ajouter un message",

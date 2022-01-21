@@ -64,7 +64,7 @@ class ItemView extends View
         $pk = filter_var($this->request->getParsedBodyParam('public_key') ?? "", FILTER_SANITIZE_STRING);
         $liste_info = !empty($this->item->liste) ? (new ListView($this->container, $this->item->liste, $this->request))->render(Renderer::SHOW_FOR_ITEM, $this->access_level) : $this->container->lang['none'];
         $descr_info = $this->item->descr ?? $this->container->lang['none'];
-        $url_info = $this->item->url ?? $this->container->lang['none'];
+        $url_info = "<a href='{$this->item->url}'{$this->container->lang['link']}<a>" ?? $this->container->lang['none'];
         $tarif_info = $this->item->tarif ?? $this->container->lang['nc'];
         if (!empty($pot->montant)) {
             $collected = $pot->totalAmount();
