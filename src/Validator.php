@@ -81,7 +81,7 @@ class Validator
     {
         if (empty($password) || empty($password_confirm))
             return false;
-        $validPassword = preg_match('@[0-9]@', $password) && preg_match('@[A-Z]@', $password) && preg_match('@[a-z]@', $password) && preg_match('@[^\w]@', $password);
+        $validPassword = preg_match('@[0-9]@', $password) && preg_match('@[A-Z]@', $password) && preg_match('@[a-z]@', $password) && (preg_match('@[^\w]@', $password) || preg_match('@_@', $password));
         return $validPassword && strlen($password) > 13 && $password === $password_confirm;
     }
 
