@@ -31,7 +31,7 @@ MyWishList est un projet permettant de gérer des listes de souhaits liées à d
 
 ### Interface
 
-//TODO IMG
+![fr](https://user-images.githubusercontent.com/37373941/150550353-de4b4164-3722-488b-85f1-c8db39eece11.PNG)
 
 ### URLS de test : 
 - [Serveur WebEtu - Privé](https://webetu.iutnc.univ-lorraine.fr/www/arnoux23u/mywishlist/) (incomplet, certaines fonctionnalités ne sont pas implémentées) ⚠️
