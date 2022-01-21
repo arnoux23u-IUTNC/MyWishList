@@ -18,7 +18,7 @@ CREATE TABLE `accounts`
     `created_at` timestamp    NOT NULL DEFAULT current_timestamp(),
     `updated`    timestamp    NULL     DEFAULT NULL,
     `last_login` timestamp    NULL     DEFAULT NULL,
-    `last_ip`    bigint(20)   NOT NULL DEFAULT '0',
+    `last_ip`    varchar(80)  NOT NULL DEFAULT '',
     `is_admin`   tinyint(1)   NOT NULL DEFAULT 0,
     `totp_key`   varchar(255)          DEFAULT NULL UNIQUE,
     `api_key`    varchar(255)          DEFAULT NULL UNIQUE

@@ -455,7 +455,7 @@ class UserView extends View
             "user_updated_at" => $user->updated ?? "Jamais",
             "user_api_key" => !empty($user->api_key) ? "<span class='hidden'>$user->api_key</span>" : "Aucune",
             "user_lastlogged_at" => $user->last_login,
-            "user_lastlogged_ip" => long2ip($user->last_ip),
+            "user_lastlogged_ip" => $user->last_ip,
             "info_msg" => match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
                 "noavatar" => "<div class='popup warning fit'><span style='color:black;'>Vous n'avez pas d'avatar<br>Nous utilisons automatiquement un Gravatar dans ce cas.</span></div>",
                 "password" => "<div class='popup warning fit'><span style='color:black;'>Mot de passe incorrect</span></div>",
