@@ -202,7 +202,7 @@ class ListView extends View
                                     </div> 
                                     <div class="flex flex-row mt-4">
                                         <label class="form-control-label mr-2" for="message">{$this->container->lang['message']}</label>
-                                        <input type="text" name="message" id="message" class="form-control form-control-alternative" autofocus/>
+                                        <input type="text" name="message" class="form-control form-control-alternative" autofocus/>
                                     </div> 
                                     <button class="btn btn-sm btn-info mt-4">{$this->container->lang['list_add_message']}</button>
                                 </form>
