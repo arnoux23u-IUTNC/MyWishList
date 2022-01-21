@@ -133,6 +133,12 @@ function genererHeader(string $title, array $styles = []): string
         <meta charset='UTF-8'>
         <link rel="icon" href="/assets/img/icons/favicon.ico">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="MyWishList est un projet permettant de gérer des listes de souhaits liées à des utilisateurs.">
+        <meta property="og:title" content="MyWishList - GARNX.FR" />
+        <meta property="og:type" content="website"/>
+        <meta property="og:url" content="https://mywishlist.garnx.fr/" />
+        <meta property="og:image" content="https://mywishlist.garnx.fr/assets/img/logos/2.png" />
+        <meta property="og:description" content="MyWishList est un projet permettant de gérer des listes de souhaits liées à des utilisateurs." />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
         <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet">
