@@ -35,7 +35,7 @@ MyWishList is a project allowing to manage wish lists linked to users.
 
 ### Live Demos : 
 - [WebEtu Server - Private](https://webetu.iutnc.univ-lorraine.fr/www/arnoux23u/mywishlist/?lang=en) (not complete, missing functionalities) ⚠️
-- [Personnal Server - Public](https://mywishlist.garnx.fr?lang=en/) (working and stable) ✔️
+- [Personnal Server - Public](https://mywishlist.garnx.fr?lang=en) (working and stable) ✔️
 
 ### Project Instructions
 Instructions are available [here](docs/wishlist_2018.pdf)
