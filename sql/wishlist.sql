@@ -112,12 +112,20 @@ CREATE TABLE `temporary_waiting_users`
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
+CREATE TABLE `passwords_reset`
+(
+    `token`      varchar(200) NOT NULL,
+    `user_id`    int(11)      NOT NULL,
+    `expiration` date         NOT NULL DEFAULT '0000-00-00',
+    PRIMARY KEY (`token`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
+
 ALTER TABLE `participe`
     ADD CONSTRAINT `fkparticipe_cagnotte` FOREIGN KEY (`cagnotte_itemid`) REFERENCES `cagnotte` (`item_id`);
-COMMIT;
 ALTER TABLE `cagnotte`
     ADD CONSTRAINT `fkcagnotte_item` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`);
-COMMIT;
 ALTER TABLE `item`
     ADD CONSTRAINT `item_listeidfk` FOREIGN KEY (`liste_id`) REFERENCES `liste` (`no`);
 ALTER TABLE `liste`
@@ -128,6 +136,8 @@ ALTER TABLE `totp_rescue_codes`
     ADD CONSTRAINT `totp_useridfk` FOREIGN KEY (`user`) REFERENCES `accounts` (`user_id`);
 ALTER TABLE `messages`
     ADD CONSTRAINT `fkmessage_listid` FOREIGN KEY (`list_id`) REFERENCES `liste` (`no`);
+ALTER TABLE `passwords_reset`
+    ADD CONSTRAINT `fkpassword_userid` FOREIGN KEY (`user_id`) REFERENCES `accounts` (`user_id`);
 
 GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
 

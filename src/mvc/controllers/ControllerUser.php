@@ -576,7 +576,7 @@ class ControllerUser
                     /*On envoie un email à l'utilisateur. S'il est envoyé, on enregistre le token dans la base de données
                     sleep(2) correspond à la durée de l'envoie de l'email, afin d'éviter les spam
                     */
-                    if (MailSender::sendMail($this->container->lang['forgot_password_title'], $html, [$rq_email, 'test-6s2wjknyg@srv1.mail-tester.com'])) {
+                    if (MailSender::sendMail($this->container->lang['forgot_password_title'], $html, [$rq_email])) {
                         $reset = new PasswordReset();
                         $reset->user_id = $user->user_id;
                         $reset->token = $token;

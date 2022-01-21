@@ -910,7 +910,7 @@ class UserView extends View
         return match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
             "nouser" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_user_notfound']}</span></div>",
             "sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_sent']}</span></div>",
-            "not_sent" => "<div class='popup fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
+            "not_sent" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['email_not_sent']}</span></div>",
             "already" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['reset_already_asked']}</span></div>",
             "invalid" => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['token_invalid']}</span></div>",
             'password' => "<div class='popup warning fit'><span style='color:black;'>{$this->container->lang['user_password_incorrect']}</span></div>",
