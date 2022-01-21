@@ -116,7 +116,7 @@ CREATE TABLE `passwords_reset`
 (
     `token`      varchar(200) NOT NULL,
     `user_id`    int(11)      NOT NULL,
-    `expiration` date         NOT NULL DEFAULT '0000-00-00',
+    `expiration` time         NOT NULL DEFAULT '0000-00-00',
     PRIMARY KEY (`token`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
