@@ -10,6 +10,8 @@
 
 MyWishList is a project allowing to manage wish lists linked to users.
 
+![w3c](https://www.w3.org/Icons/valid-html401)
+
 ### Project members :
 - ARNOUX Guillaume
 - VIGNERON Steven
