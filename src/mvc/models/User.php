@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $avatar
  * @property mixed $updated
  * @property mixed $last_login
- * @property int $last_ip
+ * @property string $last_ip
  * @property mixed $is_admin
  * @property string $totp_key
  * @method static find(int $USER_ID) Eloquent method
@@ -113,7 +113,7 @@ class User extends Model
     {
         session_regenerate_id();
         //Mise a jour des variables utilisateur
-        $this->update(['last_ip' => ip2long($_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR']), "last_login" => date("Y-m-d H:i:s")]);
+        $this->update(['last_ip' => $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'], "last_login" => date("Y-m-d H:i:s")]);
         $_SESSION['LOGGED_IN'] = true;
         $_SESSION['USER_ID'] = $this->user_id;
         $_SESSION['USER_NAME'] = $this->username;
