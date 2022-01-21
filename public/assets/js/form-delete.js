@@ -5,7 +5,7 @@ let checkForm = () => {
     switch (formData.get("type")) {
         case "link":
             const link = document.getElementById("url_img").value.toLowerCase();
-            if (link.match(/^((https?:\/{2})?(\w[\w\-\/+]+).(jpe?g|png))?$/)) {
+            if (link.match(/^((https?:\/{2})?(\w[\w\-.\/+]+).(jpe?g|png))?$/)) {
                 return true;
             } else {
                 alert("Link must match [http(s)://]nomimage.(jpe?g|png)");
@@ -14,7 +14,7 @@ let checkForm = () => {
             break;
         case "upload":
             const name = $("#file_img")[0].files[0] ? $("#file_img")[0].files[0].name.toLowerCase() : "NOLINK";
-            if (name.match(/^(\w[\w\-\/+]+).(jpe?g|png)$/)) {
+            if (name.match(/^(\w[\w\-.\/+]+).(jpe?g|png)$/)) {
                 return true;
             } else {
                 alert("Link must match [nomimage.(jpe?g|png)]");
