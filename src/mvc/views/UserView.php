@@ -746,16 +746,16 @@ class UserView extends View
      */
     private function showCreators(): string
     {
-        $list = "";
+        $users = "";
         $html = genererHeader("{$this->container->lang['phtml_creators']} - MyWishList", ["profile.css", "style.css", "lang.css"]) . $this->sidebar();
         foreach (User::all() as $user) {
-            if (Liste::whereUserId($user->user_id)->count() > 0)
-                $list .= (new UserView($this->container, $user, $this->request))->render(Renderer::SHOW_FOR_MENU);
+            if (Liste::where('user_id', 'LIKE', $user->user_id)->where('is_public', 'LIKE', 1)->count() > 0)
+                $users .= (new UserView($this->container, $user, $this->request))->render(Renderer::SHOW_FOR_MENU);
         }
         $html .= <<<HTML
             <div class="main_container">
                 <h3 class="text-white">{$this->container->lang["phtml_creators"]}</h3>
-                <div class='lists'>$list
+                <div class='lists'>$users
                 </div>
             </div>
         </body>
