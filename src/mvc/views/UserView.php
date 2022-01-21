@@ -727,6 +727,7 @@ class UserView extends View
         $html = genererHeader("{$this->container->lang['home_title']} - MyWishList", ["style.css", "lang.css"]) . $this->sidebar();
         $popup = match (filter_var($this->request->getQueryParam('info'), FILTER_SANITIZE_STRING) ?? "") {
             "deleted" => "\n\t\t<div class='popup warning fit'><span style='color:black; font-size:.7rem;'>{$this->container->lang['phtml_list_deleted']}</span></div>",
+            default => ""
         };
         $html .= <<<HTML
         <div class="main_container">
