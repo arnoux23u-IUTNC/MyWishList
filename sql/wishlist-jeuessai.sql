@@ -104,14 +104,12 @@ CREATE TABLE `messages`
 
 CREATE TABLE `temporary_waiting_users`
 (
-    `data_id` int(11)                              NOT NULL,
-    `type`    int(1)                               NOT NULL,
+    `list_id` int(11)                              NOT NULL,
     `email`   varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-    PRIMARY KEY (`data_id`, `type`)
+    PRIMARY KEY (`list_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
-
 CREATE TABLE `passwords_reset`
 (
     `token`      varchar(200) NOT NULL,

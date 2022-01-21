@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Inherits from the Model class of Laravel
  * @property int $item_id
  * @property float $montant
- * @property mixed $expiration
+ * @property mixed $limite
  * @property mixed $item Goes to item() method, eloquent relation
  * @method static where(string $string, string $string1, string $string2) Eloquent method
  * @method static find(int $cagnotte_id) Eloquent method
