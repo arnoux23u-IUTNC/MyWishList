@@ -10,8 +10,6 @@
 
 MyWishList est un projet permettant de gérer des listes de souhaits liées à des utilisateurs.
 
-IUT Nancy-Charlemagne - Année 2022
-
 ### Membres du projet :
 - ARNOUX Guillaume
 - VIGNERON Steven
@@ -36,14 +34,14 @@ IUT Nancy-Charlemagne - Année 2022
 //TODO IMG
 
 ### URLS de test : 
-- [Serveur WebEtu](https://webetu.iutnc.univ-lorraine.fr/www/arnoux23u/mywishlist/) (incomplet, certaines fonctionnalités ne sont pas implémentées) ⚠️
-- [Serveur Personnel](https://mywishlist.garnx.fr/) (fonctionnel et stable) ✔️
+- [Serveur WebEtu - Privé](https://webetu.iutnc.univ-lorraine.fr/www/arnoux23u/mywishlist/) (incomplet, certaines fonctionnalités ne sont pas implémentées) ⚠️
+- [Serveur Personnel - Public](https://mywishlist.garnx.fr/) (fonctionnel et stable) ✔️
 
 ### Sujet
-    //TODO LIEN SUJET
+Sujet disponible [ici](docs/wishlist_2018.pdf)
 
 ### Tableau de bord
-    //TODO LIEN TABLEAU DE BORD
+Le tableau de bord Trello du projet est disponible [ici](https://trello.com/b/2Z3HzkIZ/mywishlist)
 
 ---
 
@@ -101,7 +99,7 @@ Pour installer MyWishList sous windows, nous vous recommandons d'utiliser Docker
 
 On suppose PHP, Composer et XAMPP installés
 
-- Téléchargez la dernière version disponible ici //TODO METTRE LIEN
+- Téléchargez la dernière version disponible [ici](https://github.com/arnoux23u-IUTNC/MyWishList/releases/latest/)
 - Activer l'extension PHP-GD, PHP-MYSQL, PHP-MBSTRING et PHP-SIMPLEXML dans XAMPP
 - Importer votre fichier de configuration dans MySQL
 - Modifier la configuration de XAMPP afin de faire pointer le chemin par défaut dans le dossier **public**
@@ -114,8 +112,6 @@ On suppose PHP, Composer et XAMPP installés
 On suppose Docker et Docker Compose V1 (>=1.25) installés
 
 Prenez garde à bien **remplacer `db_host = localhost` par `db_host = db`** dans le fichier de configuration
-
-On suppose Docker et Docker Compose V1 (>=1.25) installés
 
 ```sh
 git clone git@github.com:arnoux23u-IUTNC/MyWishList.git mywishlist

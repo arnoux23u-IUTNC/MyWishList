@@ -610,8 +610,6 @@ class UserView extends View
         return genererHeader("{$this->container->lang["user_delete_account"]} | MyWishList", ["profile.css", "toggle.css"]) . $html;
     }
 
-    //TODO LANG ICI ET W3C
-
     /**
      * Display the 2fa manage page
      * @return string
