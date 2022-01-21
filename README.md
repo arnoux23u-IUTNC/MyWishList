@@ -67,7 +67,8 @@ Le tableau de bord Trello du projet est disponible [ici](https://trello.com/b/2Z
 On suppose PHP et Composer installés
 
 ```sh
-git clone git@github.com:arnoux23u-IUTNC/MyWishList.git /var/www/mywishlist && cd /var/www/mywishlist
+git clone git@github.com:arnoux23u-IUTNC/MyWishList.git /var/www/mywishlist
+chown -R www-data: /var/www/mywishlist && cd /var/www/mywishlist
 composer install --working-dir=src
 
 echo "CREATE USER 'usr_mywishlist'@'localhost' IDENTIFIED BY 'motdepasse';" | mysql

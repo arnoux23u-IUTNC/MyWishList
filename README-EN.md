@@ -68,7 +68,8 @@ The Trello board is available [here](https://trello.com/b/2Z3HzkIZ/mywishlist)
 We suppose PHP and Composer are already installed.
 
 ```sh
-git clone git@github.com:arnoux23u-IUTNC/MyWishList.git /var/www/mywishlist && cd /var/www/mywishlist
+git clone git@github.com:arnoux23u-IUTNC/MyWishList.git /var/www/mywishlist
+chown -R www-data: /var/www/mywishlist && cd /var/www/mywishlist
 composer install --working-dir=src
 
 echo "CREATE USER 'usr_mywishlist'@'localhost' IDENTIFIED BY 'password';" | mysql
