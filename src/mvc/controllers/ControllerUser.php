@@ -281,7 +281,7 @@ class ControllerUser
                 $file = $this->request->getUploadedFiles()['file_img'];
                 if (!empty($file->getClientFilename())) {
                     $extension = pathinfo($file->getClientFilename(), PATHINFO_EXTENSION);
-                    $finfo = [$this->user->user_id, strtolower($extension)];
+                    $finfo = [$user->user_id, strtolower($extension)];
                     $info = Validator::validateFile($this->container, $file, $finfo, "user");
                     //Si le fichier est validé
                     if ($info === "ok")
