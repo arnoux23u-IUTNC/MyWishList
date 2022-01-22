@@ -66,7 +66,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -112,7 +112,7 @@ class UserView extends View
                     </div>
                 </div>
             </div>
-            <script src="/assets/js/password-viewer.js"></script>
+            <script src="assets/js/password-viewer.js"></script>
         </body>
         </html>
         HTML;
@@ -130,7 +130,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -186,7 +186,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -243,8 +243,8 @@ class UserView extends View
                     </div>
                 </div>
             </div>
-            <script src="/assets/js/password-validator.js"></script>
-            <script src="/assets/js/password-viewer.js"></script>
+            <script src="assets/js/password-validator.js"></script>
+            <script src="assets/js/password-viewer.js"></script>
         </body>
         </html>
         HTML;
@@ -267,7 +267,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -310,7 +310,7 @@ class UserView extends View
                     </div>
                 </div>
             </div>
-            <script src="/assets/js/password-viewer.js"></script>
+            <script src="assets/js/password-viewer.js"></script>
         </body>
         </html>
         HTML;
@@ -331,7 +331,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -414,9 +414,9 @@ class UserView extends View
                     </div>
                 </div>
             </div>
-            <script src="/assets/js/password-validator.js"></script>
-            <script src="/assets/js/password-viewer.js"></script>
-            <script src="/assets/js/avatar-register.js"></script>
+            <script src="assets/js/password-validator.js"></script>
+            <script src="assets/js/password-viewer.js"></script>
+            <script src="assets/js/avatar-register.js"></script>
         </body>
         </html>
         HTML;
@@ -446,7 +446,7 @@ class UserView extends View
             "logout_route" => $this->container->router->pathFor('accounts', ["action" => 'logout']),
             "2fa_route" => $this->container->router->pathFor('2fa', ["action" => 'manage']),
             "delete_account_route" => $this->container->router->pathFor('accounts', ["action" => 'delete']),
-            "avatar_src" => (!empty($user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . "$user->avatar")) ? "/assets/img/avatars/$user->avatar" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($user->mail))) . "?size=120",
+            "avatar_src" => (!empty($user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . "$user->avatar")) ? "assets/img/avatars/$user->avatar" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($user->mail))) . "?size=120",
             "user_username" => $user->username,
             "user_firstname" => $user->firstname,
             "user_lastname" => $user->lastname,
@@ -499,7 +499,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -563,7 +563,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -621,7 +621,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                 <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="assets/img/logos/6.png" />MyWishList</a>
                 </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -677,7 +677,7 @@ class UserView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                 <div class="container-fluid">
-                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="/assets/img/logos/6.png" />MyWishList</a>
+                    <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="$route_main"><img alt="logo" class="icon" src="assets/img/logos/6.png" />MyWishList</a>
                 </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -807,7 +807,7 @@ class UserView extends View
                 <div class='lists'>$lists
                 </div>
             </div>
-            <script src="/assets/js/search.js"></script>
+            <script src="assets/js/search.js"></script>
         </body>
         </html>
         HTML;
@@ -828,7 +828,7 @@ class UserView extends View
             'my_lists_route' => $this->container->router->pathFor('lists_home'),
             'createurs_route' => $this->container->router->pathFor('createurs'),
             'create_list_route' => $this->container->router->pathFor('lists_create'),
-            'flag_img' => "<img class='selected' alt='" . strtolower($_SESSION["lang"]) . "-flag' src='/assets/img/flags/flag-" . strtolower($_SESSION["lang"]) . ".png'>",
+            'flag_img' => "<img class='selected' alt='" . strtolower($_SESSION["lang"]) . "-flag' src='assets/img/flags/flag-" . strtolower($_SESSION["lang"]) . ".png'>",
             'href' => empty($_SESSION["LOGGED_IN"]) ? $this->container->router->pathFor('accounts', ["action" => "login"]) : $this->container->router->pathFor('accounts', ["action" => "logout"]),
             'userprofile' => empty($_SESSION["LOGGED_IN"]) ? "" : <<<HTML
 
@@ -857,7 +857,7 @@ class UserView extends View
      */
     private function showInList(): string
     {
-        $avatar = (!empty($this->user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar)) ? "/assets/img/avatars/{$this->user->avatar}" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($this->user->mail))) . "?size=120";
+        $avatar = (!empty($this->user->avatar) && file_exists($this->container['users_img_dir'] . DIRECTORY_SEPARATOR . $this->user->avatar)) ? "assets/img/avatars/{$this->user->avatar}" : "https://www.gravatar.com/avatar/" . md5(strtolower(trim($this->user->mail))) . "?size=120";
         return "\n\t\t\t<div class='mb-2'>\n\t\t\t\t<div class='list form-control mw form-control-alternative flex flex-row'>\n\t\t\t\t\t<span class='mw text-white form-control-label'>{$this->user->name()}</span>\n\t\t\t\t\t<img alt='profilepicture' class='rounded-circle minimified' src='$avatar'/>\n\t\t\t\t</div>\n\t\t\t</div>";
     }
 
