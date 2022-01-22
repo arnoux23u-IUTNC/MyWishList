@@ -13,7 +13,6 @@ use Slim\{App, Container};
 
 #Container
 $container = new Container();
-$container['basePath'] = "/"; //BasePath : change this line if you want to deploy app in a subdierctory
 $container['settings']['displayErrorDetails'] = true;
 $container['notFoundHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
@@ -46,58 +45,58 @@ $app = new App($container);
 
 #Redirection du traffic dans l'application
 //Utilisateurs
-$app->any($container['basePath'] . "accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
+$app->any("/accounts/profile/2fa/{action:enable|disable|manage|recover}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->auth2FA();
 })->setName('2fa');
-$app->any($container['basePath'] . "accounts/{action:login|profile|logout|register|forgot_password|reset_password|api_key|delete}[/]", function ($request, $response, $args) {
+$app->any("/accounts/{action:login|profile|logout|register|forgot_password|reset_password|api_key|delete}[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->process();
 })->setName('accounts');
 //Listes
-$app->any($container['basePath'] . "lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
+$app->any("/lists/{id:[0-9]+}/edit/items[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->addItem();
 })->setName('lists_edit_items_id');
-$app->any($container['basePath'] . "lists/{id:[0-9]+}/addmessage[/]", function ($request, $response, $args) {
+$app->any("/lists/{id:[0-9]+}/addmessage[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->addMessage();
 })->setName('lists_add_message_id');
-$app->any($container['basePath'] . "lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
+$app->any("/lists/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->edit();
 })->setName('lists_edit_id');
-$app->any($container['basePath'] . "lists/{id:[0-9]+}/claim[/]", function ($request, $response, $args) {
+$app->any("/lists/{id:[0-9]+}/claim[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->claim();
 })->setName('lists_claim_id');
-$app->any($container['basePath'] . "lists/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
+$app->any("/lists/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->delete();
 })->setName('lists_delete_id');
-$app->any($container['basePath'] . "lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
+$app->any("/lists/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->show();
 })->setName('lists_show_id');
-$app->any($container['basePath'] . "lists/new[/]", function ($request, $response, $args) {
+$app->any("/lists/new[/]", function ($request, $response, $args) {
     return (new ControllerList($this, $request, $response, $args))->create();
 })->setName('lists_create');
-$app->any($container['basePath'] . "lists[/]", function ($request, $response, $args) use ($lang) {
+$app->any("/lists[/]", function ($request, $response, $args) use ($lang) {
     return (new ControllerUser($this, $request, $response, $args))->publicLists();
 })->setName('lists_home');
 //Items
-$app->any($container['basePath'] . "items/{id:[0-9]+}/pot/{action:delete|participate|create}[/]", function ($request, $response, $args) {
+$app->any("/items/{id:[0-9]+}/pot/{action:delete|participate|create}[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->actionPot();
 })->setName('items_pot_id');
-$app->any($container['basePath'] . "items/{id:[0-9]+}/reserve[/]", function ($request, $response, $args) {
+$app->any("/items/{id:[0-9]+}/reserve[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->reserve();
 })->setName('items_reserve_id');
-$app->any($container['basePath'] . "items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
+$app->any("/items/{id:[0-9]+}/delete[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->delete();
 })->setName('items_delete_id');
-$app->any($container['basePath'] . "items/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
+$app->any("/items/{id:[0-9]+}/edit[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->edit();
 })->setName('items_edit_id');
-$app->any($container['basePath'] . "items/{id:[0-9]+}[/]", function ($request, $response, $args) {
+$app->any("/items/{id:[0-9]+}[/]", function ($request, $response, $args) {
     return (new ControllerItem($this, $request, $response, $args))->show();
 })->setName('items_show_id');
 //Api
-$app->any($container['basePath'] . "api/v1/lists/{path:.*}[/]", function ($request, $response, $args) {
+$app->any("/api/v1/lists/{path:.*}[/]", function ($request, $response, $args) {
     return (new ControllerAPI($this, $request, $response, $args))->listsV1();
 })->setName('api_v1_lists');
-$app->any($container['basePath'] . "api/v1/items/{path:.*}[/]", function ($request, $response, $args) {
+$app->any("/api/v1/items/{path:.*}[/]", function ($request, $response, $args) {
     return (new ControllerAPI($this, $request, $response, $args))->itemsV1();
 })->setName('api_v1_items');
 $app->get($container['basePath'] . "createurs[/]", function ($request, $response, $args) {
