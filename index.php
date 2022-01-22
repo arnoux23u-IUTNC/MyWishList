@@ -3,8 +3,8 @@ session_start();
 
 $lang = [];
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'i18n' . DIRECTORY_SEPARATOR . 'langs.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'i18n' . DIRECTORY_SEPARATOR . 'langs.php';
 
 use mywishlist\db\Eloquent as Eloquent;
 use mywishlist\mvc\controllers\{ControllerUser, ControllerList, ControllerItem, ControllerAPI};
@@ -16,7 +16,7 @@ $container = new Container();
 $container['settings']['displayErrorDetails'] = true;
 $container['notFoundHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
-        $html = file_get_contents('..' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . '404.html');
+        $html = file_get_contents('errors' . DIRECTORY_SEPARATOR . '404.html');
         preg_match_all("/{#(\w|_)+#}/", $html, $matches);
         foreach ($matches[0] as $match)
             $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
@@ -25,7 +25,7 @@ $container['notFoundHandler'] = function () use ($lang) {
 };
 $container['notAllowedHandler'] = function () use ($lang) {
     return function ($request, $response) use ($lang) {
-        $html = file_get_contents('..' . DIRECTORY_SEPARATOR . 'errors' . DIRECTORY_SEPARATOR . '405.html');
+        $html = file_get_contents('errors' . DIRECTORY_SEPARATOR . '405.html');
         preg_match_all("/{#(\w|_)+#}/", $html, $matches);
         foreach ($matches[0] as $match)
             $html = str_replace($match, $lang[str_replace(["{", "#", "}"], "", $match)], $html);
@@ -40,7 +40,7 @@ $container['users_img_dir'] = __DIR__ . DIRECTORY_SEPARATOR . 'assets' . DIRECTO
 $container['lang'] = $lang;
 
 #Connexion à la base de données
-Eloquent::start('..' . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'conf.ini');
+Eloquent::start('src' . DIRECTORY_SEPARATOR . 'conf' . DIRECTORY_SEPARATOR . 'conf.ini');
 $app = new App($container);
 
 #Redirection du traffic dans l'application
