@@ -97,7 +97,7 @@ abstract class View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -133,7 +133,7 @@ abstract class View
                     </div>
                 </div>
             </div>
-            <script src="assets/js/password-viewer.js"></script>
+            <script src="/assets/js/password-viewer.js"></script>
         </body>
         </html>
         HTML;
