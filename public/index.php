@@ -100,11 +100,11 @@ $app->any($container['basePath'] . "api/v1/lists/{path:.*}[/]", function ($reque
 $app->any($container['basePath'] . "api/v1/items/{path:.*}[/]", function ($request, $response, $args) {
     return (new ControllerAPI($this, $request, $response, $args))->itemsV1();
 })->setName('api_v1_items');
-$app->get("/createurs[/]", function ($request, $response, $args) {
+$app->get($container['basePath'] . "createurs[/]", function ($request, $response, $args) {
     return (new ControllerUser($this, $request, $response, $args))->creators();
 })->setName('createurs');
 //Home
-$app->get('/', function ($request, $response) {
+$app->get($container['basePath'] . '/', function ($request, $response) {
     return (new ControllerUser($this, $request, $response, []))->home();
 })->setName('home');
 
