@@ -268,6 +268,15 @@ class ControllerUser
                 $user = new User();
                 //On force l'ID de l'utilisateur à NULL pour éviter les problèmes de clonage
                 $user->user_id = NULL;
+
+                $user->username = $username;
+                $user->lastname = $lastname;
+                $user->firstname = $firstname;
+                $user->mail = $email;
+                $user->password = password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]);
+                $user->created_at = date("Y-m-d H:i:s");
+                //Sauvegarde dans la base
+                $user->save();
                 //Si un fichier est uploadé, on le traite
                 $file = $this->request->getUploadedFiles()['file_img'];
                 if (!empty($file->getClientFilename())) {
@@ -280,14 +289,6 @@ class ControllerUser
                 }
                 //On vide le tableau FILES pour eviter les abus
                 unset($_FILES);
-                $user->username = $username;
-                $user->lastname = $lastname;
-                $user->firstname = $firstname;
-                $user->mail = $email;
-                $user->password = password_hash($password, PASSWORD_DEFAULT, ['cost' => 12]);
-                $user->created_at = date("Y-m-d H:i:s");
-                //Sauvegarde dans la base
-                $user->save();
                 $user->authenticate();
                 //Supressions des utilisateurs temporaires et attribution des listes si existantes
                 foreach (UserTemporaryResolver::whereEmail($email)->get() as $tmp) {
