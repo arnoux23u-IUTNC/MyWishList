@@ -29,8 +29,8 @@ class Eloquent
         $config = parse_ini_file($file);
         $capsule->addConnection(array('driver' => $config['db_driver'],
                 'host' => $config['db_host'],
-                'database' => 'wishlist',
-                'username' => 'usr_mywishlist',
+                'database' => $config['db_name'],
+                'username' => $config['db_user'],
                 'password' => $config['db_password'],
                 'charset' => $config['db_charset'],
                 'collation' => $config['db_collation'],
