@@ -100,12 +100,12 @@ class ItemView extends View
         } else {
             $pot_desc = "<a href='{$this->container->router->pathFor('items_pot_id', ['id' => $this->item->id, 'action' => 'create'])}' class='btn btn-sm btn-default'>{$this->container->lang['create_pot']}</a>";
         }
-        $img_info = !empty($this->item->img) ? (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . "{$this->item->img}") ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='/assets/img/items/{$this->item->img}'>" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='{$this->item->img}'>" : "")) : "";
+        $img_info = !empty($this->item->img) ? (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . "{$this->item->img}") ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='/www/arnoux23u/mywishlist/assets/img/items/{$this->item->img}'>" : (filter_var($this->item->img, FILTER_VALIDATE_URL) ? "\n\t\t\t\t\t\t\t\t\t<img class='item-img' alt='{$this->item->nom}' src='{$this->item->img}'>" : "")) : "";
         $html = <<<HTML
             <div class="main-content bg-gradient-default fullbg">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="container-fluid pt-8 fs">
@@ -193,7 +193,7 @@ class ItemView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -254,7 +254,7 @@ class ItemView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -314,7 +314,7 @@ class ItemView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -372,7 +372,7 @@ class ItemView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -427,7 +427,7 @@ class ItemView extends View
                                                     </div>
                                                     <input class="invisible" accept="image/*" type="file" name="file_img" id="file_img"/>
                                                     <input type="text" value="{$this->item->img}" class="form-control form-control-alternative choose" name="url_img" id="url_img"/>
-                                                    <button type="button" class="sendBtn" id="delete"><img class="dimg" alt="delete" id="delete_img" src="/assets/img/del.png" /></button>    
+                                                    <button type="button" class="sendBtn" id="delete"><img class="dimg" alt="delete" id="delete_img" src="/www/arnoux23u/mywishlist/assets/img/del.png" /></button>    
                                                 </div>
                                             </div>
                                         </div>
@@ -447,7 +447,7 @@ class ItemView extends View
                     </div>
                 </div>
             </div>
-            <script src="/assets/js/form-delete.js"></script>
+            <script src="/www/arnoux23u/mywishlist/assets/js/form-delete.js"></script>
         </body>
         </html>
         HTML;

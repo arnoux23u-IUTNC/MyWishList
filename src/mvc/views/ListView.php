@@ -107,13 +107,13 @@ class ListView extends View
                 case 1001:
                 case 101:
                     $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/www/arnoux23u/mywishlist/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 1002:
                 case 10001:
                     $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/www/arnoux23u/mywishlist/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/www/arnoux23u/mywishlist/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 151:
                     $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message);
@@ -123,15 +123,15 @@ class ListView extends View
                     break;
                 case 10051:
                     $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message);
-                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/www/arnoux23u/mywishlist/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/www/arnoux23u/mywishlist/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 10002:
                 case 102:
                     $reservation_state = $this->container->lang['item_unreserved'];
-                    $item_res = "<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => $public_key])}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img alt='validate' src='/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_res = "<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<form method='post' action='{$this->container->router->pathfor('items_reserve_id', ['id' => $item->id], ['public_key' => $public_key])}'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<button class='sendBtn' type='submit' name='sendBtn' title='{$this->container->lang['reserve']}'><img alt='validate' src='/www/arnoux23u/mywishlist/assets/img/checkmark.png'/></button>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</form>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/www/arnoux23u/mywishlist/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/www/arnoux23u/mywishlist/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
                 case 152:
                     $reservation_state = (!empty($_COOKIE['claimed_lists']) && in_array($l->no, json_decode($_COOKIE['claimed_lists'], true))) ? $this->container->lang['item_reserved'] : $this->container->lang['list_reserved_by'] . $reserved->getUser();
@@ -141,11 +141,11 @@ class ListView extends View
                     break;
                 case 10052:
                     $reservation_state = $this->container->lang['list_reserved_by'] . $reserved->getUser() . (empty($reserved->message) ? "" : ' -> ' . $reserved->message);
-                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
-                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_mod = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='$routeModItem'><img alt='edit' src='/www/arnoux23u/mywishlist/assets/img/edit.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
+                    $item_del = "\n\t\t\t\t\t\t\t\t\t\t\t\t<div class='flex'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<a class='pointer' id='popup$item->id' href='#popup'><img alt='delete' src='/www/arnoux23u/mywishlist/assets/img/del.png'/></a>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>";
                     break;
             }
-            $item_desc = "<span class='pos'>$pos</span>$item->nom" . (!empty($item->img) ? (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . "$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/.]+).(jpe?g|png))?$/", $item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")) : "");
+            $item_desc = "<span class='pos'>$pos</span>$item->nom" . (!empty($item->img) ? (file_exists($this->container['items_img_dir'] . DIRECTORY_SEPARATOR . "$item->img") ? "<img class='list_item_img' alt=\"$item->nom\" src='/www/arnoux23u/mywishlist/assets/img/items/$item->img'>" : (preg_match("/^((https?:\/{2})?(\w[\w\-\/.]+).(jpe?g|png))?$/", $item->img) ? "<img class='list_item_img' alt='$item->nom' src='$item->img'>" : "")) : "");
             $pk = $this->request->getQueryParam('public_key') ?? $this->request->getParsedBodyParam('public_key') ?? "";
             $routeItemShow = $this->container->router->pathFor("items_show_id", ["id" => $item->id]);
             $items_list .= <<<HTML
@@ -169,7 +169,7 @@ class ListView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="container-fluid pt-8 fs">
@@ -291,7 +291,7 @@ class ListView extends View
                     });
                 });
             </script>
-            <script src="/assets/js/password-viewer.js"></script>
+            <script src="/www/arnoux23u/mywishlist/assets/js/password-viewer.js"></script>
         </body>
         </html>
         HTML;
@@ -309,7 +309,7 @@ class ListView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -386,7 +386,7 @@ class ListView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
@@ -441,7 +441,7 @@ class ListView extends View
                                                     </div>
                                                     <input class="invisible" accept="image/*" type="file" name="file_img" id="file_img"/>
                                                     <input type="text" class="form-control form-control-alternative choose" name="url_img" id="url_img"/>
-                                                    <button type="button" class="sendBtn" id="delete"><img class="dimg" alt="delete" id="delete_img" src="/assets/img/del.png" /></button>    
+                                                    <button type="button" class="sendBtn" id="delete"><img class="dimg" alt="delete" id="delete_img" src="/www/arnoux23u/mywishlist/assets/img/del.png" /></button>    
                                                 </div>
                                             </div>
                                         </div>
@@ -461,7 +461,7 @@ class ListView extends View
                     </div>
                 </div>
             </div>
-            <script src="/assets/js/form-delete.js"></script>
+            <script src="/www/arnoux23u/mywishlist/assets/js/form-delete.js"></script>
         </body>
         </html>
         HTML;
@@ -481,7 +481,7 @@ class ListView extends View
             <div class="main-content">
                 <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
                     <div class="container-fluid">
-                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/assets/img/logos/6.png"/>MyWishList</a>
+                        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="{$this->container->router->pathFor('home')}"><img alt="logo" class="icon" src="/www/arnoux23u/mywishlist/assets/img/logos/6.png"/>MyWishList</a>
                     </div>
                 </nav>
                 <div class="header pb-8 pt-5 pt-lg-8 d-flex align-items-center" style="min-height: 300px;  background-size: cover; background-position: center top;">
