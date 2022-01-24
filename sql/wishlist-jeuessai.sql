@@ -31,7 +31,7 @@ CREATE TABLE `item`
     `liste_id` int(11)       DEFAULT NULL,
     `nom`      text    NOT NULL,
     `descr`    text          DEFAULT NULL,
-    `img`      text          DEFAULT NULL UNIQUE,
+    `img`      varchar(255)  DEFAULT NULL UNIQUE,,
     `url`      text          DEFAULT NULL,
     `tarif`    decimal(5, 2) DEFAULT NULL
 ) ENGINE = InnoDB
@@ -114,7 +114,7 @@ CREATE TABLE `passwords_reset`
 (
     `token`      varchar(200) NOT NULL,
     `user_id`    int(11)      NOT NULL,
-    `expiration` time         NOT NULL DEFAULT '0000-00-00',
+    `expiration` time         NOT NULL DEFAULT '0000-00-00 00:00:00',
     PRIMARY KEY (`token`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
