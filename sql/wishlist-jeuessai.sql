@@ -34,7 +34,7 @@ CREATE TABLE `item`
     `liste_id` int(11)       DEFAULT NULL,
     `nom`      text    NOT NULL,
     `descr`    text          DEFAULT NULL,
-    `img`      varchar(255)  DEFAULT NULL UNIQUE,,
+    `img`      varchar(255)  DEFAULT NULL UNIQUE,
     `url`      text          DEFAULT NULL,
     `tarif`    decimal(5, 2) DEFAULT NULL
 ) ENGINE = InnoDB
