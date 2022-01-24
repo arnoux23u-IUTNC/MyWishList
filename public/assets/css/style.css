@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap');
-
 * {
     --btn-width: 300px;
     --btn-height: 60px;
@@ -66,9 +65,6 @@ span {
 span a {
     font-size: 19px;
     letter-spacing: 1px;
-    transform-style: preserve-3d;
-    transform: translateZ(-25px);
-    transition: transform .25s;
     font-family: 'Montserrat', sans-serif;
 }
 
@@ -104,20 +100,12 @@ span a:before {
     background: #000;
     height: var(--btn-height);
     width: var(--btn-width);
-    transform: rotateY(0deg) translateZ(25px);
 }
 
 span a:after {
     color: #fff;
     height: var(--btn-height);
     width: var(--btn-width);
-    transform: rotateX(90deg) translateZ(25px);
-}
-
-span a:hover {
-    height: var(--btn-height);
-    width: var(--btn-width);
-    transform: translateZ(20px) rotateX(-90deg);
 }
 
 @media (max-width: 800px) {
