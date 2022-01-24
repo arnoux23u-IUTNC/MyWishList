@@ -17,3 +17,6 @@ src/conf/conf.ini
 #Apache configuration
 .htaccess
 !docs/.htaccess
+
+#PHPDocumentor
+.phpdoc/
