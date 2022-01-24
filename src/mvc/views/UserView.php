@@ -764,24 +764,26 @@ class UserView extends View
         return $html;
     }
 
-    /**
-     * Display the public lists page
-     * @return string html code
-     * @throws ForbiddenException error while render
-     */
-    private function showPublicLists(): string
+    private function showLists(): string
     {
-        $html = genererHeader("{$this->container->lang['phtml_public_lists']} - MyWishList", ["profile.css", "style.css", "lang.css", "search.css"]) . $this->sidebar();
-        $lists = "";
+        $html = genererHeader("{$this->container->lang['phtml_my_lists']} - MyWishList", ["profile.css", "style.css", "lang.css", "search.css"]) . $this->sidebar();
+        $public_lists = "";
+        $my_lists = "<h4>Aucune liste</h4>";
+        if(!empty($_SESSION["LOGGED_IN"])){
+            $my_lists = "";
+            foreach (Liste::where('user_id', 'LIKE', $_SESSION['USER_ID'])->get() as $liste) {
+                $my_lists .= (new ListView($this->container, $liste, $this->request))->render(Renderer::SHOW_FOR_MENU);
+            }
+        }
         if ($this->request->getQueryParam('search', '') != '' || $this->request->getQueryParam('exp', '') != '') {
             foreach (Liste::where('is_public', 'LIKE', '1')->orderBy('expiration')->get() as $list) {
                 if (!$list->isExpired() && $list->isPublished() && (($list->expiration ?? date('9999-99-99')) > filter_var($this->request->getQueryParam('exp'))) && str_contains(strtolower($list->getUserNameAttribute()) ?? "", strtolower(filter_var($this->request->getQueryParam('search', ''), FILTER_SANITIZE_STRING))))
-                    $lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
+                    $public_lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
             }
         } else {
             foreach (Liste::where('is_public', 'LIKE', '1')->orderBy('expiration')->get() as $list) {
                 if (!$list->isExpired() && $list->isPublished())
-                    $lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
+                    $public_lists .= (new ListView($this->container, $list, $this->request))->render(Renderer::SHOW_FOR_MENU);
             }
         }
         $search = filter_var($this->request->getQueryParam('search'), FILTER_SANITIZE_STRING);
@@ -804,10 +806,15 @@ class UserView extends View
                         <input type="date" id="expiration" value="$exp" class="form-control form-control-alternative search-date ml-2"/>
                     </div>
                 </div>
-                <div class='lists'>$lists
+                <div class='lists'>$public_lists
+                </div>
+                <h3 class="mt-4 text-white">{$this->container->lang["phtml_my_lists"]}</h3>
+                <div class="fw flex">
+                </div>
+                <div class='lists'>$my_lists
                 </div>
             </div>
-            <script src="/www/arnoux23u/mywishlist/assets/js/search.js"></script>
+            <script src="/assets/js/search.js"></script>
         </body>
         </html>
         HTML;
@@ -871,7 +878,7 @@ class UserView extends View
     {
         return match ($method) {
             Renderer::HOME_HOME => $this->showHome(),
-            Renderer::HOME_LISTS => $this->showPublicLists(),
+            Renderer::HOME_LISTS => $this->showLists(),
             Renderer::HOME_CREATORS => $this->showCreators(),
             Renderer::LOGIN => $this->login(),
             Renderer::LOGIN_2FA => $this->login(true),

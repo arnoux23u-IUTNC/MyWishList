@@ -112,6 +112,7 @@ $lang = array(
     "phtml_error_notallowedmethod" => "Méthode non autorisée",
     "phtml_error_notfound" => "Page introuvable",
     "phtml_list_deleted" => "Liste supprimée",
+    "phtml_lists" => "Listes",
     "phtml_lists_create" => "Créer une liste",
     "phtml_my_lists" => "Mes listes",
     "phtml_noted" => "C'est noté !",
