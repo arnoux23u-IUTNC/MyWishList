@@ -110,6 +110,7 @@ CREATE TABLE `temporary_waiting_users`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
+
 CREATE TABLE `passwords_reset`
 (
     `token`      varchar(200) NOT NULL,
