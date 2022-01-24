@@ -1,0 +1,7 @@
+#PHPDocumentor
+.phpdoc/
+.idea/
+.vscode/
+.htaccess
+*.phar
+*.ini
