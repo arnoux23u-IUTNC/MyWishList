@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200&display=swap');
-
 * {
     --btn-width: 300px;
     --btn-height: 60px;
@@ -70,10 +69,6 @@ span a {
     transform: translateZ(-25px);
     transition: transform .25s;
     font-family: 'Montserrat', sans-serif;
-}
-
-span a:before,
-span a:after {
     position: absolute;
     display: flex;
     align-items: center;
@@ -99,19 +94,11 @@ span a:after {
     margin-top: 2vh;
 }
 
-span a:before {
+span a {
     color: #fff;
     background: #000;
     height: var(--btn-height);
     width: var(--btn-width);
-    transform: rotateY(0deg) translateZ(25px);
-}
-
-span a:after {
-    color: #fff;
-    height: var(--btn-height);
-    width: var(--btn-width);
-    transform: rotateX(90deg) translateZ(25px);
 }
 
 span a:hover {
