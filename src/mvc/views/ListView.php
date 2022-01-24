@@ -283,7 +283,7 @@ class ListView extends View
                         const id = $(this).attr("id");
                         const itemid = id.substr(5);
                         //Exceptionnellement : Utilisation de la route directement plutot que du container pour eviter des conflits JS / PHP 
-                        $('#pform').attr('action', "/items/"+itemid+"/delete/?public_key=$public_key");
+                        $('#pform').attr('action', "www/arnoux23u/mywishlist/items/"+itemid+"/delete/?public_key=$public_key");
                         let popups = $(".popup1");
                         popups.find('h2').text("{$this->container->lang['item_delete']} "+itemid);
                         popups.find('h3').text("{$this->container->lang['item_delete_confirm']} "+itemid);
