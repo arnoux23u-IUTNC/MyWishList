@@ -1,10 +1,13 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-DROP DATABASE IF EXISTS `wishlist`;
-CREATE DATABASE `wishlist` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-USE `wishlist`;
+USE `arnoux23u`;
+DROP TABLE IF EXISTS `totp_rescue_codes`;
+DROP TABLE IF EXISTS `reserve`;
+DROP TABLE IF EXISTS `messages`;
+DROP TABLE IF EXISTS `participe`;
+DROP TABLE IF EXISTS `cagnotte`;
+DROP TABLE IF EXISTS `temporary_waiting_users`;
+DROP TABLE IF EXISTS `accounts`;
+DROP TABLE IF EXISTS `item`;
+DROP TABLE IF EXISTS `liste`;
 
 CREATE TABLE `accounts`
 (
@@ -185,9 +188,5 @@ VALUES (7, 'user@user.fr', NULL),
 INSERT INTO `messages` (`list_id`, `user_email`, `message`)
 VALUES (2, 'user@user.fr', 'Youhou !'),
        (2, 'user@user.fr', 'Joyeux Noel');
-
-GRANT ALL PRIVILEGES ON wishlist.* TO 'usr_mywishlist'@'localhost' WITH GRANT OPTION;
-
-FLUSH PRIVILEGES;
 
 COMMIT;
